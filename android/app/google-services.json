@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "441905533532",
+    "project_id": "pawrtal-rabbit-hole",
+    "storage_bucket": "pawrtal-rabbit-hole.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:441905533532:android:3aa253135ac965a3bb0c99",
+        "android_client_info": {
+          "package_name": "com.bnuuy.pawrtal"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCyZaITzSgmoSL59CIcRJhk2Ow9cgI74QU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
