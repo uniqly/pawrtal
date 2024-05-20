@@ -4,7 +4,7 @@ import 'package:pawrtal/subpawrtal/subpawrtal.dart';
 import 'package:pawrtal/user/app_user.dart';
 
 class Post {
-  final Subpawrtal portal;
+  final SubPawrtal portal;
   final AppUser poster;
   final String caption;
   bool isLiked = false;

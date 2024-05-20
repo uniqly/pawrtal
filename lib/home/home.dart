@@ -20,7 +20,7 @@ class _HomeState extends State<Home> {
 
     // testing
     var me = AppUser.testUser('0', name: 'samoyed lover', pfp: pfpMe);
-    var samoyedPortal = Subpawrtal('samoyed', pfpMe);
+    var samoyedPortal = SubPawrtal('samoyed', pfpMe);
     var posts = [ 
       ImagePost(
         portal: samoyedPortal,
