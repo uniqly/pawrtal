@@ -37,60 +37,84 @@ class _HomeState extends State<Home> {
     ];
 
     return Scaffold( 
-      appBar: AppBar( 
-        title: const Text( 
-          'pawrtal',
+      body: SafeArea(
+        child: CustomScrollView(
+          slivers: [
+            SliverAppBar( 
+              backgroundColor: Colors.white,
+              title: const Image( 
+                width: 150,
+                image: AssetImage('assets/app/pawrtal_bar.png'),
+              ),
+              actions: [ 
+                // search button
+                IconButton( 
+                  onPressed: () {},
+                  icon: const Icon(Icons.search),
+                ),
+                // notifications button
+                IconButton( 
+                  onPressed: () {},
+                  icon: const Icon(Icons.favorite_outline)
+                ),
+                // messages button
+                IconButton( 
+                  onPressed: () {},
+                  icon: const Icon(Icons.messenger)
+                )
+              ],
+            ),
+            SliverList.builder( 
+              itemCount: posts.length,
+              itemBuilder: (context, index) { 
+                return PostTile(post: posts[index]);
+              },
+            ),
+          ]
         ),
-        actions: [ 
-          IconButton( 
-            onPressed: () {},
-            icon: const Icon(Icons.favorite_outline)
-          ),
-          IconButton( 
-            onPressed: () {},
-            icon: const Icon(Icons.messenger)
-          )
-        ],
-      ),
-      body: ListView.builder( 
-        shrinkWrap: true,
-        itemCount: posts.length,
-        itemBuilder: (context, index) { 
-          return PostTile(post: posts[index]);
-        },
       ),
       bottomNavigationBar: NavigationBar( 
+        height: 54,
         selectedIndex: pageIndex,
+        indicatorColor: Colors.transparent,
+        overlayColor: const MaterialStatePropertyAll<Color>(Colors.transparent),
         onDestinationSelected: (index) {
           setState(() {
             pageIndex = index;
           });
         },
         labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
-        destinations: const [
-          NavigationDestination( 
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home),
+        destinations: [
+          const NavigationDestination( 
+            icon: Icon(
+              Icons.home_outlined,
+              size: 28,
+            ),
+            selectedIcon: Icon(
+              Icons.home,
+              size: 28,
+            ),
+            label: '',
+          ),
+          const NavigationDestination( 
+            icon: Icon(
+              Icons.add_rounded,
+              size: 28,
+            ),
+            selectedIcon: Icon(
+              Icons.add_rounded,
+              size: 32,
+            ),
             label: '',
           ),
           NavigationDestination( 
-            icon: Icon(Icons.search_outlined),
-            selectedIcon: Icon(Icons.search),
-            label: '',
-          ),
-          NavigationDestination( 
-            icon: Icon(Icons.add_outlined),
-            selectedIcon: Icon(Icons.add),
-            label: '',
-          ),
-          NavigationDestination( 
-            icon: Icon(Icons.video_library_outlined),
-            selectedIcon: Icon(Icons.video_library),
-            label: '',
-          ),
-          NavigationDestination( 
-            icon: CircleAvatar( 
-              backgroundImage: AssetImage(pfpMe),
+            icon: CircleAvatar(
+              backgroundColor: pageIndex == 2 ? Colors.pinkAccent : Colors.transparent,
+              radius: 22,
+              child: const CircleAvatar( 
+                backgroundImage: AssetImage(pfpMe),
+                radius: 20,
+              ),
             ),
             label: '',
           ),

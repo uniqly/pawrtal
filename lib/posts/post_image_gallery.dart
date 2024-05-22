@@ -22,7 +22,8 @@ class _PostImageGalleryState extends State<PostImageGallery> {
   Widget build(BuildContext context) {
     int numImages = widget.imageStrings.length; 
 
-    return Column(
+    return Stack(
+      alignment: Alignment.bottomCenter,
       children: [
         SizedBox(
           height: 500.0,
@@ -53,7 +54,7 @@ class _PostImageGalleryState extends State<PostImageGallery> {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.fromLTRB(6.0, 3.0, 6.0, 0.0),
+          padding: const EdgeInsets.fromLTRB(6.0, 3.0, 6.0, 3.0),
           child: Container( 
             decoration: BoxDecoration( 
               borderRadius: BorderRadius.circular(15.0),
