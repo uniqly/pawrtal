@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pawrtal/posts/post.dart';
 import 'package:pawrtal/posts/post_tile.dart';
+import 'package:pawrtal/services/auth.dart';
 import 'package:pawrtal/subpawrtal/subpawrtal.dart';
 import 'package:pawrtal/test/placeholder_images.dart';
 import 'package:pawrtal/user/app_user.dart';
@@ -14,6 +15,8 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   var pageIndex = 0;
+
+  final AuthService _auth = AuthService();
 
   @override
   Widget build(BuildContext context) {
@@ -61,6 +64,19 @@ class _HomeState extends State<Home> {
                 IconButton( 
                   onPressed: () {},
                   icon: const Icon(Icons.messenger)
+                ),
+                // logout button
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.grey[400], // background color
+                  ),
+                  child: const Text(
+                    'Logout',
+                    style: TextStyle(color: Colors.black),
+                  ),
+                  onPressed: () async {
+                    await _auth.signOut();
+                  },
                 )
               ],
             ),
@@ -77,7 +93,7 @@ class _HomeState extends State<Home> {
         height: 54,
         selectedIndex: pageIndex,
         indicatorColor: Colors.transparent,
-        overlayColor: const MaterialStatePropertyAll<Color>(Colors.transparent),
+        overlayColor: const WidgetStatePropertyAll<Color>(Colors.transparent),
         onDestinationSelected: (index) {
           setState(() {
             pageIndex = index;
