@@ -26,28 +26,30 @@ class _SignInState extends State<SignIn> {
   @override
   Widget build(BuildContext context) {
     return loading ? const Loading() : Scaffold(
-      backgroundColor: Colors.purple[100],
-      appBar: AppBar(
-        backgroundColor: Colors.grey[300],
-        elevation: 0.0, // remove drop shadow
-        title: const Text('Welcome back owo!!'),
-        actions: <Widget>[
-          TextButton.icon(
-            icon: const Icon(Icons.person),
-            label: const Text('Register'),
-            onPressed: () {
-              widget.toggleView();
-            }
-          )
-        ]
-      ),
+      backgroundColor: const Color(0xFFFEF7FF),
+      
       body: Container(
         padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 50.0),
         child: Form(
           key: _formKey,
           child: Column(
             children: <Widget>[
-              const SizedBox(height: 20.0),
+              Center(
+                child: Image.asset('assets/app/pawrtal_logo_full.png'),
+              ),
+              const SizedBox(height: 50.0),
+              const Text(
+                'Welcome Back!',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 32,
+                  fontFamily: 'Roboto',
+                  fontWeight: FontWeight.w500,
+                  height: 0.05,
+                ),
+              ),
+              const SizedBox(height: 80.0),
               TextFormField(
                 decoration: textInputDecoration.copyWith(hintText: 'Email'),
                 validator: (val) => val!.isEmpty ? 'Enter an email' : null,
@@ -65,32 +67,88 @@ class _SignInState extends State<SignIn> {
                 },
               ),
               const SizedBox(height: 20.0),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.grey[400], // background color
-                ),
-                child: const Text(
-                  'Sign in',
-                  style: TextStyle(color: Colors.black),
-                ),
-                onPressed: () async {
-                  if (_formKey.currentState!.validate()) {
-                    setState(() => loading = true);
-                    dynamic result = await _auth.signInWithEmailandPassword(email, password);
-                    if(result == null) {
-                      setState(() {
-                        error = 'Could not sign in with those credentials';
-                        loading = false;
-                      });
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF65558F), // background color
+                  ),
+                  child: const Text(
+                    'Sign in',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Color(0xFFFEF7FF),
+                      fontSize: 18,
+                      fontFamily: 'Roboto',
+                      fontWeight: FontWeight.w700,
+                      height: 0.07,
+                      letterSpacing: 0.50,
+                    ),
+                  ),
+                  onPressed: () async {
+                    if (_formKey.currentState!.validate()) {
+                      setState(() => loading = true);
+                      dynamic result = await _auth.signInWithEmailandPassword(email, password);
+                      if(result == null) {
+                        setState(() {
+                          error = 'Could not sign in with those credentials';
+                          loading = false;
+                        });
+                      }
                     }
                   }
-                }
-              ),
-              const SizedBox(height: 12.0),
-                Text(
-                  error,
-                  style: const TextStyle(color: Colors.red, fontSize: 14.0),
                 ),
+              ),
+              const SizedBox(height: 5.0),
+              const Text('Or'),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white, // background color
+                  ),
+                  icon: Image.asset(
+                    'assets/app/google_logo_icon.png',
+                    height: 24,
+                    width: 24,
+                 ), // Google icon
+                  onPressed: () {
+                    
+                  },
+                  label: const Text(
+                    'Sign in with Google',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Color(0xFF65558F),
+                      fontSize: 18,
+                      fontFamily: 'Roboto',
+                      fontWeight: FontWeight.w700,
+                      height: 0.07,
+                      letterSpacing: 0.50,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 5.0),
+              Text(
+                error,
+                style: const TextStyle(color: Colors.red, fontSize: 14.0),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  const Text(
+                    'Don\'t have an account?'
+                  ),
+                  TextButton.icon(
+                    icon: const Icon(Icons.person),
+                    label: const Text('Register'),
+                    onPressed: () {
+                      widget.toggleView();
+                    },
+                  ),
+                ],
+              ),
             ],
           ),
         ),

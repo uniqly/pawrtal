@@ -26,28 +26,29 @@ class _RegisterState extends State<Register> {
   @override
   Widget build(BuildContext context) {
     return loading ? const Loading() : Scaffold(
-      backgroundColor: Colors.purple[100],
-      appBar: AppBar(
-        backgroundColor: Colors.pink[200],
-        elevation: 0.0,
-        title: const Text('Register for Pawtral'),
-        actions: <Widget>[
-          TextButton.icon(
-            icon: const Icon(Icons.person),
-            label: const Text('Sign In'),
-            onPressed: () {
-              widget.toggleView();
-            }
-          )
-        ]
-        ),
+      backgroundColor: const Color(0xFFFEF7FF),
         body: Container(
           padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 50.0),
           child: Form(
             key: _formKey,
             child: Column(
               children: <Widget>[
-                const SizedBox(height: 20.0),
+                Center(
+                child: Image.asset('assets/app/pawrtal.png'),
+              ),
+                const SizedBox(height: 50.0),
+                const Text(
+                'Register now!',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 32,
+                  fontFamily: 'Roboto',
+                  fontWeight: FontWeight.w500,
+                  height: 0.05,
+                ),
+              ),
+              const SizedBox(height: 50.0),
                 TextFormField(
                   decoration: textInputDecoration.copyWith(hintText: 'Email'),
                   validator: (val) => val!.isEmpty ? 'Enter an email' : null,
@@ -65,13 +66,23 @@ class _RegisterState extends State<Register> {
                   },
                 ),
                 const SizedBox(height: 20.0),
-                ElevatedButton(
+                SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.grey[400], // background color
+                    backgroundColor: const Color(0xFF65558F),
                   ),
                   child: const Text(
                     'Register',
-                    style: TextStyle(color: Colors.black),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Color(0xFFFEF7FF),
+                      fontSize: 18,
+                      fontFamily: 'Roboto',
+                      fontWeight: FontWeight.w700,
+                      height: 0.07,
+                      letterSpacing: 0.50,
+                    ),
                   ),
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
@@ -86,12 +97,55 @@ class _RegisterState extends State<Register> {
                     }
                   },
                 ),
+                ),
+                const SizedBox(height: 5.0),
+                const Text('Or'),
+                SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white, // background color
+                  ),
+                  icon: Image.asset(
+                    'assets/app/google_logo_icon.png',
+                    height: 24,
+                    width: 24,
+                 ), // Google icon // Google icon
+                  onPressed: () {},
+                  label: const Text(
+                    'Sign in with Google',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Color(0xFF65558F),
+                      fontSize: 18,
+                      fontFamily: 'Roboto',
+                      fontWeight: FontWeight.w700,
+                      height: 0.07,
+                      letterSpacing: 0.50,
+                    ),
+                  ),
+                ),
+              ),
                 const SizedBox(height: 12.0),
                 Text(
                   error,
                   style: const TextStyle(color: Colors.red, fontSize: 14.0),
                 ),
-
+                Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  const Text(
+                    'Already have an account?'
+                  ),
+                  TextButton.icon(
+                    icon: const Icon(Icons.person),
+                    label: const Text('Sign in'),
+                    onPressed: () {
+                      widget.toggleView();
+                    },
+                  ),
+                ],
+              ),
               ],
             ),
           ),
