@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pawrtal/posts/post.dart';
+import 'package:pawrtal/models/posts/post.dart';
 
 class PostTile extends StatefulWidget {
   final Post post;
@@ -42,7 +42,7 @@ class _PostTileState extends State<PostTile> {
               ),
               const SizedBox(width: 5.0,),
               Text( 
-                '#${widget.post.portal.name}',
+                'p/${widget.post.portal.name}',
                 style: TextStyle(color: Colors.grey.shade700, fontSize: 18.0),
               )
             ],

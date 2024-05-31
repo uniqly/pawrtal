@@ -1,9 +1,10 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pawrtal/firebase_options.dart';
-import 'package:pawrtal/home/home.dart';
+import 'package:pawrtal/views/main_view.dart';
 
-void main()  async {
+void main() async {
   
   // Firebase Initialisation
   WidgetsFlutterBinding.ensureInitialized();
@@ -12,7 +13,12 @@ void main()  async {
   );
 
   // Main app
-  runApp(const MainApp());
+  runApp( 
+    // enable riverpod
+    const ProviderScope(
+      child: MainApp()
+    )
+  );
 }
 
 class MainApp extends StatelessWidget {
@@ -21,7 +27,7 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-      home: Home(),
+      home: MainView(),
     );
   }
 }

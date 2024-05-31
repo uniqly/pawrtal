@@ -63,6 +63,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '441905533532',
     projectId: 'pawrtal-rabbit-hole',
     storageBucket: 'pawrtal-rabbit-hole.appspot.com',
+    androidClientId: '441905533532-cpmrfprc71mmmc9dj4kqor2lrqvg14k9.apps.googleusercontent.com',
+    iosClientId: '441905533532-iej1qbjq67l5qbbp5h417jl6j0gfebu7.apps.googleusercontent.com',
     iosBundleId: 'com.bnuuy.pawrtal',
   );
 
@@ -72,6 +74,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '441905533532',
     projectId: 'pawrtal-rabbit-hole',
     storageBucket: 'pawrtal-rabbit-hole.appspot.com',
+    androidClientId: '441905533532-cpmrfprc71mmmc9dj4kqor2lrqvg14k9.apps.googleusercontent.com',
+    iosClientId: '441905533532-iej1qbjq67l5qbbp5h417jl6j0gfebu7.apps.googleusercontent.com',
     iosBundleId: 'com.bnuuy.pawrtal',
   );
 
@@ -83,4 +87,5 @@ class DefaultFirebaseOptions {
     authDomain: 'pawrtal-rabbit-hole.firebaseapp.com',
     storageBucket: 'pawrtal-rabbit-hole.appspot.com',
   );
+
 }

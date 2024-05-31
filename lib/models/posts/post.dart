@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:pawrtal/posts/post_image_gallery.dart';
-import 'package:pawrtal/subpawrtal/subpawrtal.dart';
-import 'package:pawrtal/user/app_user.dart';
+import 'package:pawrtal/models/posts/post_image_gallery.dart';
+import 'package:pawrtal/models/subpawrtal/subpawrtal.dart';
+import 'package:pawrtal/models/user/app_user.dart';
 
 class Post {
   final SubPawrtal portal;
