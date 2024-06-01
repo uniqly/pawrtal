@@ -1,31 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:pawrtal/models/posts/post.dart';
+import 'package:pawrtal/models/posts/post_image_gallery.dart';
+import 'package:pawrtal/models/posts/post_model.dart';
 
-class PostTile extends StatefulWidget {
-  final Post post;
+class PostTile extends StatelessWidget {
+  final PostModel post;
 
   const PostTile({
     super.key,
     required this.post,
   });
 
-  @override
-  State<PostTile> createState() => _PostTileState();
-}
-
-class _PostTileState extends State<PostTile> {
-  void toggleLike() {
-    setState(() {
-      widget.post.toggleLike();
-    });
-  }
-
-  void toggleBookmark() {
-    setState(() {
-      widget.post.toggleBookmark();
-    });
-  }
-
+  // TODO: Implement likes / bookmark logic
   @override
   Widget build(BuildContext context) {
     return Column( 
@@ -38,11 +23,11 @@ class _PostTileState extends State<PostTile> {
           child: Row( 
             children: [ 
               CircleAvatar( 
-                backgroundImage: widget.post.portal.portalPfp,
+                backgroundImage: NetworkImage(post.portal.picture!),
               ),
               const SizedBox(width: 5.0,),
               Text( 
-                'p/${widget.post.portal.name}',
+                'p/${post.portal.name}',
                 style: TextStyle(color: Colors.grey.shade700, fontSize: 18.0),
               )
             ],
@@ -51,32 +36,50 @@ class _PostTileState extends State<PostTile> {
         // caption and content
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 6.0),
-          child: widget.post.captionText,
+          child: Text(
+            post.caption!,
+            style: const TextStyle( 
+              fontWeight: FontWeight.bold,
+              fontSize: 28,
+            ),
+          ),
         ),
         GestureDetector(
-          onDoubleTap: toggleLike,
-          child: widget.post.content
+          onDoubleTap: () {},
+          child: FutureBuilder<List<String>?>( 
+              future: post.postImages,
+              builder: (context, snapshot) { 
+                if (snapshot.hasData && snapshot.data != null) {
+                  var images = snapshot.data!;
+                  return PostImageGallery(imageStrings: images);
+                } else {
+                  return const SizedBox.shrink();
+                }
+              }
+            )
         ),
         // actions bar of post
         Row( 
           children: [
             TextButton.icon( 
-              onPressed: toggleLike,
-              icon: widget.post.isLiked  
-                ? const Icon(Icons.favorite, color: Colors.red,)
-                : const Icon(Icons.favorite_outline),
-              label: Text('${widget.post.likeCount}'),
+              onPressed: () {} ,
+              //icon: widget.post.isLiked  
+              //  ? const Icon(Icons.favorite, color: Colors.red,)
+              //  : const Icon(Icons.favorite_outline),
+              icon: const Icon(Icons.favorite_outline),
+              label: Text('${post.likeCount}'),
             ),
             TextButton.icon(
               onPressed: () {},
               icon: const Icon(Icons.message_outlined),
-              label: Text('${widget.post.commentCount}'),
+              label: Text('${post.commentCount}'),
             ),
             IconButton( 
-              onPressed: toggleBookmark,
-              icon: widget.post.isBookmarked
-                ? const Icon(Icons.bookmark) 
-                : const Icon(Icons.bookmark_outline),
+              onPressed: () {},
+              //icon: widget.post.isBookmarked
+              //  ? const Icon(Icons.bookmark) 
+              //  : const Icon(Icons.bookmark_outline),
+              icon: const Icon(Icons.bookmark_outline),
             ),
           ],
         ),

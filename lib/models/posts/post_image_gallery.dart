@@ -45,7 +45,7 @@ class _PostImageGalleryState extends State<PostImageGallery> {
                     color: Colors.grey[400],
                     child: Image( 
                       fit: BoxFit.fitHeight, 
-                      image: AssetImage(widget.imageStrings[index]),
+                      image: NetworkImage(widget.imageStrings[index]),
                       errorBuilder: (context, error, stackTrack) => const SizedBox.shrink(),
                     ),
                   )

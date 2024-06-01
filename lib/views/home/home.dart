@@ -1,28 +1,34 @@
 import 'package:flutter/material.dart';
-import 'package:pawrtal/models/posts/post.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:pawrtal/models/posts/post_model.dart';
 import 'package:pawrtal/models/posts/post_tile.dart';
+import 'package:pawrtal/viewmodels/home_viewmodel.dart';
 import 'package:pawrtal/views/profile/profile.dart';
-import 'package:pawrtal/test/placeholder_users.dart';
 
-class HomeView extends StatelessWidget {
+class HomeView extends ConsumerWidget {
   const HomeView({
     super.key,
-    required this.posts,
   });
 
-  final List<Post> posts;
-
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final viewModel = ref.watch(homeViewModelProvider);
+    final posts = ref.watch(homeViewModelProvider.notifier).retrievePosts();
+
     return Container(
       color: Colors.white,
       child: SafeArea(
         child: Scaffold(
           floatingActionButton: FloatingActionButton(  // TODO: test button
-            onPressed: () {
+            onPressed: () async {
               Navigator.of(context).push( 
                 MaterialPageRoute( 
-                  builder: (context) => ProfileView(user: mainUser)
+                  builder: (context) => viewModel.when( 
+                    loading: () => const CircularProgressIndicator(),
+                    error: (err, stack) => Text('Error: $err'),
+                    data: (user) => ProfileView(userId: user.uid),
+                  )
                 )
               );
             },
@@ -56,10 +62,15 @@ class HomeView extends StatelessWidget {
                   )
                 ],
               ),
-              SliverList.builder( 
-                itemCount: posts.length,
-                itemBuilder: (context, index) { 
-                  return PostTile(post: posts[index]);
+              StreamBuilder<List<PostModel>>( 
+                stream: posts,
+                builder: (context, snapshot) { 
+                  return snapshot.hasData ? SliverList.list(
+                    children: [ 
+                      for (var post in snapshot.data!) 
+                        PostTile(post: post,)
+                    ], 
+                  ) : const SliverToBoxAdapter(child: SizedBox.shrink());
                 },
               ),
             ]
