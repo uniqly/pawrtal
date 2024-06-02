@@ -1,17 +1,23 @@
-import 'package:flutter/material.dart';
+import 'dart:developer';
 
-class CreateView extends StatefulWidget {
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:pawrtal/viewmodels/create/create_post_viewmodel.dart';
+import 'package:pawrtal/views/create/create_choose_portal.dart';
+
+class CreateView extends ConsumerStatefulWidget {
   const CreateView({super.key});
 
   @override
-  State<CreateView> createState() => _CreateViewState();
+  ConsumerState<CreateView> createState() => _CreateViewState();
 }
 
-class _CreateViewState extends State<CreateView> {
-  var isButtonDisabled = true;
-
+class _CreateViewState extends ConsumerState<CreateView> {
   @override
   Widget build(BuildContext context) {
+    final createPostViewModel = ref.watch(createPostViewModelNotifierProvider);
+    final disableNextButton = createPostViewModel.emptyCaption;
+
     return Container(
       color: Colors.white,
       child: SafeArea(
@@ -35,7 +41,13 @@ class _CreateViewState extends State<CreateView> {
                     foregroundColor: Theme.of(context).colorScheme.surface,
                     disabledForegroundColor: Theme.of(context).colorScheme.surfaceDim,
                   ),
-                  onPressed: isButtonDisabled ? null : () {},
+                  onPressed: disableNextButton ? null : () { 
+                    log('$createPostViewModel');
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => const CreateChoosePortalView()
+                      )
+                    );
+                  },
                   child: const Text('Next'), 
                 ),
               ),
@@ -44,11 +56,8 @@ class _CreateViewState extends State<CreateView> {
           floatingActionButton: SizedBox(
             height: 75,
             width: 75,
-            child: FloatingActionButton( 
+            child: FloatingActionButton( // TODO: Implement picture picker
               onPressed: () { 
-                setState(() {
-                  isButtonDisabled = !isButtonDisabled;
-                });
               },
               shape: const CircleBorder(),
               backgroundColor: Theme.of(context).colorScheme.primary,
@@ -75,6 +84,9 @@ class _CreateViewState extends State<CreateView> {
                     fontWeight: FontWeight.bold,
                     color: Theme.of(context).colorScheme.onSecondaryContainer, 
                   ),
+                  onChanged: (value) { 
+                    ref.read(createPostViewModelNotifierProvider.notifier).updateForm(caption: value);
+                  },
                 ),
                 TextFormField( 
                   decoration: InputDecoration( 
@@ -89,6 +101,9 @@ class _CreateViewState extends State<CreateView> {
                     color: Theme.of(context).colorScheme.onSecondaryContainer,
                   ),
                   maxLines: null,
+                  onChanged: (value) {
+                    ref.read(createPostViewModelNotifierProvider.notifier).updateForm(description: value);
+                  },
                 )
               ],
             ),

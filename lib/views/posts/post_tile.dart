@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pawrtal/models/posts/post_image_gallery.dart';
+import 'package:pawrtal/views/posts/post_image_gallery.dart';
 import 'package:pawrtal/models/posts/post_model.dart';
 
 class PostTile extends StatelessWidget {

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:pawrtal/models/portals/portal_model.dart';
@@ -34,6 +36,22 @@ class PostModel {
     final poster = await UserModel.userFromFirebase(postData['poster'].id);
     return PostModel( 
       uid: uid,
+      portal: portal,
+      poster: poster,
+      caption: postData['caption'],
+      images: postData['images'],
+      likeCount: postData['likes'],
+      commentCount: postData['comments'],
+    );
+  }
+
+  static Future<PostModel> postFromSnapshot(DocumentSnapshot<Map<String, dynamic>> snapshot) async {
+    log('id: ${snapshot.id}');
+    final postData = snapshot.data()!;
+    final portal = await PortalModel.portalFromFirebase(postData['portal'].id);
+    final poster = await UserModel.userFromFirebase(postData['poster'].id);
+    return PostModel( 
+      uid: snapshot.id,
       portal: portal,
       poster: poster,
       caption: postData['caption'],
