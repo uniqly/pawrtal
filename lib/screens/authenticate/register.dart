@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pawrtal/services/auth.dart';
 import 'package:pawrtal/shared/constants.dart';
 import 'package:pawrtal/shared/loading.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class Register extends StatefulWidget {
 
@@ -26,8 +27,9 @@ class _RegisterState extends State<Register> {
   @override
   Widget build(BuildContext context) {
     return loading ? const Loading() : Scaffold(
-      backgroundColor: const Color(0xFFFEF7FF),
-        body: Container(
+      backgroundColor: const Color.fromRGBO(254, 247, 255, 1),
+        body: SingleChildScrollView(
+        child: Container(
           padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 50.0),
           child: Form(
             key: _formKey,
@@ -50,7 +52,10 @@ class _RegisterState extends State<Register> {
               ),
               const SizedBox(height: 50.0),
                 TextFormField(
-                  decoration: textInputDecoration.copyWith(hintText: 'Email'),
+                  decoration: textInputDecoration.copyWith(
+                    hintText: 'Email',
+                    prefixIcon: const Icon(Icons.email), // Add the email icon
+                  ),
                   validator: (val) => val!.isEmpty ? 'Enter an email' : null,
                   onChanged: (val) {
                     setState(() => email = val);
@@ -58,7 +63,10 @@ class _RegisterState extends State<Register> {
                 ),
                 const SizedBox(height: 20.0),
                 TextFormField(
-                  decoration: textInputDecoration.copyWith(hintText: 'Password'),
+                  decoration: textInputDecoration.copyWith(
+                    hintText: 'Password',
+                    prefixIcon: const Icon(Icons.lock),
+                  ),
                   obscureText: true,
                   validator: (val) => val!.length < 6 ? 'Enter a password 6+ chars long' : null,
                   onChanged: (val) {
@@ -99,7 +107,38 @@ class _RegisterState extends State<Register> {
                 ),
                 ),
                 const SizedBox(height: 5.0),
-                const Text('Or'),
+                Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 10.0),
+                        child: Divider(
+                          color: Colors.grey[600], // Change the color to match your design
+                          thickness: 1.0, // Change the thickness if needed
+                        ),
+                      ),
+                    ),
+                    const Text(
+                      'OR',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 12,
+                        fontFamily: 'Roboto',
+                        fontWeight: FontWeight.w500,
+                        height: 0.05,
+                      ),
+                    ),
+                    Expanded(
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 10.0),
+                        child: Divider(
+                          color: Colors.grey[600], // Change the color to match your design
+                          thickness: 1.0, // Change the thickness if needed
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
                 SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
@@ -111,7 +150,19 @@ class _RegisterState extends State<Register> {
                     height: 24,
                     width: 24,
                  ), // Google icon // Google icon
-                  onPressed: () {},
+                 onPressed: () async {
+                      setState(() => loading = true);
+                      UserCredential? result = await _auth.signInWithGoogle();
+                      if (result == null) {
+                      setState(() {
+                        error = 'Could not sign in with Google';
+                        loading = false;
+                      });
+                    } else {
+                    // Optional: navigate to the home screen or perform other actions
+                      print('Signed in with Google: ${result.user?.email}');
+                    }
+                    },
                   label: const Text(
                     'Sign in with Google',
                     textAlign: TextAlign.center,
@@ -150,6 +201,7 @@ class _RegisterState extends State<Register> {
             ),
           ),
         ),
-      );
+      )
+    );
   }
 }

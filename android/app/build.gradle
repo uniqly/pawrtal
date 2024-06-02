@@ -28,7 +28,7 @@ if (flutterVersionName == null) {
 android {
     namespace "com.bnuuy.pawrtal"
     compileSdk flutter.compileSdkVersion
-    ndkVersion flutter.ndkVersion
+    ndkVersion "26.1.10909125"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -69,7 +69,13 @@ flutter {
 
 dependencies {
   // Import the Firebase BoM
-  implementation platform('com.google.firebase:firebase-bom:33.0.0')
+  implementation platform('com.google.firebase:firebase-bom:33.1.0')
+  // Add the dependency for the Firebase Authentication library
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation("com.google.firebase:firebase-auth")
+
+    // Also add the dependency for the Google Play services library and specify its version
+    implementation("com.google.android.gms:play-services-auth:21.2.0")
 
 
   // TODO: Add the dependencies for Firebase products you want to use
