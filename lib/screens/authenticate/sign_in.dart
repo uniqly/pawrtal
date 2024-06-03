@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pawrtal/screens/authenticate/forget_password.dart';
 import 'package:pawrtal/services/auth.dart';
 import 'package:pawrtal/shared/constants.dart';
 import 'package:pawrtal/shared/loading.dart';
@@ -72,36 +73,6 @@ class _SignInState extends State<SignIn> {
                   onChanged: (val) {
                     setState(() => password = val);
                   },
-                ),
-                const SizedBox(height: 20.0),
-                const Row(
-                  children: [
-                    Text(
-                      'Remember Me',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 12,
-                        fontFamily: 'Roboto',
-                        fontWeight: FontWeight.w500,
-                        height: 0.05,
-                      ),
-                    ),
-                    Spacer(),
-                    Expanded(
-                      child: Text(
-                        'Forgot password?',
-                        textAlign: TextAlign.right,
-                        style: TextStyle(
-                          decoration: TextDecoration.underline,
-                          color: Colors.black,
-                          fontSize: 12,
-                          fontFamily: 'Roboto',
-                          fontWeight: FontWeight.w500,
-                          height: 0.05,
-                        ),
-                      ),
-                    ),
-                  ],
                 ),
                 const SizedBox(height: 20.0),
                 SizedBox(
@@ -207,7 +178,6 @@ class _SignInState extends State<SignIn> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 10.0),
                 Text(
                   error,
                   style: const TextStyle(color: Colors.red, fontSize: 14.0),
@@ -215,15 +185,20 @@ class _SignInState extends State<SignIn> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    const Text(
-                      'Don\'t have an account?'
-                    ),
-                    TextButton.icon(
-                      icon: const Icon(Icons.person),
-                      label: const Text('Register'),
+                    ElevatedButton(
                       onPressed: () {
-                        widget.toggleView();
+                        widget.toggleView(); // Toggle to the registration screen
                       },
+                      child: const Text('Create account'),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const ForgetPassword()),
+                        );
+                      },
+                      child: const Text('Forgot password?'),
                     ),
                   ],
                 ),
