@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:pawrtal/models/user/user_model.dart';
-import 'package:pawrtal/viewmodels/profile_viewmodel.dart';
+import 'package:pawrtal/viewmodels/profile/profile_viewmodel.dart';
 
 class ProfileView extends ConsumerWidget {
   final String userId;
@@ -10,11 +9,13 @@ class ProfileView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final userForView = ref.watch(ProfileViewModelProvider(uid: userId));
+    final userForView = ref.watch(ProfileViewModelNotifierProvider(uid: userId));
+    
     return userForView.when( 
       loading: () => const CircularProgressIndicator(),
       error: (err, stack) => Text('error: $err'),
-      data: (user) { 
+      data: (viewmodel) { 
+        final userData = viewmodel.profileInfo;
         return Container(
           color: Colors.white,
           child: SafeArea(
@@ -64,7 +65,7 @@ class ProfileView extends ConsumerWidget {
                             decoration: BoxDecoration(
                               image: DecorationImage(
                                 fit: BoxFit.fitWidth,
-                                image: NetworkImage(user.banner!),
+                                image: NetworkImage(userData['banner']),
                               ),
                             ),
                           ),
@@ -83,11 +84,12 @@ class ProfileView extends ConsumerWidget {
                                         backgroundColor: Colors.white,
                                         radius: 51,
                                         child: CircleAvatar( 
-                                          backgroundImage: NetworkImage(user.pfp!),
+                                          backgroundImage: NetworkImage(userData['pfp']),
                                           radius: 50,
                                         ),
                                       ),
-                                      TextButton(
+                                      // button depending on userprofile
+                                      viewmodel.isCurrUserProfile ? TextButton(
                                         style: TextButton.styleFrom( 
                                           backgroundColor: Theme.of(context).colorScheme.primary,
                                           foregroundColor: Theme.of(context).colorScheme.surface,
@@ -100,13 +102,26 @@ class ProfileView extends ConsumerWidget {
                                           'Edit Pawfile',
                                           style: TextStyle(fontWeight: FontWeight.bold),
                                         ), 
+                                      ) : TextButton(
+                                        style: TextButton.styleFrom( 
+                                          backgroundColor: Theme.of(context).colorScheme.primary,
+                                          foregroundColor: Theme.of(context).colorScheme.surface,
+                                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                        ),
+                                        onPressed: () {
+                                          //ref.read(mainUserProvider.notifier).incrFollows();
+                                        },
+                                        child: const Text(
+                                          'Follow',
+                                          style: TextStyle(fontWeight: FontWeight.bold),
+                                        ), 
                                       ),
                                     ],
                                   ),
                                   SizedBox(
                                     height: 40,
                                     child: Text(
-                                      user.displayName!,
+                                      userData['name'],
                                       style: const TextStyle( 
                                         fontSize: 32,
                                         fontWeight: FontWeight.bold,
@@ -114,14 +129,14 @@ class ProfileView extends ConsumerWidget {
                                     ),
                                   ),
                                   Text(
-                                    '@${user.handle}',
+                                    '@${userData['handle']}',
                                     style: TextStyle( 
                                       fontSize: 14,
                                       color: Theme.of(context).colorScheme.surfaceTint,
                                     ),
                                   ),
                                   Text(
-                                    user.bio!,
+                                    userData['bio'],
                                     style: const TextStyle( 
                                       fontSize: 14,
                                     ),
@@ -133,7 +148,7 @@ class ProfileView extends ConsumerWidget {
                                         color: Theme.of(context).colorScheme.secondary,
                                       ),
                                       Text(
-                                        user.location ?? 'Unknown',
+                                        userData['location'] ?? 'Unknown',
                                         style: TextStyle( 
                                           color: Theme.of(context).colorScheme.secondary, 
                                         ),
@@ -143,14 +158,14 @@ class ProfileView extends ConsumerWidget {
                                   Row( 
                                     children: [ 
                                       Text(
-                                        '${NumberFormat.compact().format(user.followingCount)} following',
+                                        '${NumberFormat.compact().format(userData['following'])} following',
                                         style: const TextStyle( 
                                           fontWeight: FontWeight.bold,
                                         ),   
                                       ),
                                       const SizedBox(width: 20,),
                                       Text(
-                                        '${NumberFormat.compact().format(user.followerCount)} followers',
+                                        '${NumberFormat.compact().format(userData['followers'])} followers',
                                         style: const TextStyle( 
                                           fontWeight: FontWeight.bold,
                                         ),   

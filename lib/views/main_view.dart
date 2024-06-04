@@ -36,7 +36,7 @@ class _MainViewState extends ConsumerState<MainView> {
           backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
           indicatorColor: Colors.transparent,
           overlayColor: const WidgetStatePropertyAll<Color>(Colors.transparent),
-          onDestinationSelected: (index) {
+          onDestinationSelected: (index) async {
             setState(() {
               pageIndex = index;
             });
@@ -45,9 +45,9 @@ class _MainViewState extends ConsumerState<MainView> {
                 currTab = PageTab.home;
               }
               case 1: {
-                Navigator.push(context, MaterialPageRoute( 
+                await Navigator.push(context, MaterialPageRoute( 
                   builder: (context) => const CreateView(),
-                ));
+                )).then((_) => setState(() {})); // refresh page after upload
               }
               case 2: {
                 currTab = PageTab.profile;

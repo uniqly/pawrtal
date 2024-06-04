@@ -24,7 +24,7 @@ class PostModel {
     final storage = FirebaseStorage.instance.ref();
     return (images ?? 0) == 0 ? null : [
       for (var i = 1; i <= images!; i++)
-        await storage.child('images/posts/$uid-$i.png').getDownloadURL()
+        await storage.child('images/posts/$uid-$i.png').getDownloadURL().onError((e, s) => '')
     ];
   }
 

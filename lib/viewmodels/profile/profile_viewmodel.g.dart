@@ -6,7 +6,8 @@ part of 'profile_viewmodel.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$profileViewModelHash() => r'3aede0e082a4b29389f8299be6adf26ad5245ac1';
+String _$profileViewModelNotifierHash() =>
+    r'fecbeb1262fcc20a263ecd865da6f007aceb023b';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -29,36 +30,37 @@ class _SystemHash {
   }
 }
 
-abstract class _$ProfileViewModel
-    extends BuildlessAutoDisposeAsyncNotifier<UserModel> {
+abstract class _$ProfileViewModelNotifier
+    extends BuildlessAutoDisposeAsyncNotifier<ProfileViewModel> {
   late final String uid;
 
-  FutureOr<UserModel> build({
+  FutureOr<ProfileViewModel> build({
     required String uid,
   });
 }
 
-/// See also [ProfileViewModel].
-@ProviderFor(ProfileViewModel)
-const profileViewModelProvider = ProfileViewModelFamily();
+/// See also [ProfileViewModelNotifier].
+@ProviderFor(ProfileViewModelNotifier)
+const profileViewModelNotifierProvider = ProfileViewModelNotifierFamily();
 
-/// See also [ProfileViewModel].
-class ProfileViewModelFamily extends Family<AsyncValue<UserModel>> {
-  /// See also [ProfileViewModel].
-  const ProfileViewModelFamily();
+/// See also [ProfileViewModelNotifier].
+class ProfileViewModelNotifierFamily
+    extends Family<AsyncValue<ProfileViewModel>> {
+  /// See also [ProfileViewModelNotifier].
+  const ProfileViewModelNotifierFamily();
 
-  /// See also [ProfileViewModel].
-  ProfileViewModelProvider call({
+  /// See also [ProfileViewModelNotifier].
+  ProfileViewModelNotifierProvider call({
     required String uid,
   }) {
-    return ProfileViewModelProvider(
+    return ProfileViewModelNotifierProvider(
       uid: uid,
     );
   }
 
   @override
-  ProfileViewModelProvider getProviderOverride(
-    covariant ProfileViewModelProvider provider,
+  ProfileViewModelNotifierProvider getProviderOverride(
+    covariant ProfileViewModelNotifierProvider provider,
   ) {
     return call(
       uid: provider.uid,
@@ -77,30 +79,31 @@ class ProfileViewModelFamily extends Family<AsyncValue<UserModel>> {
       _allTransitiveDependencies;
 
   @override
-  String? get name => r'profileViewModelProvider';
+  String? get name => r'profileViewModelNotifierProvider';
 }
 
-/// See also [ProfileViewModel].
-class ProfileViewModelProvider
-    extends AutoDisposeAsyncNotifierProviderImpl<ProfileViewModel, UserModel> {
-  /// See also [ProfileViewModel].
-  ProfileViewModelProvider({
+/// See also [ProfileViewModelNotifier].
+class ProfileViewModelNotifierProvider
+    extends AutoDisposeAsyncNotifierProviderImpl<ProfileViewModelNotifier,
+        ProfileViewModel> {
+  /// See also [ProfileViewModelNotifier].
+  ProfileViewModelNotifierProvider({
     required String uid,
   }) : this._internal(
-          () => ProfileViewModel()..uid = uid,
-          from: profileViewModelProvider,
-          name: r'profileViewModelProvider',
+          () => ProfileViewModelNotifier()..uid = uid,
+          from: profileViewModelNotifierProvider,
+          name: r'profileViewModelNotifierProvider',
           debugGetCreateSourceHash:
               const bool.fromEnvironment('dart.vm.product')
                   ? null
-                  : _$profileViewModelHash,
-          dependencies: ProfileViewModelFamily._dependencies,
+                  : _$profileViewModelNotifierHash,
+          dependencies: ProfileViewModelNotifierFamily._dependencies,
           allTransitiveDependencies:
-              ProfileViewModelFamily._allTransitiveDependencies,
+              ProfileViewModelNotifierFamily._allTransitiveDependencies,
           uid: uid,
         );
 
-  ProfileViewModelProvider._internal(
+  ProfileViewModelNotifierProvider._internal(
     super._createNotifier, {
     required super.name,
     required super.dependencies,
@@ -113,8 +116,8 @@ class ProfileViewModelProvider
   final String uid;
 
   @override
-  FutureOr<UserModel> runNotifierBuild(
-    covariant ProfileViewModel notifier,
+  FutureOr<ProfileViewModel> runNotifierBuild(
+    covariant ProfileViewModelNotifier notifier,
   ) {
     return notifier.build(
       uid: uid,
@@ -122,10 +125,10 @@ class ProfileViewModelProvider
   }
 
   @override
-  Override overrideWith(ProfileViewModel Function() create) {
+  Override overrideWith(ProfileViewModelNotifier Function() create) {
     return ProviderOverride(
       origin: this,
-      override: ProfileViewModelProvider._internal(
+      override: ProfileViewModelNotifierProvider._internal(
         () => create()..uid = uid,
         from: from,
         name: null,
@@ -138,14 +141,14 @@ class ProfileViewModelProvider
   }
 
   @override
-  AutoDisposeAsyncNotifierProviderElement<ProfileViewModel, UserModel>
-      createElement() {
-    return _ProfileViewModelProviderElement(this);
+  AutoDisposeAsyncNotifierProviderElement<ProfileViewModelNotifier,
+      ProfileViewModel> createElement() {
+    return _ProfileViewModelNotifierProviderElement(this);
   }
 
   @override
   bool operator ==(Object other) {
-    return other is ProfileViewModelProvider && other.uid == uid;
+    return other is ProfileViewModelNotifierProvider && other.uid == uid;
   }
 
   @override
@@ -157,18 +160,19 @@ class ProfileViewModelProvider
   }
 }
 
-mixin ProfileViewModelRef on AutoDisposeAsyncNotifierProviderRef<UserModel> {
+mixin ProfileViewModelNotifierRef
+    on AutoDisposeAsyncNotifierProviderRef<ProfileViewModel> {
   /// The parameter `uid` of this provider.
   String get uid;
 }
 
-class _ProfileViewModelProviderElement
-    extends AutoDisposeAsyncNotifierProviderElement<ProfileViewModel, UserModel>
-    with ProfileViewModelRef {
-  _ProfileViewModelProviderElement(super.provider);
+class _ProfileViewModelNotifierProviderElement
+    extends AutoDisposeAsyncNotifierProviderElement<ProfileViewModelNotifier,
+        ProfileViewModel> with ProfileViewModelNotifierRef {
+  _ProfileViewModelNotifierProviderElement(super.provider);
 
   @override
-  String get uid => (origin as ProfileViewModelProvider).uid;
+  String get uid => (origin as ProfileViewModelNotifierProvider).uid;
 }
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

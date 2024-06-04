@@ -27,7 +27,7 @@ class HomeView extends ConsumerWidget {
                 onPressed: () async {
                   Navigator.of(context).push( 
                     MaterialPageRoute( 
-                      builder: (context) => ProfileView(userId: viewmodel.user.uid)
+                      builder: (context) => const ProfileView(userId: 'otheruser')
                     )
                   );
                 },

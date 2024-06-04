@@ -10,4 +10,11 @@ class MainUser extends _$MainUser {
   Future<UserModel> build() {
     return UserModel.userFromFirebase('mainuser');
   }
+
+  Future<void> refresh() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async { 
+      return state.value!.copyWith();
+    });
+  }
 }

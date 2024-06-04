@@ -22,16 +22,33 @@ class UserModel {
     final db = FirebaseFirestore.instance;
     final dataSnapshot = await db.collection('users').doc(uid).get();
     final data = dataSnapshot.data()!;
+
+    
     return UserModel(
       uid: uid,
       displayName: data['displayName'] ,
       handle: data['handle'],
-      pfp: await storage.child('images/users/$uid-pfp.png').getDownloadURL(),
-      banner: await storage.child('images/users/$uid-banner.png').getDownloadURL(),
+      pfp: await storage.child('images/users/$uid-pfp.png').getDownloadURL().onError((e, s) => ''),
+      banner: await storage.child('images/users/$uid-banner.png').getDownloadURL().onError((e, s) => ''),
       location: data['location'],
       bio: data['bio'],
       followerCount: data['followers'],
       followingCount: data['following'],
+    );
+  }
+
+  UserModel copyWith({String? displayName, String? handle, String? bio, String? location,
+      String? pfp, String? banner, int? followerCount, int? followingCount}) {
+    return UserModel( 
+      uid: uid,
+      displayName: displayName ?? this.displayName,
+      handle: handle ?? this.handle,
+      bio: bio ?? this.bio,
+      location: location ?? this.location,
+      pfp: pfp ?? this.pfp,
+      banner: banner ?? this.banner,
+      followerCount: followerCount ?? this.followerCount,
+      followingCount: followingCount ?? this.followingCount
     );
   }
 }
