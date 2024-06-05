@@ -21,7 +21,7 @@ class _SignInState extends State<SignIn> {
   bool loading = false;
 
   // text field state
-  String email = '';
+  String emailOrUsername = '';
   String password = '';
   String error = '';
 
@@ -54,12 +54,12 @@ class _SignInState extends State<SignIn> {
                 const SizedBox(height: 50.0),
                 TextFormField(
                   decoration: textInputDecoration.copyWith(
-                    hintText: 'Email',
+                    hintText: 'Email or username',
                     prefixIcon: const Icon(Icons.email), // Add the email icon
                   ),
-                  validator: (val) => val!.isEmpty ? 'Enter an email' : null,
+                  validator: (val) => val!.isEmpty ? 'Enter an email or username' : null,
                   onChanged: (val) {
-                    setState(() => email = val);
+                    setState(() => emailOrUsername = val);
                   },
                 ),
                 const SizedBox(height: 20.0),
@@ -69,7 +69,7 @@ class _SignInState extends State<SignIn> {
                     prefixIcon: const Icon(Icons.lock),
                     ),
                   obscureText: true,
-                  validator: (val) => val!.length < 6 ? 'Enter a password 6+ chars long' : null,
+                  validator: (val) => val!.length < 8 ? 'Enter a password 8+ chars long' : null,
                   onChanged: (val) {
                     setState(() => password = val);
                   },
@@ -96,7 +96,7 @@ class _SignInState extends State<SignIn> {
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
                         setState(() => loading = true);
-                        dynamic result = await _auth.signInWithEmailandPassword(email, password);
+                        dynamic result = await _auth.signInWithEmailandPassword(emailOrUsername, password);
                         if(result == null) {
                           setState(() {
                             error = 'Could not sign in with those credentials';

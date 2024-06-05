@@ -29,19 +29,31 @@ class _ForgetPasswordState extends State<ForgetPassword> {
                 Center(
                   child: Image.asset('assets/app/pawrtal.png'),
                 ),
-                const SizedBox(height: 50.0),
+                Center(
+                  child: Image.asset(
+                    'assets/app/reset-password.png',
+                    height: 100.0,
+                    fit: BoxFit.contain,
+                  )
+                ),
+                const SizedBox(height: 40.0),
                 const Text(
-                  'Reset Password',
+                  'Forgot your password?',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.black,
-                    fontSize: 32,
+                    fontSize: 25,
                     fontFamily: 'Roboto',
                     fontWeight: FontWeight.w500,
                     height: 0.05,
                   )
                 ),
-                const SizedBox(height: 100.0),
+                const SizedBox(height: 40.0),
+                const Text(
+                  'Enter your email below to receive a password reset link to get back into your account.',
+                  textAlign: TextAlign.center,
+                  ),
+                const SizedBox(height: 20.0),
                 TextFormField(
                   decoration: textInputDecoration.copyWith(
                     hintText: 'Email',
