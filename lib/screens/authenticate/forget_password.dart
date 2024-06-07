@@ -77,7 +77,7 @@ class _ForgetPasswordState extends State<ForgetPassword> {
                           await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
                         } catch (e) {
                           print('exception->$e');
-                          return null;
+                          return;
                         }
                       },
                       child: const Text(
