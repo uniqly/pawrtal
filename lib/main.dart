@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:pawrtal/firebase_options.dart';
 import 'package:pawrtal/screens/authenticate/authenticate.dart';
-import 'package:pawrtal/screens/wrapper.dart';
 import 'package:pawrtal/services/auth.dart';
 import 'package:provider/provider.dart';
 import 'package:pawrtal/models/myuser.dart';

@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:pawrtal/screens/onboarding/welcome.dart';
-import 'package:pawrtal/screens/wrapper.dart';
 import 'package:pawrtal/services/auth.dart';
 import 'package:pawrtal/shared/constants.dart';
 import 'package:pawrtal/shared/loading.dart';
