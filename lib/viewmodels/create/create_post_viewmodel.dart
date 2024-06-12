@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:pawrtal/models/portals/portal_model.dart';
 import 'package:pawrtal/models/user/user_model.dart';
 import 'package:pawrtal/test/test_user.dart';
@@ -10,6 +11,9 @@ import 'package:uuid/uuid.dart';
 part 'create_post_viewmodel.g.dart';
 
 class CreatePostViewModel { 
+  static final _storage = FirebaseStorage.instance.ref();
+  static final _db = FirebaseFirestore.instance;
+
   final UserModel _poster;
   String _caption = '';
   String _description = '';
@@ -31,8 +35,7 @@ class CreatePostViewModel {
 
   // query for the list of subpawrtals whose name (not id) starts with the query string
   Stream<List<PortalModel>> portalQuery(String query) async* { 
-    final db = FirebaseFirestore.instance;
-    Query<Map<String, dynamic>> ref = db.collection('portals');
+    Query<Map<String, dynamic>> ref = _db.collection('portals');
     var portals = <PortalModel>[];
     // non empty query => find doucments with name gte name and lt name + 1 unicode char
     if (query.isNotEmpty) { 
@@ -43,7 +46,7 @@ class CreatePostViewModel {
         .where('name', isLessThan: endQuery);
       log('query: ($query, $endQuery)');
     }
-    await ref.get()
+    await ref.orderBy('memberCount', descending: true).get()
       .then((querySnapshot) async { 
         for (var docSnapshot in querySnapshot.docs) {
           log('portal: $docSnapshot');
@@ -54,11 +57,10 @@ class CreatePostViewModel {
   }
 
   Future<void> createPost() async { 
-    final db = FirebaseFirestore.instance;
     final newUuid = const Uuid().v4();
     final upload = { 
-      'poster': db.doc('users/${_poster.uid}'),
-      'portal': db.doc('portals/$_portalId'),
+      'poster': _db.doc('users/${_poster.uid}'),
+      'portal': _db.doc('portals/$_portalId'),
       'caption': _caption,
       'description': _description,
       'comments': 0,
@@ -66,7 +68,7 @@ class CreatePostViewModel {
       'images': _imageCount,
       'timestamp': FieldValue.serverTimestamp(),
     };
-    db.collection('posts').doc(newUuid).set(upload, SetOptions(merge: true));
+    _db.collection('posts').doc(newUuid).set(upload, SetOptions(merge: true));
   }
 }
 

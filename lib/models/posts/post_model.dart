@@ -6,6 +6,9 @@ import 'package:pawrtal/models/portals/portal_model.dart';
 import 'package:pawrtal/models/user/user_model.dart';
 
 class PostModel {
+  static final _db = FirebaseFirestore.instance;
+  static final _storage = FirebaseStorage.instance.ref();
+
   final String uid;
   final PortalModel portal;
   final UserModel poster;
@@ -20,17 +23,16 @@ class PostModel {
   PostModel({required this.uid, required this.portal, required this.poster, this.caption, 
       this.description, this.images, this.likeCount, this.commentCount});
 
+
   Future<List<String>?> get postImages async {
-    final storage = FirebaseStorage.instance.ref();
     return (images ?? 0) == 0 ? null : [
       for (var i = 1; i <= images!; i++)
-        await storage.child('images/posts/$uid-$i.png').getDownloadURL().onError((e, s) => '')
+        await _storage.child('images/posts/$uid-$i.png').getDownloadURL().onError((e, s) => '')
     ];
   }
 
   static Future<PostModel> postFromFirebase(String uid) async {
-    final db = FirebaseFirestore.instance;
-    final postSnapshot = await db.collection('posts').doc(uid).get();
+    final postSnapshot = await _db.collection('posts').doc(uid).get();
     final postData = postSnapshot.data()!;
     final portal = await PortalModel.portalFromFirebase(postData['portal'].id);
     final poster = await UserModel.userFromFirebase(postData['poster'].id);

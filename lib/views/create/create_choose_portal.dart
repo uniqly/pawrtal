@@ -51,7 +51,7 @@ class _CreateChoosePortalViewState extends ConsumerState<CreateChoosePortalView>
                         );
                         ScaffoldMessenger.of(context).showSnackBar(success);
                         Navigator.of(context).popUntil((route) => route.isFirst);
-                        await ref.read(mainUserProvider.notifier).refresh();
+                        //await ref.read(mainUserProvider.notifier).refresh();
                       }).onError((s, e) { 
                         final error = SnackBar( 
                           content: Text('Error with upload, $e'),

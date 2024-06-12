@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:pawrtal/viewmodels/profile/profile_viewmodel.dart';
+import 'package:pawrtal/views/profile/profile_media.dart';
+import 'package:pawrtal/views/profile/profile_posts.dart';
 
 class ProfileView extends ConsumerWidget {
   final String userId;
@@ -9,9 +11,9 @@ class ProfileView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final userForView = ref.watch(ProfileViewModelNotifierProvider(uid: userId));
+    final profileViewModel = ref.watch(ProfileViewModelNotifierProvider(uid: userId));
     
-    return userForView.when( 
+    return profileViewModel.when( 
       loading: () => const CircularProgressIndicator(),
       error: (err, stack) => Text('error: $err'),
       data: (viewmodel) { 
@@ -22,8 +24,8 @@ class ProfileView extends ConsumerWidget {
             child: Scaffold(
               body: DefaultTabController(
                 length: 4,
-                child: CustomScrollView( 
-                  slivers: [
+                child: NestedScrollView( 
+                  headerSliverBuilder: (context, _) => [
                     SliverAppBar(
                       scrolledUnderElevation: 0,
                       backgroundColor: Colors.white,
@@ -205,15 +207,15 @@ class ProfileView extends ConsumerWidget {
                         ],
                       ),
                     ),
-                    SliverFillRemaining(
-                      child: TabBarView( 
-                        children: [ 
-                          for (var i = 0; i < 4; i++)
-                          Text('$i')
-                        ],
-                      )
-                    )
                   ],
+                  body: TabBarView( 
+                    children: [ 
+                      ProfilePostsView(userId: userId),
+                      ProfileMediaView(userId: userId),
+                      const Text('likes'),
+                      const Text('communitites'),
+                    ],
+                  )
                 ),
               ),
             ),

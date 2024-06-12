@@ -1,18 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pawrtal/models/posts/post_model.dart';
 import 'package:pawrtal/views/posts/post_tile.dart';
 import 'package:pawrtal/viewmodels/home/home_viewmodel.dart';
 import 'package:pawrtal/views/profile/profile.dart';
 
-class HomeView extends ConsumerWidget {
+class HomeView extends ConsumerStatefulWidget {
   const HomeView({
     super.key,
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeView> createState() => _HomeViewState();
+}
+
+class _HomeViewState extends ConsumerState<HomeView> with AutomaticKeepAliveClientMixin<HomeView> {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget build(BuildContext context) {
     final homeViewModel = ref.watch(homeViewModelNotifierProvider);
 
     return homeViewModel.when( 
@@ -69,7 +76,7 @@ class HomeView extends ConsumerWidget {
                           for (var post in snapshot.data!) 
                             PostTile(post: post,)
                         ], 
-                      ) : const SliverToBoxAdapter(child: SizedBox.shrink());
+                      ) : const SliverToBoxAdapter(child: CircularProgressIndicator());
                     },
                   ),
                 ]

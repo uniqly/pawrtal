@@ -47,7 +47,7 @@ class _MainViewState extends ConsumerState<MainView> {
               case 1: {
                 await Navigator.push(context, MaterialPageRoute( 
                   builder: (context) => const CreateView(),
-                )).then((_) => setState(() {})); // refresh page after upload
+                ));
               }
               case 2: {
                 currTab = PageTab.profile;
