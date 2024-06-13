@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pawrtal/screens/authenticate/forget_password.dart';
 import 'package:pawrtal/services/auth.dart';
 import 'package:pawrtal/shared/constants.dart';
 import 'package:pawrtal/shared/loading.dart';
@@ -20,7 +21,7 @@ class _SignInState extends State<SignIn> {
   bool loading = false;
 
   // text field state
-  String email = '';
+  String emailOrUsername = '';
   String password = '';
   String error = '';
 
@@ -53,12 +54,12 @@ class _SignInState extends State<SignIn> {
                 const SizedBox(height: 50.0),
                 TextFormField(
                   decoration: textInputDecoration.copyWith(
-                    hintText: 'Email',
+                    hintText: 'Email or username',
                     prefixIcon: const Icon(Icons.email), // Add the email icon
                   ),
-                  validator: (val) => val!.isEmpty ? 'Enter an email' : null,
+                  validator: (val) => val!.isEmpty ? 'Enter an email or username' : null,
                   onChanged: (val) {
-                    setState(() => email = val);
+                    setState(() => emailOrUsername = val);
                   },
                 ),
                 const SizedBox(height: 20.0),
@@ -68,40 +69,10 @@ class _SignInState extends State<SignIn> {
                     prefixIcon: const Icon(Icons.lock),
                     ),
                   obscureText: true,
-                  validator: (val) => val!.length < 6 ? 'Enter a password 6+ chars long' : null,
+                  validator: (val) => val!.length < 8 ? 'Enter a password 8+ chars long' : null,
                   onChanged: (val) {
                     setState(() => password = val);
                   },
-                ),
-                const SizedBox(height: 20.0),
-                const Row(
-                  children: [
-                    Text(
-                      'Remember Me',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 12,
-                        fontFamily: 'Roboto',
-                        fontWeight: FontWeight.w500,
-                        height: 0.05,
-                      ),
-                    ),
-                    Spacer(),
-                    Expanded(
-                      child: Text(
-                        'Forgot password?',
-                        textAlign: TextAlign.right,
-                        style: TextStyle(
-                          decoration: TextDecoration.underline,
-                          color: Colors.black,
-                          fontSize: 12,
-                          fontFamily: 'Roboto',
-                          fontWeight: FontWeight.w500,
-                          height: 0.05,
-                        ),
-                      ),
-                    ),
-                  ],
                 ),
                 const SizedBox(height: 20.0),
                 SizedBox(
@@ -125,7 +96,7 @@ class _SignInState extends State<SignIn> {
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
                         setState(() => loading = true);
-                        dynamic result = await _auth.signInWithEmailandPassword(email, password);
+                        dynamic result = await _auth.signInWithEmailandPassword(emailOrUsername, password);
                         if(result == null) {
                           setState(() {
                             error = 'Could not sign in with those credentials';
@@ -207,7 +178,6 @@ class _SignInState extends State<SignIn> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 10.0),
                 Text(
                   error,
                   style: const TextStyle(color: Colors.red, fontSize: 14.0),
@@ -215,15 +185,20 @@ class _SignInState extends State<SignIn> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    const Text(
-                      'Don\'t have an account?'
-                    ),
-                    TextButton.icon(
-                      icon: const Icon(Icons.person),
-                      label: const Text('Register'),
+                    ElevatedButton(
                       onPressed: () {
-                        widget.toggleView();
+                        widget.toggleView(); // Toggle to the registration screen
                       },
+                      child: const Text('Create account'),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const ForgetPassword()),
+                        );
+                      },
+                      child: const Text('Forgot password?'),
                     ),
                   ],
                 ),

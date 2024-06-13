@@ -25,6 +25,7 @@ class _PostImageGalleryState extends State<PostImageGallery> {
     return Stack(
       alignment: Alignment.bottomCenter,
       children: [
+        // pictures
         SizedBox(
           height: 500.0,
           child: PageView.builder( 
@@ -44,7 +45,7 @@ class _PostImageGalleryState extends State<PostImageGallery> {
                     color: Colors.grey[400],
                     child: Image( 
                       fit: BoxFit.fitHeight, 
-                      image: AssetImage(widget.imageStrings[index]),
+                      image: NetworkImage(widget.imageStrings[index]),
                       errorBuilder: (context, error, stackTrack) => const SizedBox.shrink(),
                     ),
                   )
@@ -53,6 +54,8 @@ class _PostImageGalleryState extends State<PostImageGallery> {
             },   
           ),
         ),
+        // gallery buttons
+        if (numImages > 1)
         Padding(
           padding: const EdgeInsets.fromLTRB(6.0, 3.0, 6.0, 3.0),
           child: Container( 
