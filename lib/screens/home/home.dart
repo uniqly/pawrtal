@@ -1,3 +1,5 @@
+// Deprecated: to delete
+/*
 import 'package:flutter/material.dart';
 import 'package:pawrtal/posts/post.dart';
 import 'package:pawrtal/posts/post_tile.dart';
@@ -143,3 +145,4 @@ class _HomeState extends State<Home> {
     );
   }
 }
+*/

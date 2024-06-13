@@ -7,7 +7,6 @@ import 'package:pawrtal/screens/authenticate/authenticate.dart';
 import 'package:pawrtal/services/auth.dart';
 import 'package:provider/provider.dart' as provider;
 import 'package:pawrtal/models/myuser.dart';
-import 'package:pawrtal/screens/home/home.dart';
 import 'package:pawrtal/screens/onboarding/welcome.dart';
 
 void main() async {
@@ -38,7 +37,7 @@ class MainApp extends StatelessWidget {
         initialRoute: '/',
         routes: {
           '/': (context) => const Authenticate(), // Modify as necessary
-          '/home': (context) => const Home(),
+          '/home': (context) => const MainView(),
           '/welcome': (context) {
             final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
             final username = args['username'] as String;
