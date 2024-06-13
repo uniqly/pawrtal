@@ -4,6 +4,7 @@ import 'package:pawrtal/services/auth.dart';
 import 'package:pawrtal/shared/constants.dart';
 import 'package:pawrtal/shared/loading.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:pawrtal/views/home/home.dart';
 
 class SignIn extends StatefulWidget {
 
@@ -21,7 +22,7 @@ class _SignInState extends State<SignIn> {
   bool loading = false;
 
   // text field state
-  String emailOrUsername = '';
+  String username = '';
   String password = '';
   String error = '';
 
@@ -54,12 +55,12 @@ class _SignInState extends State<SignIn> {
                 const SizedBox(height: 50.0),
                 TextFormField(
                   decoration: textInputDecoration.copyWith(
-                    hintText: 'Email or username',
+                    hintText: 'Username',
                     prefixIcon: const Icon(Icons.email), // Add the email icon
                   ),
-                  validator: (val) => val!.isEmpty ? 'Enter an email or username' : null,
+                  validator: (val) => val!.isEmpty ? 'Enter a username' : null,
                   onChanged: (val) {
-                    setState(() => emailOrUsername = val);
+                    setState(() => username = val);
                   },
                 ),
                 const SizedBox(height: 20.0),
@@ -96,15 +97,22 @@ class _SignInState extends State<SignIn> {
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
                         setState(() => loading = true);
-                        dynamic result = await _auth.signInWithEmailandPassword(emailOrUsername, password);
-                        if(result == null) {
+                        dynamic result = await _auth.signInWithUsernameAndPassword(username, password);
+                        if (result == null) {
                           setState(() {
                             error = 'Could not sign in with those credentials';
                             loading = false;
                           });
+                        } else {
+                          setState(() => loading = false);
+                          // Navigate to home screen
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => const HomeView()),
+                          );
                         }
                       }
-                    }
+                    },
                   ),
                 ),
                 const SizedBox(height: 10.0),
@@ -153,16 +161,23 @@ class _SignInState extends State<SignIn> {
                   ), // Google icon
                     onPressed: () async {
                       setState(() => loading = true);
+                      print('Initiating Google sign-in');
                       UserCredential? result = await _auth.signInWithGoogle();
+                      print('Google SignIn result: $result');
                       if (result == null) {
                       setState(() {
                         error = 'Could not sign in with Google';
                         loading = false;
                       });
                     } else {
-                    // Optional: navigate to the home screen or perform other actions
-                      print('Signed in with Google: ${result.user?.email}');
-                    }
+                      setState(() => loading = false);
+                        print('Signed in with Google: ${result.user?.email}');
+                        // Navigate to home screen
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => HomeView()),
+                          );
+                      }
                     },
                     label: const Text(
                       'Sign in with Google',

@@ -29,13 +29,28 @@ class AuthService {
     }
   }
 
-  // sign in with email and password
-  Future signInWithEmailandPassword(String email, String password) async {
+  // sign in with username
+  Future signInWithUsernameAndPassword(String username, String password) async {
     try {
+      // Assuming you have a Firestore collection 'users' with documents having fields 'username' and 'email'
+      final userSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('username', isEqualTo: username)
+          .limit(1)
+          .get();
+
+      if (userSnapshot.docs.isEmpty) {
+        throw FirebaseAuthException(
+          code: 'user-not-found',
+          message: 'No user found for that username.',
+        );
+      }
+
+      final email = userSnapshot.docs.first.get('email');
       UserCredential result = await _auth.signInWithEmailAndPassword(email: email, password: password);
       User? user = result.user;
       return _userFromFirebaseUser(user);
-    } catch(e) {
+    } catch (e) {
       print(e.toString());
       return null;
     }

@@ -4,6 +4,7 @@ import 'package:pawrtal/models/posts/post_model.dart';
 import 'package:pawrtal/views/posts/post_tile.dart';
 import 'package:pawrtal/viewmodels/home/home_viewmodel.dart';
 import 'package:pawrtal/views/profile/profile.dart';
+import 'package:pawrtal/services/auth.dart';
 
 class HomeView extends ConsumerStatefulWidget {
   const HomeView({
@@ -15,6 +16,7 @@ class HomeView extends ConsumerStatefulWidget {
 }
 
 class _HomeViewState extends ConsumerState<HomeView> with AutomaticKeepAliveClientMixin<HomeView> {
+  final AuthService _auth = AuthService();
   @override
   bool get wantKeepAlive => true;
 
@@ -65,6 +67,23 @@ class _HomeViewState extends ConsumerState<HomeView> with AutomaticKeepAliveClie
                       IconButton( 
                         onPressed: () {},
                         icon: const Icon(Icons.messenger)
+                      ),
+                      // logout button
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: Colors.grey[400], // background color
+                        ),
+                        child: const Text(
+                          'Logout',
+                          style: TextStyle(color: Colors.black),
+                        ),
+                        onPressed: () async {
+                          if (mounted) {
+                            await _auth.signOut();
+                            // Navigate to Authenticate screen
+                            Navigator.pushReplacementNamed(context, '/');
+                          }
+                        },
                       )
                     ],
                   ),
