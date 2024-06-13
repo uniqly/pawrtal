@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pawrtal/firebase_options.dart';
 import 'package:pawrtal/screens/authenticate/authenticate.dart';
 import 'package:pawrtal/services/auth.dart';
-import 'package:provider/provider.dart';
+import 'package:provider/provider.dart' as provider;
 import 'package:pawrtal/models/myuser.dart';
 import 'package:pawrtal/screens/home/home.dart';
 import 'package:pawrtal/screens/onboarding/welcome.dart';
@@ -14,7 +15,11 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  runApp(const MainApp());
+  runApp(
+    const ProviderScope(
+      child: MainApp()
+      ),
+  );
 }
 
 class MainApp extends StatelessWidget {
@@ -22,7 +27,7 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StreamProvider<MyUser?>.value(
+    return provider.StreamProvider<MyUser?>.value(
       initialData: null,
       value: AuthService().user,
       child: MaterialApp(
