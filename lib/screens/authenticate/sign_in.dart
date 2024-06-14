@@ -55,10 +55,10 @@ class _SignInState extends State<SignIn> {
                 const SizedBox(height: 50.0),
                 TextFormField(
                   decoration: textInputDecoration.copyWith(
-                    hintText: 'Username',
+                    hintText: 'Email or Username',
                     prefixIcon: const Icon(Icons.email), // Add the email icon
                   ),
-                  validator: (val) => val!.isEmpty ? 'Enter a username' : null,
+                  validator: (val) => val!.isEmpty ? 'Enter a username or email' : null,
                   onChanged: (val) {
                     setState(() => username = val);
                   },
@@ -97,7 +97,7 @@ class _SignInState extends State<SignIn> {
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
                         setState(() => loading = true);
-                        dynamic result = await _auth.signInWithUsernameAndPassword(username, password);
+                        dynamic result = await _auth.signInWithUsernameOrEmailAndPassword(username, password);
                         if (result == null) {
                           setState(() {
                             error = 'Could not sign in with those credentials';
