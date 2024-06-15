@@ -5,7 +5,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:pawrtal/models/portals/portal_model.dart';
 import 'package:pawrtal/models/user/user_model.dart';
-import 'package:pawrtal/test/test_user.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
 
@@ -88,7 +87,7 @@ class CreatePostViewModel {
 class CreatePostViewModelNotifier extends _$CreatePostViewModelNotifier {
   @override
   Future<CreatePostViewModel> build() async {
-    final mainUser = await ref.watch(mainUserProvider.future);
+    final mainUser = ref.watch(appUserProvider).value!;
     return CreatePostViewModel(mainUser);
   }
 }

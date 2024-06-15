@@ -20,11 +20,11 @@ class ProfileViewModel {
   Map<String, dynamic> get profileInfo {
     return { 
       "name": _profile.displayName,
-      "handle": _profile.handle,
+      "username": _profile.username,
       "pfp": _profile.pfp,
-      "bio": _profile.bio,
+      "bio": _profile.bio!.isNotEmpty ? _profile.bio : '- empty bio -',
       "banner": _profile.banner,
-      "location": _profile.location,
+      "location": _profile.location!.isNotEmpty ? _profile.bio : 'unknown location',
       "followers": _profile.followerCount,
       "following": _profile.followingCount,
     };
@@ -72,7 +72,7 @@ class ProfileViewModelNotifier extends _$ProfileViewModelNotifier {
   @override
   Future<ProfileViewModel> build({required String uid}) async {
     log('getting user: $uid');
-    final profile = await UserModel.userFromFirebase(uid);
+    final profile = await UserModel(uid).updated;
     final mainUser = await ref.watch(mainUserProvider.future);
     return ProfileViewModel(profile, mainUser);
   }

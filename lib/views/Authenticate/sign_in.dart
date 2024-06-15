@@ -1,10 +1,13 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
-import 'package:pawrtal/screens/authenticate/forget_password.dart';
+import 'package:pawrtal/main.dart';
+import 'package:pawrtal/views/Authenticate/forget_password.dart';
 import 'package:pawrtal/services/auth.dart';
 import 'package:pawrtal/shared/constants.dart';
 import 'package:pawrtal/shared/loading.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:pawrtal/views/home/home.dart';
+import 'package:pawrtal/views/main_view.dart';
 
 class SignIn extends StatefulWidget {
 
@@ -98,19 +101,18 @@ class _SignInState extends State<SignIn> {
                       if (_formKey.currentState!.validate()) {
                         setState(() => loading = true);
                         //dynamic result = await _auth.signInWithUsernameAndPassword(username, password);
-                        dynamic result = await _auth.signInWithUsernameAndPassword(username, password);
+                        final result = await AuthService.signInWithUsernameAndPassword(username, password);
                         if (result == null) {
                           setState(() {
                             error = 'Could not sign in with those credentials';
                             loading = false;
                           });
                         } else {
-                          setState(() => loading = false);
+                          loading = false;
                           // Navigate to home screen
-                          Navigator.pushReplacementNamed(
-                            context,
-                            '/home'
-                          );
+                          if (context.mounted) {
+                            //Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const MainView()));
+                          }
                         }
                       }
                     },
@@ -162,22 +164,21 @@ class _SignInState extends State<SignIn> {
                   ), // Google icon
                     onPressed: () async {
                       setState(() => loading = true);
-                      print('Initiating Google sign-in');
-                      UserCredential? result = await _auth.signInWithGoogle();
-                      print('Google SignIn result: $result');
+                      log('Initiating Google sign-in');
+                      UserCredential? result = await AuthService.signInWithGoogle();
+                      log('Google SignIn result: $result');
                       if (result == null) {
                       setState(() {
                         error = 'Could not sign in with Google';
                         loading = false;
                       });
-                    } else {
-                      setState(() => loading = false);
-                        print('Signed in with Google: ${result.user?.email}');
+                      } else {
+                        loading = false;
+                        log('Signed in with Google: ${result.user?.email}');
                         // Navigate to home screen
-                          Navigator.pushReplacementNamed(
-                            context,
-                            '/home',
-                          );
+                        if (context.mounted) {
+                          //Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const MainView()));
+                        }
                       }
                     },
                     label: const Text(
@@ -209,7 +210,7 @@ class _SignInState extends State<SignIn> {
                     ),
                     TextButton(
                       onPressed: () {
-                        Navigator.push(
+                        Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(builder: (context) => const ForgetPassword()),
                         );

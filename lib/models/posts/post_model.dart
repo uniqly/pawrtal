@@ -35,7 +35,7 @@ class PostModel {
     final postSnapshot = await _db.collection('posts').doc(uid).get();
     final postData = postSnapshot.data()!;
     final portal = await PortalModel.portalFromFirebase(postData['portal'].id);
-    final poster = await UserModel.userFromFirebase(postData['poster'].id);
+    final poster = await UserModel(postData['poster'].id).updated;
     return PostModel( 
       uid: uid,
       portal: portal,
@@ -51,7 +51,7 @@ class PostModel {
     log('id: ${snapshot.id}');
     final postData = snapshot.data()!;
     final portal = await PortalModel.portalFromFirebase(postData['portal'].id);
-    final poster = await UserModel.userFromFirebase(postData['poster'].id);
+    final poster = await UserModel(postData['poster'].id).updated;
     return PostModel( 
       uid: snapshot.id,
       portal: portal,

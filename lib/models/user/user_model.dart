@@ -1,5 +1,11 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:pawrtal/services/auth.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'user_model.g.dart';
 
 // TODO: Integrate with firebase auth
 class UserModel {
@@ -7,53 +13,79 @@ class UserModel {
   static final _storage = FirebaseStorage.instance.ref();
 
   final String uid;
-  final String? displayName;
-  final String? handle;
-  final String? pfp;
-  final String? banner;
-  final String? location;
-  final String? bio;
-  final int? followerCount;
-  final int? followingCount;
+  String? _displayName;
+  String? get displayName => _displayName;
+  String? _username;
+  String? get username => _username;
+  String? _pfp;
+  String? get pfp => _pfp;
+  String? _banner;
+  String? get banner => _banner;
+  String? _location;
+  String? get location => _location;
+  String? _bio;
+  String? get bio => _bio;
+  int? _followerCount;
+  int? get followerCount => _followerCount;
+  int? _followingCount;
+  int? get followingCount => _followingCount;
 
+  UserModel(this.uid);
 
-  UserModel({required this.uid, this.displayName, this.handle, this.pfp, this.banner, 
-      this.location, this.bio, this.followerCount, this.followingCount});
+  static Future<UserModel> fromSnapshot({required String uid, required DocumentSnapshot<Map<String, dynamic>> snapshot}) async {
+    final user = UserModel(uid);
+    user._username = snapshot['username'] ?? '<NULL>';
+    user._location = snapshot['location'] ?? '';
+    user._bio = snapshot['bio'] ?? '';
+    user._followerCount = snapshot['followers'] ?? 0;
+    user._followingCount = snapshot['following'] ?? 0;
+    user._pfp = await _storage.child('images/users/$uid-pfp.png').getDownloadURL().onError((e, s) => '');
+    user._banner = await _storage.child('images/users/$uid-banner.png').getDownloadURL().onError((e, s) => '');
+    return user;
+  }
 
   DocumentReference get dbRef {
     return _db.collection('users').doc(uid);
   }
 
-  static Future<UserModel> userFromFirebase(String uid) async {
+
+  Future<UserModel> get updated async {
     final dataSnapshot = await _db.collection('users').doc(uid).get();
-    final data = dataSnapshot.data()!;
-    
-    return UserModel(
-      uid: uid,
-      displayName: data['displayName'] ,
-      handle: data['handle'],
-      pfp: await _storage.child('images/users/$uid-pfp.png').getDownloadURL().onError((e, s) => ''),
-      banner: await _storage.child('images/users/$uid-banner.png').getDownloadURL().onError((e, s) => ''),
-      location: data['location'],
-      bio: data['bio'],
-      followerCount: data['followers'],
-      followingCount: data['following'],
-    );
+    if (dataSnapshot.data() != null) {
+      final data = dataSnapshot.data()!;
+      
+      _displayName = data['displayName'];
+      _username = data['username'];
+      _pfp = await _storage.child('images/users/$uid-pfp.png').getDownloadURL().onError((e, s) => '');
+      _banner = await _storage.child('images/users/$uid-banner.png').getDownloadURL().onError((e, s) => '');
+      _location = data['location'];
+      _bio = data['bio'];
+      _followerCount = data['followers'];
+      _followingCount = data['following'];
+    }
+
+    return this;
   }
 
-  UserModel copyWith({String? displayName, String? handle, String? bio, String? location,
-      String? pfp, String? banner, int? followerCount, int? followingCount}) {
-    return UserModel( 
-      uid: uid,
-      displayName: displayName ?? this.displayName,
-      handle: handle ?? this.handle,
-      bio: bio ?? this.bio,
-      location: location ?? this.location,
-      pfp: pfp ?? this.pfp,
-      banner: banner ?? this.banner,
-      followerCount: followerCount ?? this.followerCount,
-      followingCount: followingCount ?? this.followingCount
-    );
+  @override
+  String toString() {
+    return 'user: $uid, $_displayName, $_username, $_bio, $_location, $_banner, $_followerCount, $_followingCount';
   }
 }
 
+@riverpod
+Stream<UserModel?> appUser(AppUserRef ref) async* { 
+  final auth = ref.watch(authUserProvider);
+  final user = auth.value;
+  if (user != null) {
+    yield* FirebaseFirestore.instance.collection('users').doc(user.uid).snapshots().asyncMap((snapshot) { 
+      if (snapshot.exists) {
+        return UserModel.fromSnapshot(uid: user.uid, snapshot: snapshot);
+      } else {
+        return null;
+      }
+    });
+  } else {
+   yield null;
+  }
+}

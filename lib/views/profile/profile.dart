@@ -59,7 +59,7 @@ class ProfileView extends ConsumerWidget {
                       child: Stack( 
                         children: [
                           SizedBox(
-                            height: 374,
+                            height: 380,
                             width: MediaQuery.of(context).size.width
                           ),
                           Container(
@@ -131,14 +131,14 @@ class ProfileView extends ConsumerWidget {
                                     ),
                                   ),
                                   Text(
-                                    '@${userData['handle']}',
+                                    '@${userData['username']}',
                                     style: TextStyle( 
                                       fontSize: 14,
                                       color: Theme.of(context).colorScheme.surfaceTint,
                                     ),
                                   ),
                                   Text(
-                                    userData['bio'],
+                                    userData['bio'] ?? 'no bio',
                                     style: const TextStyle( 
                                       fontSize: 14,
                                     ),

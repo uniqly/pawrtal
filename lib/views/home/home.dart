@@ -79,7 +79,7 @@ class _HomeViewState extends ConsumerState<HomeView> with AutomaticKeepAliveClie
                         ),
                         onPressed: () async {
                           if (mounted) {
-                            await _auth.signOut();
+                            await AuthService.signOut();
                             // Navigate to Authenticate screen
                             Navigator.pushReplacementNamed(context, '/');
                           }

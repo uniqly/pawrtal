@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:pawrtal/screens/authenticate/authenticate.dart';
+import 'package:pawrtal/main.dart';
+import 'package:pawrtal/views/Authenticate/authenticate.dart';
 import 'package:pawrtal/screens/onboarding/welcome.dart';
-import 'package:pawrtal/views/home/home.dart';
+import 'package:pawrtal/views/main_view.dart';
 import 'package:provider/provider.dart';
 import 'package:pawrtal/models/myuser.dart';
 
@@ -20,7 +21,7 @@ class Wrapper extends StatelessWidget {
     } else if (isNewUser) {
       return Welcome(username: customer.username ?? '');
     } else {
-      return const HomeView();
+      return const MainApp();
     }
   }
 }

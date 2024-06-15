@@ -1,4 +1,7 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:pawrtal/screens/onboarding/welcome.dart';
 import 'package:pawrtal/services/auth.dart';
 import 'package:pawrtal/shared/constants.dart';
 import 'package:pawrtal/shared/loading.dart';
@@ -33,7 +36,7 @@ class _RegisterState extends State<Register> {
       String password = _passwordController.text;
 
       try {
-        dynamic result = await _auth.registerWithEmailandPassword(email, username, password);
+        dynamic result = await AuthService.registerWithEmailandPassword(email, username, password);
         if (result == null) {
           setState(() {
             error = 'Registration failed. Please try again.';
@@ -41,11 +44,11 @@ class _RegisterState extends State<Register> {
           });
         } else {
           if (mounted) {
-            Navigator.pushReplacementNamed(context, '/welcome', arguments: {'username': username});
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Welcome(username: username)));
           }
         }
       } catch (e) {
-        print('Error registering user: $e');
+        log('Error registering user: $e');
         if (mounted) {
           setState(() {
             error = 'Registration failed. Please try again.';
@@ -180,14 +183,14 @@ class _RegisterState extends State<Register> {
                         ),
                         onPressed: () async {
                           setState(() => loading = true);
-                          UserCredential? result = await _auth.signInWithGoogle();
+                          UserCredential? result = await AuthService.signInWithGoogle();
                           if (result == null) {
                             setState(() {
                               error = 'Could not sign in with Google';
                               loading = false;
                             });
                           } else {
-                            print('Signed in with Google: ${result.user?.email}');
+                            log('Signed in with Google: ${result.user?.email}');
                           }
                         },
                         label: const Text(
