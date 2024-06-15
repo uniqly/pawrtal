@@ -5,6 +5,7 @@ import 'package:pawrtal/views/main_view.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:pawrtal/screens/authenticate/authenticate.dart';
 import 'package:pawrtal/services/auth.dart';
+import 'package:pawrtal/views/profile/profile.dart';
 import 'package:provider/provider.dart' as provider;
 import 'package:pawrtal/models/myuser.dart';
 import 'package:pawrtal/screens/onboarding/welcome.dart';

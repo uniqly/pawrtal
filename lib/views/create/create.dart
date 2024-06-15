@@ -1,7 +1,10 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:pawrtal/viewmodels/create/create_post_viewmodel.dart';
 import 'package:pawrtal/views/create/create_choose_portal.dart';
 
@@ -19,6 +22,30 @@ class _CreateViewState extends ConsumerState<CreateView> {
 
   bool _validate() {
     return _formKey.currentState?.validate() ?? false;
+  }
+
+  List<File> _images = [];
+  void _pickImages() async {
+    try {
+      //final image = await ImagePicker().pickImage(source:  ImageSource.gallery);
+      final images = await ImagePicker().pickMultiImage();
+      log('$images');
+
+      final temp = images.map((image) => File(image.path)).toList();
+      setState(() {
+        _images = temp;
+      });
+    } on PlatformException catch (e) {
+      log('Failed to pick image: $e');
+    }
+  }
+
+  void _removeImage(File image) {
+    if (_images.contains(image)) {
+      setState(() {
+        _images.remove(image);
+      });
+    }
   }
 
   @override
@@ -52,11 +79,12 @@ class _CreateViewState extends ConsumerState<CreateView> {
                       disabledForegroundColor: Theme.of(context).colorScheme.surfaceDim,
                     ),
                     onPressed: _validate() ? () { 
-                      log('$viewmodel');
                       viewmodel.updateForm(
                         caption: captionController.text,
-                        description: descriptionController.text
+                        description: descriptionController.text,
+                        images: _images
                       );
+                      log('form: $viewmodel');
                       Navigator.of(context).push(MaterialPageRoute(
                           builder: (context) => const CreateChoosePortalView()
                         )
@@ -72,6 +100,7 @@ class _CreateViewState extends ConsumerState<CreateView> {
               width: 75,
               child: FloatingActionButton( // TODO: Implement picture picker
                 onPressed: () { 
+                  _pickImages(); 
                 },
                 shape: const CircleBorder(),
                 backgroundColor: Theme.of(context).colorScheme.primary,
@@ -84,6 +113,7 @@ class _CreateViewState extends ConsumerState<CreateView> {
               child: Form(
                 key: _formKey,
                 child: Column( 
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [ 
                     TextFormField( 
                       validator: (value) => value?.isEmpty ?? true ? '' : null,
@@ -118,6 +148,56 @@ class _CreateViewState extends ConsumerState<CreateView> {
                         color: Theme.of(context).colorScheme.onSecondaryContainer,
                       ),
                       maxLines: null,
+                    ),
+                    const Spacer(),
+                    SizedBox(
+                      height: 120,
+                      width: MediaQuery.sizeOf(context).width * 0.7,
+                      child: ShaderMask(
+                        shaderCallback: (rect) { 
+                          return const LinearGradient( 
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight, 
+                            colors: [Colors.transparent, Colors.purple],
+                            stops: [0.8, 1.0],
+                          ).createShader(rect);
+                        },
+                        blendMode: BlendMode.dstOut,
+                        child: ListView.builder( 
+                          scrollDirection: Axis.horizontal,
+                          itemCount: _images.length,
+                          itemBuilder: (context, index) => Stack(
+                            alignment: Alignment.topRight,
+                            children: [ 
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(5.0),
+                                  child: Image.file(
+                                    _images[index],
+                                    height: 100,
+                                    width: 100,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
+                              CircleAvatar(
+                                radius: 10.0,
+                                backgroundColor: Colors.red, 
+                                child: IconButton(
+                                  color: Theme.of(context).colorScheme.surfaceContainer,
+                                  onPressed: () => _removeImage(_images[index]), 
+                                  padding: EdgeInsets.zero,
+                                  icon: const Icon(
+                                    Icons.clear,
+                                    size: 15.0,
+                                  )
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     )
                   ],
                 ),

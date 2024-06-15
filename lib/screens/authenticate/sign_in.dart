@@ -97,6 +97,7 @@ class _SignInState extends State<SignIn> {
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
                         setState(() => loading = true);
+                        //dynamic result = await _auth.signInWithUsernameAndPassword(username, password);
                         dynamic result = await _auth.signInWithUsernameAndPassword(username, password);
                         if (result == null) {
                           setState(() {
@@ -106,9 +107,9 @@ class _SignInState extends State<SignIn> {
                         } else {
                           setState(() => loading = false);
                           // Navigate to home screen
-                          Navigator.pushReplacement(
+                          Navigator.pushReplacementNamed(
                             context,
-                            MaterialPageRoute(builder: (context) => const HomeView()),
+                            '/home'
                           );
                         }
                       }
@@ -173,9 +174,9 @@ class _SignInState extends State<SignIn> {
                       setState(() => loading = false);
                         print('Signed in with Google: ${result.user?.email}');
                         // Navigate to home screen
-                          Navigator.pushReplacement(
+                          Navigator.pushReplacementNamed(
                             context,
-                            MaterialPageRoute(builder: (context) => HomeView()),
+                            '/home',
                           );
                       }
                     },

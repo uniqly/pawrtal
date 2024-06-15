@@ -25,6 +25,8 @@ dependencies:
   provider: ^6.1.2
   riverpod_annotation: ^2.3.5
   smooth_page_indicator: ^1.1.0
+  image_picker: ^1.1.2
+  image: ^4.2.0
 
 
 dev_dependencies:

@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -17,20 +18,22 @@ class CreatePostViewModel {
   final UserModel _poster;
   String _caption = '';
   String _description = '';
-  int _imageCount = 0;
+  List<File> _images = [];
   String? _portalId;
 
   CreatePostViewModel(this._poster);
 
-  void updateForm({String? caption, String? description, String? portalId}) {
+  void updateForm({String? caption, String? description, String? portalId, List<File>? images}) {
     _caption = caption ?? _caption;
     _description = description ?? _description;
     _portalId = portalId;
+    _images = images ?? _images;
   }
 
   @override
   String toString() {
-    return '$_caption, $_description, $_portalId';
+    final img = _images.fold('', (s, f) => '$s${f.uri.pathSegments.last}, ');
+    return '$_caption, $_description, $_portalId, [ $img]';
   }
 
   // query for the list of subpawrtals whose name (not id) starts with the query string
@@ -58,6 +61,8 @@ class CreatePostViewModel {
 
   Future<void> createPost() async { 
     final newUuid = const Uuid().v4();
+    
+    // upload post to firestore
     final upload = { 
       'poster': _db.doc('users/${_poster.uid}'),
       'portal': _db.doc('portals/$_portalId'),
@@ -65,11 +70,18 @@ class CreatePostViewModel {
       'description': _description,
       'comments': 0,
       'likes': 0,
-      'images': _imageCount,
+      'images': _images.length,
       'timestamp': FieldValue.serverTimestamp(),
     };
     _db.collection('posts').doc(newUuid).set(upload, SetOptions(merge: true));
+
+    // upload images to cloud
+    for (int i = 0; i < _images.length; i++) {
+      var file = _images[i];
+      _storage.child('images/posts/$newUuid-${i+1}.png').putFile(file);
+    }
   }
+
 }
 
 @riverpod
