@@ -46,17 +46,7 @@ class PostTile extends StatelessWidget {
         ),
         GestureDetector(
           onDoubleTap: () {},
-          child: FutureBuilder<List<String>?>( 
-              future: post.postImages,
-              builder: (context, snapshot) { 
-                if (snapshot.hasData && snapshot.data != null) {
-                  var images = snapshot.data!;
-                  return PostImageGallery(imageStrings: images);
-                } else {
-                  return const SizedBox.shrink();
-                }
-              }
-            )
+          child: post.images!.isNotEmpty ? PostImageGallery(imageStrings: post.images!) : const SizedBox.shrink(),
         ),
         // actions bar of post
         Row( 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:pawrtal/viewmodels/profile/profile_viewmodel.dart';
+import 'package:pawrtal/views/profile/profile_edit.dart';
 import 'package:pawrtal/views/profile/profile_media.dart';
 import 'package:pawrtal/views/profile/profile_posts.dart';
 
@@ -59,7 +60,7 @@ class ProfileView extends ConsumerWidget {
                       child: Stack( 
                         children: [
                           SizedBox(
-                            height: 374,
+                            height: 380,
                             width: MediaQuery.of(context).size.width
                           ),
                           Container(
@@ -98,7 +99,9 @@ class ProfileView extends ConsumerWidget {
                                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                         ),
                                         onPressed: () {
-                                          //ref.read(mainUserProvider.notifier).incrFollows();
+                                          Navigator.push(context, MaterialPageRoute(builder: (context) =>
+                                            const ProfileEditView()
+                                          ));
                                         },
                                         child: const Text(
                                           'Edit Pawfile',
@@ -131,14 +134,14 @@ class ProfileView extends ConsumerWidget {
                                     ),
                                   ),
                                   Text(
-                                    '@${userData['handle']}',
+                                    '@${userData['username']}',
                                     style: TextStyle( 
                                       fontSize: 14,
                                       color: Theme.of(context).colorScheme.surfaceTint,
                                     ),
                                   ),
                                   Text(
-                                    userData['bio'],
+                                    userData['bio'].isEmpty ? '- empty bio -' : userData['bio'],
                                     style: const TextStyle( 
                                       fontSize: 14,
                                     ),
@@ -150,7 +153,7 @@ class ProfileView extends ConsumerWidget {
                                         color: Theme.of(context).colorScheme.secondary,
                                       ),
                                       Text(
-                                        userData['location'] ?? 'Unknown',
+                                        userData['location'].isEmpty ? 'Unknown Location' : userData['location'],
                                         style: TextStyle( 
                                           color: Theme.of(context).colorScheme.secondary, 
                                         ),

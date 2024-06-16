@@ -24,8 +24,12 @@ class HomeViewModel {
       .asyncMap(
         (querySnapshot) async {
           var posts = <PostModel>[];
+          log('${querySnapshot.docs}');
           for (var docSnapshot in querySnapshot.docs) {
-            await PostModel.postFromSnapshot(docSnapshot).then((post) => posts.add(post));
+            //await PostModel.postFromSnapshot(docSnapshot).then((post) => posts.add(post));
+            final post = await PostModel.postFromSnapshot(docSnapshot);
+            log(post.caption ?? '');
+            posts.add(post);
           }
           final temp = [for (var p in posts) p.caption];
           log('homeposts: $temp');

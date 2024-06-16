@@ -1,13 +1,12 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pawrtal/firebase_options.dart';
 import 'package:pawrtal/views/main_view.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:pawrtal/screens/authenticate/authenticate.dart';
+import 'package:pawrtal/views/auth/authenticate.dart';
 import 'package:pawrtal/services/auth.dart';
-import 'package:provider/provider.dart' as provider;
-import 'package:pawrtal/models/myuser.dart';
-import 'package:pawrtal/screens/onboarding/welcome.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,11 +24,29 @@ void main() async {
   );
 }
 
-class MainApp extends StatelessWidget {
+class MainApp extends ConsumerWidget {
   const MainApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    //final auth = ref.watch(authUserProvider);
+    return const MaterialApp( 
+      /*
+      home: auth.when(
+        loading: () => const CircularProgressIndicator(),
+        error: (err, stack) { 
+          log('$stack');
+          return Text('error: $err');
+        },
+        data: (authUser) {
+          log('authstate: ${authUser != null}');
+          return authUser != null ? const MainView() : const Authenticate();
+        }
+      )
+      */
+      home: MainView(),
+    );
+    /*
     return provider.StreamProvider<MyUser?>.value(
       initialData: null,
       value: AuthService().user,
@@ -46,5 +63,6 @@ class MainApp extends StatelessWidget {
         },
       ),
     );
+    */
   }
 }
