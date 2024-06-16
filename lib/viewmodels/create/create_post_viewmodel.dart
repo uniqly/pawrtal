@@ -1,10 +1,10 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:pawrtal/models/portals/portal_model.dart';
 import 'package:pawrtal/models/user/user_model.dart';
-import 'package:pawrtal/test/test_user.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
 
@@ -17,20 +17,22 @@ class CreatePostViewModel {
   final UserModel _poster;
   String _caption = '';
   String _description = '';
-  int _imageCount = 0;
+  List<File> _images = [];
   String? _portalId;
 
   CreatePostViewModel(this._poster);
 
-  void updateForm({String? caption, String? description, String? portalId}) {
+  void updateForm({String? caption, String? description, String? portalId, List<File>? images}) {
     _caption = caption ?? _caption;
     _description = description ?? _description;
     _portalId = portalId;
+    _images = images ?? _images;
   }
 
   @override
   String toString() {
-    return '$_caption, $_description, $_portalId';
+    final img = _images.fold('', (s, f) => '$s${f.uri.pathSegments.last}, ');
+    return '$_caption, $_description, $_portalId, [ $img]';
   }
 
   // query for the list of subpawrtals whose name (not id) starts with the query string
@@ -46,18 +48,32 @@ class CreatePostViewModel {
         .where('name', isLessThan: endQuery);
       log('query: ($query, $endQuery)');
     }
-    await ref.orderBy('memberCount', descending: true).get()
-      .then((querySnapshot) async { 
-        for (var docSnapshot in querySnapshot.docs) {
-          log('portal: $docSnapshot');
-          await PortalModel.portalFromSnapshot(docSnapshot).then((portal) => portals.add(portal));
-        }
-      });
+    await ref.get().then((querySnapshot) async { 
+      for (var docSnapshot in querySnapshot.docs) {
+        log('portal: $docSnapshot');
+        await PortalModel.portalFromSnapshot(docSnapshot).then((portal) => portals.add(portal));
+      }
+    });
     yield portals;
   }
 
   Future<void> createPost() async { 
     final newUuid = const Uuid().v4();
+
+    final images = <String>[];
+
+    // upload images to cloud
+    for (int i = 0; i < _images.length; i++) {
+      final file = _images[i];
+      final ref =_storage.child('images/posts/$newUuid-${i+1}.png');
+      final image = await ref.putFile(file).then((snapshot) => snapshot.ref.getDownloadURL());
+      images.add(image);
+      //await ref.getDownloadURL().then((image) => images.add(image));
+    }
+    
+    log('$images');
+    
+    // upload post to firestore
     final upload = { 
       'poster': _db.doc('users/${_poster.uid}'),
       'portal': _db.doc('portals/$_portalId'),
@@ -65,18 +81,20 @@ class CreatePostViewModel {
       'description': _description,
       'comments': 0,
       'likes': 0,
-      'images': _imageCount,
+      'images': images,
       'timestamp': FieldValue.serverTimestamp(),
     };
     _db.collection('posts').doc(newUuid).set(upload, SetOptions(merge: true));
+
   }
+
 }
 
 @riverpod
 class CreatePostViewModelNotifier extends _$CreatePostViewModelNotifier {
   @override
   Future<CreatePostViewModel> build() async {
-    final mainUser = await ref.watch(mainUserProvider.future);
+    final mainUser = ref.watch(appUserProvider).value!;
     return CreatePostViewModel(mainUser);
   }
 }

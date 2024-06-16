@@ -1,36 +1,39 @@
+import 'dart:developer';
+
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:pawrtal/models/myuser.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'auth.g.dart';
 class AuthService {
 
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  static final FirebaseAuth _auth = FirebaseAuth.instance;
+  static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  static final _storage = FirebaseStorage.instance.ref();
 
   // create user object based on FirebaseUser
-  MyUser? _userFromFirebaseUser(User? user) {
+  static MyUser? _userFromFirebaseUser(User? user) {
     return user != null ? MyUser(uid: user.uid) : null;
   }
 
-  // auth change user stream
-  Stream<MyUser?> get user {
-    return _auth.authStateChanges().map((User? user) => _userFromFirebaseUser(user));
-  }
-
   // sign in anon
-  Future signInAnon() async {
+  static Future<MyUser?> signInAnon() async {
     try {
       UserCredential result = await _auth.signInAnonymously(); //AuthResult result = await _auth.signInAnonymously();
       User? user = result.user; // FirebaseUser user = result.user;
       return _userFromFirebaseUser(user!);
     } catch(e) {
-      print(e.toString());
+      log('error on anon sign in: $e');
       return null;
     }
   }
 
-  // sign in with email or username
-  Future signInWithUsernameOrEmailAndPassword(String input, String password) async {
+
+  // sign in with username
+  static Future<MyUser?> signInWithUsernameAndPassword(String username, String password) async {
     try {
       String email;
       // Check if the input is an email
@@ -60,13 +63,13 @@ class AuthService {
       User? user = result.user;
       return _userFromFirebaseUser(user);
     } catch (e) {
-      print(e.toString());
+      log('error on username sign in: $e');
       return null;
     }
   }
 
   // sign in with google 
-  Future<UserCredential?> signInWithGoogle() async {
+  static Future<UserCredential?> signInWithGoogle() async {
     try {
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
       if (googleUser == null) {
@@ -85,26 +88,35 @@ class AuthService {
 
       // Check if user data exists in Firestore
       if (user != null) {
+        final pfp = await _storage.child('images/users/default-pfp.png').getDownloadURL();
+        final banner = await _storage.child('images/users/default-banner.png').getDownloadURL();
         DocumentSnapshot userDoc = await _firestore.collection('users').doc(user.uid).get();
         if (!userDoc.exists) {
           // If user data does not exist, add it to Firestore
           await _firestore.collection('users').doc(user.uid).set({
-            'username': user.displayName,
+            'displayName': user.displayName,
+            'username': user.uid,
             'email': user.email,
             'createdAt': FieldValue.serverTimestamp(),
+            'location': '',
+            'bio': '',
+            'followers': 0,
+            'following': 0,
+            'pfp': pfp,
+            'banner': banner,
           });
         }
       }
 
       return userCredential;
     } catch (e) {
-      print('exception->$e');
+      log('error on google sign in: $e');
       return null;
     }
   }
 
   // register with email and password
-  Future registerWithEmailandPassword(String email, String username, String password) async {
+  static Future<MyUser?> registerWithEmailandPassword(String email, String username, String password) async {
     try {
       UserCredential result = await _auth.createUserWithEmailAndPassword(email: email, password: password);
       User? user = result.user;
@@ -114,30 +126,44 @@ class AuthService {
         await user.updateDisplayName(username);
         await user.reload();
         user = _auth.currentUser;
+
+        final pfp = await _storage.child('images/users/default-pfp.png').getDownloadURL();
+        final banner = await _storage.child('images/users/default-banner.png').getDownloadURL();
         
         // Store user information in Firestore
         await _firestore.collection('users').doc(user?.uid).set({
+          'displayName': username,
           'username': username,
           'email': email,
           'createdAt': FieldValue.serverTimestamp(),
+          'location': '',
+          'bio': '',
+          'followers': 0,
+          'following': 0,
+          'pfp': pfp,
+          'banner': banner,
         });
       }
       
       return _userFromFirebaseUser(user);
     } catch(e) {
-      print(e.toString());
+      log('error while registering: $e');
       return null;
     }
   }
 
   // sign out
-  Future signOut() async {
+  static Future<void> signOut() async {
     try {
       return await _auth.signOut();
     } catch(e) {
-      print(e.toString());
-      return null;
+      log('error while signing out: $e');
     }
   }
 
+}
+
+@riverpod
+Stream<User?> authUser(AuthUserRef ref) {
+  return FirebaseAuth.instance.authStateChanges();
 }

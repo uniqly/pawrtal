@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:pawrtal/main.dart';
 import 'package:pawrtal/shared/loading.dart';
+import 'package:pawrtal/views/main_view.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class Welcome extends StatefulWidget {
@@ -82,7 +84,7 @@ class _WelcomeState extends State<Welcome> {
             isLastPage 
             ? TextButton(
                 onPressed: () {
-                  Navigator.pushReplacementNamed(context, '/home');
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const MainApp()));
                 },
                 child: const Text('Get Started'),
               )

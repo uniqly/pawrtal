@@ -7,7 +7,7 @@ part of 'profile_viewmodel.dart';
 // **************************************************************************
 
 String _$profileViewModelNotifierHash() =>
-    r'fecbeb1262fcc20a263ecd865da6f007aceb023b';
+    r'96f36d3578338fae4282f9f84f4a2e6bb81b83d6';
 
 /// Copied from Dart SDK
 class _SystemHash {

@@ -8,13 +8,13 @@ part 'test_user.g.dart';
 class MainUser extends _$MainUser {
   @override
   Future<UserModel> build() {
-    return UserModel.userFromFirebase('mainuser');
+    return UserModel('mainuser').updated;
   }
 
   Future<void> refresh() async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async { 
-      return state.value!.copyWith();
+      return state.value!.updated;
     });
   }
 }
