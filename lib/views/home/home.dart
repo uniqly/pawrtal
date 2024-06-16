@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pawrtal/models/posts/post_model.dart';
+import 'package:pawrtal/views/auth/authenticate.dart';
 import 'package:pawrtal/views/posts/post_tile.dart';
 import 'package:pawrtal/viewmodels/home/home_viewmodel.dart';
 import 'package:pawrtal/views/profile/profile.dart';
@@ -81,7 +82,7 @@ class _HomeViewState extends ConsumerState<HomeView> with AutomaticKeepAliveClie
                           if (mounted) {
                             await AuthService.signOut();
                             // Navigate to Authenticate screen
-                            Navigator.pushReplacementNamed(context, '/');
+                            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Authenticate()));
                           }
                         },
                       )

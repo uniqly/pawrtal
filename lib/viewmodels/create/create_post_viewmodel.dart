@@ -48,18 +48,30 @@ class CreatePostViewModel {
         .where('name', isLessThan: endQuery);
       log('query: ($query, $endQuery)');
     }
-    await ref.orderBy('memberCount', descending: true).get()
-      .then((querySnapshot) async { 
-        for (var docSnapshot in querySnapshot.docs) {
-          log('portal: $docSnapshot');
-          await PortalModel.portalFromSnapshot(docSnapshot).then((portal) => portals.add(portal));
-        }
-      });
+    await ref.get().then((querySnapshot) async { 
+      for (var docSnapshot in querySnapshot.docs) {
+        log('portal: $docSnapshot');
+        await PortalModel.portalFromSnapshot(docSnapshot).then((portal) => portals.add(portal));
+      }
+    });
     yield portals;
   }
 
   Future<void> createPost() async { 
     final newUuid = const Uuid().v4();
+
+    final images = <String>[];
+
+    // upload images to cloud
+    for (int i = 0; i < _images.length; i++) {
+      final file = _images[i];
+      final ref =_storage.child('images/posts/$newUuid-${i+1}.png');
+      final image = await ref.putFile(file).then((snapshot) => snapshot.ref.getDownloadURL());
+      images.add(image);
+      //await ref.getDownloadURL().then((image) => images.add(image));
+    }
+    
+    log('$images');
     
     // upload post to firestore
     final upload = { 
@@ -69,16 +81,11 @@ class CreatePostViewModel {
       'description': _description,
       'comments': 0,
       'likes': 0,
-      'images': _images.length,
+      'images': images,
       'timestamp': FieldValue.serverTimestamp(),
     };
     _db.collection('posts').doc(newUuid).set(upload, SetOptions(merge: true));
 
-    // upload images to cloud
-    for (int i = 0; i < _images.length; i++) {
-      var file = _images[i];
-      _storage.child('images/posts/$newUuid-${i+1}.png').putFile(file);
-    }
   }
 
 }

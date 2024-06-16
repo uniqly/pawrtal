@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:pawrtal/shared/constants.dart';
 import 'package:pawrtal/shared/loading.dart';
@@ -70,16 +72,16 @@ class _ForgetPasswordState extends State<ForgetPassword> {
                   children: [
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromARGB(255, 206, 199, 224),
+                        backgroundColor: Colors.white,
                       ),
-                      onPressed: () async {
+                      onPressed: email.isNotEmpty ? () async {
                         try {
                           await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
                         } catch (e) {
-                          print('exception->$e');
+                          log('error in sending reset email: $e');
                           return;
                         }
-                      },
+                      } : null,
                       child: const Text(
                         'Reset password',              
                       ),
@@ -87,7 +89,7 @@ class _ForgetPasswordState extends State<ForgetPassword> {
                     const SizedBox(width: 10), // Add a gap of 10 pixels
                     ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 206, 199, 224),
+                    backgroundColor: Colors.white,
                   ),
                   onPressed: () {
                     Navigator.pop(context);

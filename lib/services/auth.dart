@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:pawrtal/models/myuser.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -11,6 +12,7 @@ class AuthService {
 
   static final FirebaseAuth _auth = FirebaseAuth.instance;
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  static final _storage = FirebaseStorage.instance.ref();
 
   // create user object based on FirebaseUser
   static MyUser? _userFromFirebaseUser(User? user) {
@@ -76,6 +78,8 @@ class AuthService {
 
       // Check if user data exists in Firestore
       if (user != null) {
+        final pfp = await _storage.child('images/users/default-pfp.png').getDownloadURL();
+        final banner = await _storage.child('images/users/default-banner.png').getDownloadURL();
         DocumentSnapshot userDoc = await _firestore.collection('users').doc(user.uid).get();
         if (!userDoc.exists) {
           // If user data does not exist, add it to Firestore
@@ -88,6 +92,8 @@ class AuthService {
             'bio': '',
             'followers': 0,
             'following': 0,
+            'pfp': pfp,
+            'banner': banner,
           });
         }
       }
@@ -110,6 +116,9 @@ class AuthService {
         await user.updateDisplayName(username);
         await user.reload();
         user = _auth.currentUser;
+
+        final pfp = await _storage.child('images/users/default-pfp.png').getDownloadURL();
+        final banner = await _storage.child('images/users/default-banner.png').getDownloadURL();
         
         // Store user information in Firestore
         await _firestore.collection('users').doc(user?.uid).set({
@@ -121,6 +130,8 @@ class AuthService {
           'bio': '',
           'followers': 0,
           'following': 0,
+          'pfp': pfp,
+          'banner': banner,
         });
       }
       

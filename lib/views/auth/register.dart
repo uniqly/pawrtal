@@ -44,6 +44,7 @@ class _RegisterState extends State<Register> {
           });
         } else {
           if (mounted) {
+            log('reg');
             Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Welcome(username: username)));
           }
         }

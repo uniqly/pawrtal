@@ -49,6 +49,13 @@ class _CreateViewState extends ConsumerState<CreateView> {
   }
 
   @override
+  void dispose() { 
+    super.dispose();
+    captionController.dispose();
+    descriptionController.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final notifier = ref.watch(createPostViewModelNotifierProvider);
 

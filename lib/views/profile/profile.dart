@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:pawrtal/viewmodels/profile/profile_viewmodel.dart';
+import 'package:pawrtal/views/profile/profile_edit.dart';
 import 'package:pawrtal/views/profile/profile_media.dart';
 import 'package:pawrtal/views/profile/profile_posts.dart';
 
@@ -98,7 +99,9 @@ class ProfileView extends ConsumerWidget {
                                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                         ),
                                         onPressed: () {
-                                          //ref.read(mainUserProvider.notifier).incrFollows();
+                                          Navigator.push(context, MaterialPageRoute(builder: (context) =>
+                                            const ProfileEditView()
+                                          ));
                                         },
                                         child: const Text(
                                           'Edit Pawfile',
@@ -138,7 +141,7 @@ class ProfileView extends ConsumerWidget {
                                     ),
                                   ),
                                   Text(
-                                    userData['bio'] ?? 'no bio',
+                                    userData['bio'].isEmpty ? '- empty bio -' : userData['bio'],
                                     style: const TextStyle( 
                                       fontSize: 14,
                                     ),
@@ -150,7 +153,7 @@ class ProfileView extends ConsumerWidget {
                                         color: Theme.of(context).colorScheme.secondary,
                                       ),
                                       Text(
-                                        userData['location'] ?? 'Unknown',
+                                        userData['location'].isEmpty ? 'Unknown Location' : userData['location'],
                                         style: TextStyle( 
                                           color: Theme.of(context).colorScheme.secondary, 
                                         ),

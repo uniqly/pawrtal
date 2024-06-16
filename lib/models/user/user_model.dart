@@ -35,19 +35,19 @@ class UserModel {
   static Future<UserModel> fromSnapshot({required String uid, required DocumentSnapshot<Map<String, dynamic>> snapshot}) async {
     final user = UserModel(uid);
     user._username = snapshot['username'] ?? '<NULL>';
+    user._displayName = snapshot['displayName'] ?? '<NO NAME>';
     user._location = snapshot['location'] ?? '';
     user._bio = snapshot['bio'] ?? '';
     user._followerCount = snapshot['followers'] ?? 0;
     user._followingCount = snapshot['following'] ?? 0;
-    user._pfp = await _storage.child('images/users/$uid-pfp.png').getDownloadURL().onError((e, s) => '');
-    user._banner = await _storage.child('images/users/$uid-banner.png').getDownloadURL().onError((e, s) => '');
+    user._pfp = snapshot['pfp'] ?? '';
+    user._banner = snapshot['banner'] ?? '';
     return user;
   }
 
   DocumentReference get dbRef {
     return _db.collection('users').doc(uid);
   }
-
 
   Future<UserModel> get updated async {
     final dataSnapshot = await _db.collection('users').doc(uid).get();
@@ -56,8 +56,8 @@ class UserModel {
       
       _displayName = data['displayName'];
       _username = data['username'];
-      _pfp = await _storage.child('images/users/$uid-pfp.png').getDownloadURL().onError((e, s) => '');
-      _banner = await _storage.child('images/users/$uid-banner.png').getDownloadURL().onError((e, s) => '');
+      _pfp = data['pfp'];
+      _banner = data['banner'];
       _location = data['location'];
       _bio = data['bio'];
       _followerCount = data['followers'];

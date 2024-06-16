@@ -6,6 +6,7 @@ import 'package:pawrtal/models/user/user_model.dart';
 import 'package:pawrtal/services/auth.dart';
 import 'package:pawrtal/shared/loading.dart';
 import 'package:pawrtal/test/test_user.dart';
+import 'package:pawrtal/views/auth/authenticate.dart';
 import 'package:pawrtal/views/create/create.dart';
 import 'package:pawrtal/views/profile/profile.dart';
 
@@ -23,6 +24,20 @@ enum PageTab { home, profile }
 class _MainViewState extends ConsumerState<MainView> {
   var currTab = PageTab.home;
   var pageIndex = 0;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    Future(() async {
+        final auth = ref.read(appUserProvider.future);
+        final user = await auth;
+        if (user == null && mounted) {
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Authenticate()));
+        }
+      }
+    );
+  }
 
   @override
   Widget build(BuildContext context) {

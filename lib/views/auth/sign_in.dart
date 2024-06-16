@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:pawrtal/main.dart';
-import 'package:pawrtal/views/Authenticate/forget_password.dart';
+import 'package:pawrtal/views/auth/forget_password.dart';
 import 'package:pawrtal/services/auth.dart';
 import 'package:pawrtal/shared/constants.dart';
 import 'package:pawrtal/shared/loading.dart';
@@ -111,7 +111,7 @@ class _SignInState extends State<SignIn> {
                           loading = false;
                           // Navigate to home screen
                           if (context.mounted) {
-                            //Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const MainView()));
+                            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const MainView()));
                           }
                         }
                       }
@@ -177,7 +177,7 @@ class _SignInState extends State<SignIn> {
                         log('Signed in with Google: ${result.user?.email}');
                         // Navigate to home screen
                         if (context.mounted) {
-                          //Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const MainView()));
+                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const MainView()));
                         }
                       }
                     },
@@ -210,7 +210,7 @@ class _SignInState extends State<SignIn> {
                     ),
                     TextButton(
                       onPressed: () {
-                        Navigator.pushReplacement(
+                        Navigator.push(
                           context,
                           MaterialPageRoute(builder: (context) => const ForgetPassword()),
                         );

@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pawrtal/firebase_options.dart';
 import 'package:pawrtal/views/main_view.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:pawrtal/views/Authenticate/authenticate.dart';
+import 'package:pawrtal/views/auth/authenticate.dart';
 import 'package:pawrtal/services/auth.dart';
 
 void main() async {
@@ -29,8 +29,9 @@ class MainApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final auth = ref.watch(authUserProvider);
-    return MaterialApp( 
+    //final auth = ref.watch(authUserProvider);
+    return const MaterialApp( 
+      /*
       home: auth.when(
         loading: () => const CircularProgressIndicator(),
         error: (err, stack) { 
@@ -42,6 +43,8 @@ class MainApp extends ConsumerWidget {
           return authUser != null ? const MainView() : const Authenticate();
         }
       )
+      */
+      home: MainView(),
     );
     /*
     return provider.StreamProvider<MyUser?>.value(
