@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pawrtal/main.dart';
 import 'package:pawrtal/shared/loading.dart';
-import 'package:pawrtal/views/main_view.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class Welcome extends StatefulWidget {

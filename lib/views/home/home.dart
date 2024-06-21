@@ -17,7 +17,6 @@ class HomeView extends ConsumerStatefulWidget {
 }
 
 class _HomeViewState extends ConsumerState<HomeView> with AutomaticKeepAliveClientMixin<HomeView> {
-  final AuthService _auth = AuthService();
   @override
   bool get wantKeepAlive => true;
 
