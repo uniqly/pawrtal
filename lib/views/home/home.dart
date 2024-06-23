@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pawrtal/views/auth/authenticate.dart';
 import 'package:pawrtal/views/posts/post_list_view.dart';
 import 'package:pawrtal/viewmodels/home/home_viewmodel.dart';
-import 'package:pawrtal/views/profile/profile.dart';
 import 'package:pawrtal/services/auth.dart';
 
 class HomeView extends ConsumerStatefulWidget {
@@ -32,15 +31,6 @@ class _HomeViewState extends ConsumerState<HomeView> with AutomaticKeepAliveClie
           color: Colors.white,
           child: SafeArea(
             child: Scaffold(
-              floatingActionButton: FloatingActionButton(  // TODO: test button
-                onPressed: () async {
-                  Navigator.of(context).push( 
-                    MaterialPageRoute( 
-                      builder: (context) => const ProfileView(userId: 'mainuser')
-                    )
-                  );
-                },
-              ),
               body: NestedScrollView(
                 headerSliverBuilder: (context, _) => [
                   SliverAppBar( 

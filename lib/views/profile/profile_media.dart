@@ -48,7 +48,7 @@ class _ProfileMediaViewState extends ConsumerState<ProfileMediaView> with Automa
                   ),
                 );
               }
-            ) : const CircularProgressIndicator();
+            ) : const Center(child: SizedBox(height: 30, width: 30, child: CircularProgressIndicator()));
           },
         );
       }

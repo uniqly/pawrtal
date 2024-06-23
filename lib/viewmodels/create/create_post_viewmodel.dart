@@ -79,8 +79,8 @@ class CreatePostViewModel {
       'portal': _db.doc('portals/$_portalId'),
       'caption': _caption,
       'description': _description,
-      'comments': 0,
-      'likes': 0,
+      'commentCount': 0,
+      'likeCount': 0,
       'images': images,
       'timestamp': FieldValue.serverTimestamp(),
     };

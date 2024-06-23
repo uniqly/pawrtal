@@ -3,16 +3,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pawrtal/viewmodels/profile/profile_viewmodel.dart';
 import 'package:pawrtal/views/posts/post_list_view.dart';
 
-class ProfilePostsView extends ConsumerStatefulWidget {
+class ProfileLikesView extends ConsumerStatefulWidget {
   final String userId;
 
-  const ProfilePostsView({super.key, required this.userId});
+  const ProfileLikesView({super.key, required this.userId});
 
   @override
-  ConsumerState<ProfilePostsView> createState() => _ProfilePostsViewState();
+  ConsumerState<ProfileLikesView> createState() => _ProfileLikesViewState();
 }
 
-class _ProfilePostsViewState extends ConsumerState<ProfilePostsView> with AutomaticKeepAliveClientMixin<ProfilePostsView> {
+class _ProfileLikesViewState extends ConsumerState<ProfileLikesView> with AutomaticKeepAliveClientMixin<ProfileLikesView> {
   @override
   bool get wantKeepAlive => true;
 
@@ -24,7 +24,7 @@ class _ProfilePostsViewState extends ConsumerState<ProfilePostsView> with Automa
     return profileViewModel.when( 
       loading: () => const CircularProgressIndicator(),
       error: (err, stack) => Text('error: $err'),
-      data: (viewmodel) => PostListView(postStream: viewmodel.posts),
+      data: (viewmodel) => PostListView(postStream: viewmodel.likedPosts),
     );
   }
 }

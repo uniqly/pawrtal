@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:pawrtal/models/portals/portal_model.dart';
 import 'package:pawrtal/test/placeholder_images.dart';
-import 'package:pawrtal/test/test_user.dart';
 import 'package:pawrtal/viewmodels/create/create_post_viewmodel.dart';
 
 class CreateChoosePortalView extends ConsumerStatefulWidget {

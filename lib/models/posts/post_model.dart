@@ -1,7 +1,6 @@
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:pawrtal/models/comments/comment_model.dart';
 import 'package:pawrtal/models/portals/portal_model.dart';
 import 'package:pawrtal/models/user/user_model.dart';
@@ -9,7 +8,6 @@ import 'package:uuid/uuid.dart';
 
 class PostModel {
   static final _db = FirebaseFirestore.instance;
-  static final _storage = FirebaseStorage.instance.ref();
 
   final String uid;
   PortalModel? _portal;
@@ -17,6 +15,7 @@ class PostModel {
   String? _caption;
   String? _description;
   List<String>? _images;
+  List<DocumentReference>? _likes;
   int? _likeCount;
   int? _commentCount;
 
@@ -48,14 +47,9 @@ class PostModel {
   // TODO: Implement Likes and Bookmarks
   PostModel({required this.uid});
 
-  /*
-  Future<List<String>?> get postImages async {
-    return (images ?? 0) == 0 ? null : [
-      for (var i = 1; i <= images!; i++)
-        await _storage.child('images/posts/$uid-$i.png').getDownloadURL().onError((e, s) => '')
-    ];
+  DocumentReference get dbRef { 
+    return _db.collection('posts').doc(uid);
   }
-  */
 
   Future<PostModel> get updated async {
     final postSnapshot = await _db.collection('posts').doc(uid).get();
@@ -68,10 +62,33 @@ class PostModel {
     _caption = postData['caption'];
     _description = postData['description'];
     _images = List.from(postData['images'] ?? const Iterable.empty());
-    _likeCount = postData['likes'];
-    _commentCount = postData['comments'];
+    _likes = List.from(postData['likes'] ?? const Iterable.empty());
+    _likeCount = postData['likeCount'];
+    _commentCount = postData['commentCount'];
 
     return this;
+  }
+
+  bool isLikedBy(UserModel user) {
+    return _likes!.contains(user.dbRef);
+  }
+
+  void addUserToLikes(UserModel user) {
+    // only add to likes if not already liked
+    if (!isLikedBy(user)) { 
+      _likes!.add(user.dbRef);
+      _likeCount = _likeCount! + 1;
+      dbRef.update({ 'likes': FieldValue.arrayUnion(_likes!), 'likeCount': _likeCount });
+    }
+  }
+
+  void removeUserFromLikes(UserModel user) {
+    // only remove from likes if already liked
+    if (isLikedBy(user)) {
+      _likes!.remove(user.dbRef);
+      _likeCount = _likeCount! - 1;
+      dbRef.update({ 'likes': FieldValue.arrayRemove([user.dbRef]), 'likeCount': _likeCount });
+    }
   }
 
   Future<void> uploadComment({required String message, required UserModel commenter}) async {
@@ -85,13 +102,12 @@ class PostModel {
     };
 
     // upload process
-    _db.collection('posts').doc(uid)
-      .collection('comments').doc(newUuid)
+    dbRef.collection('comments').doc(newUuid)
       .set(commentUpload) // first upload to db
       .then((_) { // then only when completed increment comment count
         _commentCount = _commentCount! + 1;
         _db.collection('posts').doc(uid)
-          .set({ 'comments': _commentCount! + 1 }, SetOptions(merge: true));
+          .update({ 'commentCount': _commentCount! });
       });
   }
 
@@ -106,8 +122,9 @@ class PostModel {
     post._caption = postData['caption'];
     post._description = postData['description'];
     post._images = List.from(postData['images'] ?? const Iterable.empty());
-    post._likeCount = postData['likes'];
-    post._commentCount = postData['comments'];
+    post._likeCount = postData['likeCount'];
+    post._likes = List.from(postData['likes'] ?? const Iterable.empty());
+    post._commentCount = postData['commentCount'];
 
     log('post: $post');
     return post;

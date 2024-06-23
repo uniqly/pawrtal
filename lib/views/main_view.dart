@@ -25,7 +25,6 @@ class _MainViewState extends ConsumerState<MainView> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     Future(() async {
         final auth = ref.read(appUserProvider.future);
@@ -40,7 +39,6 @@ class _MainViewState extends ConsumerState<MainView> {
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(appUserProvider);
-    //TODO: add state for user and posts
     return user.when( 
       loading: () => const Loading(),
       error: (err, stack) { 

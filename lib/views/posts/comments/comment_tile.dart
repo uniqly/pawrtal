@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:pawrtal/models/comments/comment_model.dart';
 import 'package:pawrtal/views/profile/profile.dart';
 

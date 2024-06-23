@@ -55,6 +55,26 @@ class ProfileViewModel {
       ); 
   }
 
+  // gets liked posts of the user excluding self likes
+  Stream<List<PostModel>> get likedPosts {
+    return _db.collection('posts')
+      .where('likes', arrayContains: _profile.dbRef)
+      .where('poster', isNotEqualTo: _profile.dbRef)
+      .orderBy('timestamp', descending: true)
+      .snapshots()
+      .asyncMap(
+        (querySnapshot) async {
+          var posts = <PostModel>[];
+          for (var docSnapshot in querySnapshot.docs) {
+            await PostModel.postFromSnapshot(docSnapshot).then((post) => posts.add(post));
+          }
+          final temp = [for (var p in posts) p.caption];
+          log('homeposts: $temp');
+          return posts;
+        }
+      );
+  }
+
   // get media from the user
   Stream<List<String>> get media {
     return posts.asyncMap((posts) async { 
@@ -93,7 +113,7 @@ class ProfileViewModel {
       'pfp': pfpString,
     };  
     
-    _db.collection('users').doc(_currUser.uid).set(updated, SetOptions(merge: true));
+    _db.collection('users').doc(_currUser.uid).update(updated);
   }
 }
 

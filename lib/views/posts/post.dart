@@ -57,7 +57,7 @@ class _PostViewState extends ConsumerState<PostView> {
                   Expanded(
                     child: ListView(
                       children: [ 
-                        PostTile(post: widget.post),
+                        PostTile(post: widget.post, showDescription: true),
                         if (snapshot.data!.isEmpty)
                           const Center( 
                             child: Padding(
@@ -109,7 +109,7 @@ class _PostViewState extends ConsumerState<PostView> {
                                         commenter: _user
                                       ).whenComplete(() {
                                         const success = SnackBar( 
-                                          content: Text('Saved Profile!'),
+                                          content: Text('Sent Comment!'),
                                         );
                                         ScaffoldMessenger.of(context).showSnackBar(success);
                                         //await ref.read(mainUserProvider.notifier).refresh();

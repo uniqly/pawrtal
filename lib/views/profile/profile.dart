@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:pawrtal/viewmodels/profile/profile_viewmodel.dart';
 import 'package:pawrtal/views/profile/profile_edit.dart';
+import 'package:pawrtal/views/profile/profile_likes.dart';
 import 'package:pawrtal/views/profile/profile_media.dart';
 import 'package:pawrtal/views/profile/profile_posts.dart';
 
@@ -215,7 +216,7 @@ class ProfileView extends ConsumerWidget {
                     children: [ 
                       ProfilePostsView(userId: userId),
                       ProfileMediaView(userId: userId),
-                      const Text('likes'),
+                      ProfileLikesView(userId: userId),
                       const Text('communitites'),
                     ],
                   )

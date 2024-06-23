@@ -1,32 +1,29 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:pawrtal/models/posts/post_model.dart';
 import 'package:pawrtal/services/auth.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'user_model.g.dart';
 
-// TODO: Integrate with firebase auth
 class UserModel {
   static final _db = FirebaseFirestore.instance;
-  static final _storage = FirebaseStorage.instance.ref();
 
   final String uid;
   String? _displayName;
-  String? get displayName => _displayName;
   String? _username;
-  String? get username => _username;
   String? _pfp;
-  String? get pfp => _pfp;
   String? _banner;
-  String? get banner => _banner;
   String? _location;
-  String? get location => _location;
   String? _bio;
-  String? get bio => _bio;
   int? _followerCount;
-  int? get followerCount => _followerCount;
   int? _followingCount;
+
+  String? get displayName => _displayName;
+  String? get username => _username;
+  String? get pfp => _pfp;
+  String? get banner => _banner;
+  String? get location => _location;
+  String? get bio => _bio;
+  int? get followerCount => _followerCount;
   int? get followingCount => _followingCount;
 
   UserModel(this.uid);
