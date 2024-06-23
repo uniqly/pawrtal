@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:pawrtal/models/posts/post_model.dart';
 import 'package:pawrtal/views/auth/authenticate.dart';
-import 'package:pawrtal/views/posts/post_tile.dart';
+import 'package:pawrtal/views/posts/post_list_view.dart';
 import 'package:pawrtal/viewmodels/home/home_viewmodel.dart';
 import 'package:pawrtal/views/profile/profile.dart';
 import 'package:pawrtal/services/auth.dart';
@@ -22,6 +21,7 @@ class _HomeViewState extends ConsumerState<HomeView> with AutomaticKeepAliveClie
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final homeViewModel = ref.watch(homeViewModelNotifierProvider);
 
     return homeViewModel.when( 
@@ -36,13 +36,13 @@ class _HomeViewState extends ConsumerState<HomeView> with AutomaticKeepAliveClie
                 onPressed: () async {
                   Navigator.of(context).push( 
                     MaterialPageRoute( 
-                      builder: (context) => const ProfileView(userId: 'otheruser')
+                      builder: (context) => const ProfileView(userId: 'mainuser')
                     )
                   );
                 },
               ),
-              body: CustomScrollView(
-                slivers: [
+              body: NestedScrollView(
+                headerSliverBuilder: (context, _) => [
                   SliverAppBar( 
                     scrolledUnderElevation: 0,
                     backgroundColor: Colors.white,
@@ -78,27 +78,17 @@ class _HomeViewState extends ConsumerState<HomeView> with AutomaticKeepAliveClie
                           style: TextStyle(color: Colors.black),
                         ),
                         onPressed: () async {
-                          if (mounted) {
-                            await AuthService.signOut();
-                            // Navigate to Authenticate screen
+                          await AuthService.signOut();
+                          // Navigate to Authenticate screen
+                          if (context.mounted) {
                             Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Authenticate()));
                           }
                         },
                       )
                     ],
                   ),
-                  StreamBuilder<List<PostModel>>( 
-                    stream: viewmodel.posts,
-                    builder: (context, snapshot) { 
-                      return snapshot.hasData ? SliverList.list(
-                        children: [ 
-                          for (var post in snapshot.data!) 
-                            PostTile(post: post,)
-                        ], 
-                      ) : const SliverToBoxAdapter(child: CircularProgressIndicator());
-                    },
-                  ),
-                ]
+                ],
+                body: PostListView(postStream: viewmodel.posts),
               ),
             ),
           ),

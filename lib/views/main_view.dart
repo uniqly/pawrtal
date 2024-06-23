@@ -42,7 +42,7 @@ class _MainViewState extends ConsumerState<MainView> {
     final user = ref.watch(appUserProvider);
     //TODO: add state for user and posts
     return user.when( 
-      loading: () => const CircularProgressIndicator(),
+      loading: () => const Loading(),
       error: (err, stack) { 
         log('$stack');
         return Text('error: $err');
@@ -77,13 +77,12 @@ class _MainViewState extends ConsumerState<MainView> {
             },
             labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
             destinations: [
-              const NavigationDestination( 
-                icon: Icon(
-                  Icons.home_outlined,
-                  size: 28,
-                ),
-                selectedIcon: Icon(
+              NavigationDestination( 
+                icon: currTab == PageTab.home ? const Icon(
                   Icons.home,
+                  size: 28,
+                ) : const  Icon(
+                  Icons.home_outlined,
                   size: 28,
                 ),
                 label: '',
@@ -92,16 +91,12 @@ class _MainViewState extends ConsumerState<MainView> {
                 icon: Icon(
                   Icons.add_rounded,
                   size: 28,
-                ),
-                selectedIcon: Icon(
-                  Icons.add_rounded,
-                  size: 32,
                 ),
                 label: '',
               ),
               NavigationDestination( 
                 icon: CircleAvatar(
-                  backgroundColor: pageIndex == 2 ? Colors.pinkAccent : Colors.transparent,
+                  backgroundColor: currTab == PageTab.profile ? Colors.pinkAccent : Colors.transparent,
                   radius: 22,
                   child: CircleAvatar( 
                     backgroundImage: NetworkImage(mainUser.pfp!),

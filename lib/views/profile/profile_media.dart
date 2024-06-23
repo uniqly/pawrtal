@@ -17,6 +17,7 @@ class _ProfileMediaViewState extends ConsumerState<ProfileMediaView> with Automa
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final profileViewModel = ref.watch(ProfileViewModelNotifierProvider(uid: widget.userId));
 
     return profileViewModel.when( 

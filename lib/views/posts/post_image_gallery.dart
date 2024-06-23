@@ -26,32 +26,30 @@ class _PostImageGalleryState extends State<PostImageGallery> {
       alignment: Alignment.bottomCenter,
       children: [
         // pictures
-        SizedBox(
+        Container(
           height: 500.0,
-          child: PageView.builder( 
-            itemCount: numImages,
-            controller: controller,
-            onPageChanged: (value) {
-              setState(() {
-                pageIndex = value;
-              });
-            },
-            itemBuilder: (context, index) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 6.0),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(25.0),
-                  child: Container(
-                    color: Colors.grey[400],
-                    child: Image( 
-                      fit: BoxFit.fitHeight, 
-                      image: NetworkImage(widget.imageStrings[index]),
-                      errorBuilder: (context, error, stackTrack) => const SizedBox.shrink(),
-                    ),
-                  )
-                ),
-              );
-            },   
+          padding: const EdgeInsets.symmetric(horizontal: 6.0),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(25.0),
+            child: PageView.builder( 
+              itemCount: numImages,
+              controller: controller,
+              onPageChanged: (value) {
+                setState(() {
+                  pageIndex = value;
+                });
+              },
+              itemBuilder: (context, index) {
+                return Container(
+                  color: Colors.grey[400],
+                  child: Image( 
+                    fit: BoxFit.cover, 
+                    image: NetworkImage(widget.imageStrings[index]),
+                    errorBuilder: (context, error, stackTrack) => const SizedBox.shrink(),
+                  ),
+                );
+              },   
+            ),
           ),
         ),
         // gallery buttons

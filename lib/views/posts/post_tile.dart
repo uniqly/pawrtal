@@ -17,17 +17,16 @@ class PostTile extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [ 
         // subportal picture and name
-        const Divider(),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 6.0),
+          padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 6.0),
           child: Row( 
             children: [ 
               CircleAvatar( 
-                backgroundImage: NetworkImage(post.portal.picture!),
+                backgroundImage: NetworkImage(post.portal!.picture!),
               ),
               const SizedBox(width: 5.0,),
               Text( 
-                'p/${post.portal.name}',
+                'p/${post.portal!.name}',
                 style: TextStyle(color: Colors.grey.shade700, fontSize: 18.0),
               )
             ],
@@ -44,15 +43,12 @@ class PostTile extends StatelessWidget {
             ),
           ),
         ),
-        GestureDetector(
-          onDoubleTap: () {},
-          child: post.images!.isNotEmpty ? PostImageGallery(imageStrings: post.images!) : const SizedBox.shrink(),
-        ),
+        post.images!.isNotEmpty ? PostImageGallery(imageStrings: post.images!) : const SizedBox.shrink(),
         // actions bar of post
         Row( 
           children: [
             TextButton.icon( 
-              onPressed: () {} ,
+              onPressed: () {},
               //icon: widget.post.isLiked  
               //  ? const Icon(Icons.favorite, color: Colors.red,)
               //  : const Icon(Icons.favorite_outline),
@@ -72,6 +68,9 @@ class PostTile extends StatelessWidget {
               icon: const Icon(Icons.bookmark_outline),
             ),
           ],
+        ),
+        const Divider( 
+          height: 0,
         ),
       ],
     );

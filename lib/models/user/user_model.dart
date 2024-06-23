@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:pawrtal/models/posts/post_model.dart';
 import 'package:pawrtal/services/auth.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
