@@ -8,6 +8,7 @@ import 'package:pawrtal/shared/loading.dart';
 import 'package:pawrtal/test/test_user.dart';
 import 'package:pawrtal/views/auth/authenticate.dart';
 import 'package:pawrtal/views/create/create.dart';
+import 'package:pawrtal/views/menu_view.dart';
 import 'package:pawrtal/views/profile/profile.dart';
 
 import 'home/home.dart';
@@ -19,7 +20,7 @@ class MainView extends ConsumerStatefulWidget {
   ConsumerState<MainView> createState() => _MainViewState();
 }
 
-enum PageTab { home, profile }
+enum PageTab { home, profile, none }
 
 class _MainViewState extends ConsumerState<MainView> {
   var currTab = PageTab.home;
@@ -30,92 +31,128 @@ class _MainViewState extends ConsumerState<MainView> {
     // TODO: implement initState
     super.initState();
     Future(() async {
-        final auth = ref.read(appUserProvider.future);
-        final user = await auth;
-        if (user == null && mounted) {
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Authenticate()));
-        }
+      final auth = ref.read(appUserProvider.future);
+      final user = await auth;
+      if (user == null && mounted) {
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => const Authenticate()));
       }
-    );
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(appUserProvider);
     //TODO: add state for user and posts
-    return user.when( 
-      loading: () => const CircularProgressIndicator(),
-      error: (err, stack) { 
-        log('$stack');
+    return user.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (err, stack) {
+        log('Error: $err\nStack: $stack');
         return Text('error: $err');
       },
-      data: (mainUser) { 
-        log('$mainUser');
-        return mainUser != null ? Scaffold( 
-          body: currTab == PageTab.home ? const HomeView() : ProfileView(userId: mainUser.uid),
-          bottomNavigationBar: NavigationBar( 
-            height: 54,
-            selectedIndex: pageIndex,
-            backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-            indicatorColor: Colors.transparent,
-            overlayColor: const WidgetStatePropertyAll<Color>(Colors.transparent),
-            onDestinationSelected: (index) async {
-              setState(() {
-                pageIndex = index;
-              });
-              switch (index) {
-                case 0: {
-                  currTab = PageTab.home;
-                }
-                case 1: {
-                  await Navigator.push(context, MaterialPageRoute( 
-                    builder: (context) => const CreateView(),
-                  ));
-                }
-                case 2: {
-                  currTab = PageTab.profile;
-                }
-              }
-            },
-            labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
-            destinations: [
-              const NavigationDestination( 
-                icon: Icon(
-                  Icons.home_outlined,
-                  size: 28,
+      data: (mainUser) {
+        log('User data: $mainUser');
+        return mainUser != null
+            ? Scaffold(
+                body: currTab == PageTab.home
+                    ? const HomeView()
+                    : currTab == PageTab.profile
+                        ? ProfileView(userId: mainUser.uid)
+                        : Container(),
+                bottomNavigationBar: NavigationBar(
+                  height: 54,
+                  selectedIndex: pageIndex,
+                  backgroundColor:
+                      Theme.of(context).colorScheme.surfaceContainerHighest,
+                  indicatorColor: Colors.transparent,
+                  overlayColor: const WidgetStatePropertyAll<Color>(
+                      Colors.transparent),
+                  onDestinationSelected: (index) async {
+                    setState(() {
+                      pageIndex = index;
+                    });
+                    switch (index) {
+                      case 0:
+                        setState(() {
+                          currTab = PageTab.home;
+                        });
+                        break;
+                      case 1:
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const CreateView()),
+                        );
+                        break;
+                      case 2:
+                        setState(() {
+                          currTab = PageTab.profile;
+                        });
+                        break;
+                      case 3:
+                        setState(() {
+                          currTab = PageTab.none;
+                        });
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const MenuView()),
+                        );
+                        break;
+                    }
+                  },
+                  labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
+                  destinations: [
+                    const NavigationDestination(
+                      icon: Icon(
+                        Icons.home_outlined,
+                        size: 28,
+                      ),
+                      selectedIcon: Icon(
+                        Icons.home,
+                        size: 28,
+                      ),
+                      label: '',
+                    ),
+                    const NavigationDestination(
+                      icon: Icon(
+                        Icons.add_rounded,
+                        size: 28,
+                      ),
+                      selectedIcon: Icon(
+                        Icons.add_rounded,
+                        size: 32,
+                      ),
+                      label: '',
+                    ),
+                    NavigationDestination(
+                      icon: CircleAvatar(
+                        backgroundColor:
+                            pageIndex == 2 ? Colors.pinkAccent : Colors.transparent,
+                        radius: 22,
+                        child: CircleAvatar(
+                          backgroundImage: NetworkImage(mainUser.pfp!),
+                          radius: 20,
+                        ),
+                      ),
+                      label: '',
+                    ),
+                    const NavigationDestination(
+                      icon: Icon(
+                        Icons.menu,
+                        size: 28,
+                      ),
+                      selectedIcon: Icon(
+                        Icons.menu,
+                        size: 28,
+                      ),
+                      label: 'Menu',
+                    ),
+                  ],
                 ),
-                selectedIcon: Icon(
-                  Icons.home,
-                  size: 28,
-                ),
-                label: '',
-              ),
-              const NavigationDestination( 
-                icon: Icon(
-                  Icons.add_rounded,
-                  size: 28,
-                ),
-                selectedIcon: Icon(
-                  Icons.add_rounded,
-                  size: 32,
-                ),
-                label: '',
-              ),
-              NavigationDestination( 
-                icon: CircleAvatar(
-                  backgroundColor: pageIndex == 2 ? Colors.pinkAccent : Colors.transparent,
-                  radius: 22,
-                  child: CircleAvatar( 
-                    backgroundImage: NetworkImage(mainUser.pfp!),
-                    radius: 20,
-                  ),
-                ),
-                label: '',
-              ),
-            ],
-          ),
-        ) : const Loading();
-      }
+              )
+            : const Loading();
+      },
     );
   }
 }

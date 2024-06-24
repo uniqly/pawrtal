@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pawrtal/shared/loading.dart';
+import 'package:pawrtal/viewmodels/messaging/message_view.dart';
+import 'package:pawrtal/views/events/events_view.dart';
+import 'package:pawrtal/views/main_view.dart';
 
 class MenuView extends StatefulWidget {
   const MenuView({super.key});
@@ -18,7 +21,7 @@ class _MenuViewState extends State<MenuView> {
     return loading
         ? const Loading()
         : Scaffold(
-            backgroundColor: Color.fromARGB(255, 240, 219, 243),
+            backgroundColor: const Color.fromARGB(255, 240, 219, 243),
             body: CustomScrollView(
               slivers: [
                 const SliverAppBar(
@@ -42,18 +45,21 @@ class _MenuViewState extends State<MenuView> {
                     child: GridView.count(
                       crossAxisCount: 2,
                       shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
+                      physics: const NeverScrollableScrollPhysics(),
                       children: [
                         _buildGridTile(Icons.event, 'Events', () {
-                          setState(() {
-                            loading = true;
-                          });
-                          if (mounted) {
-                            Navigator.pushReplacementNamed(context, '/events');
-                          }
-                          setState(() {
-                            loading = false;
-                          });
+                          Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const EventsView()),
+                        );
+                        }),
+                        _buildGridTile(Icons.message, 'Messages', () {
+                          Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const MessageView()),
+                        );
                         }),
                         _buildGridTile(Icons.emoji_events, 'Compawtitions', () {
                           // Navigate to Events page
@@ -69,9 +75,6 @@ class _MenuViewState extends State<MenuView> {
                         }),
                         _buildGridTile(Icons.person_add, 'Friend Requests', () {
                           // Navigate to Friend Requests page
-                        }),
-                        _buildGridTile(Icons.message, 'Messages', () {
-                          // Navigate to Messages page
                         }),
                         _buildGridTile(Icons.bookmark, 'Saved Posts', () {
                           // Navigate to Saved Posts page
@@ -116,7 +119,11 @@ class _MenuViewState extends State<MenuView> {
                   IconButton(
                     icon: const Icon(Icons.home),
                     onPressed: () {
-                      Navigator.pushReplacementNamed(context, '/home');
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const MainView()),
+                        );
                     },
                   ),
                   IconButton(

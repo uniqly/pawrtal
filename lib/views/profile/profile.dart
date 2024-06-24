@@ -54,10 +54,6 @@ class ProfileView extends ConsumerWidget {
                           onPressed: () {},
                           icon: const Icon(Icons.messenger)
                         ),
-                        IconButton(
-                          onPressed: () {},
-                          icon: const Icon(Icons.menu)
-                        ),
                       ],
                     ),
                     SliverToBoxAdapter(

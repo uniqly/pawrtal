@@ -33,7 +33,7 @@ class AuthService {
 
 
   // sign in with username
-  static Future<MyUser?> signInWithUsernameAndPassword(String username, String password) async {
+  static Future<MyUser?> signInWithUsernameAndPassword(String input, String password) async {
     try {
       String email;
       // Check if the input is an email
