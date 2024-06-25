@@ -25,6 +25,7 @@ class _ProfileEditViewState extends ConsumerState<ProfileEditView> {
     String userName, String bio, String location) _saveEdits;
   bool _updatedBanner = false;
   bool _updatedProfile = false;
+  bool _notSubmitted = true;
   File? _newBanner;
   File? _newPfp;
   late final TextEditingController _displayNameController;
@@ -115,7 +116,10 @@ class _ProfileEditViewState extends ConsumerState<ProfileEditView> {
                 foregroundColor: Theme.of(context).colorScheme.surface,
                 disabledForegroundColor: Theme.of(context).colorScheme.surfaceDim,
               ),
-              onPressed: _hasChanges ? () async { 
+              onPressed: _hasChanges && _notSubmitted ? () async { 
+                setState(() { // lock form when button is pressed
+                  _notSubmitted = false;
+                });
                 await _saveEdits(_newPfp, _newBanner, _displayNameController.text, 
                   _usernameController.text, _bioController.text, _locationController.text).whenComplete(() {
                     const success = SnackBar( 
@@ -129,6 +133,9 @@ class _ProfileEditViewState extends ConsumerState<ProfileEditView> {
                       content: Text('Error with upload, $e'),
                     );
                     ScaffoldMessenger.of(context).showSnackBar(error);
+                    setState(() { // unlock form if unsuccessful
+                      _notSubmitted = true;
+                    });
                   });
               } : null,
               child: const Text('Save'), 
