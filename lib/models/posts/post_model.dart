@@ -27,6 +27,13 @@ class PostModel {
   int? get likeCount => _likeCount;
   int? get commentCount => _commentCount;
 
+  // TODO: Implement Likes and Bookmarks
+  PostModel({required this.uid});
+
+  DocumentReference get dbRef { 
+    return _db.collection('posts').doc(uid);
+  }
+
   Stream<List<CommentModel>> get comments { 
     return _db.collection('posts')
       .doc(uid)
@@ -44,17 +51,11 @@ class PostModel {
         return comments;
       });
   }
-  // TODO: Implement Likes and Bookmarks
-  PostModel({required this.uid});
-
-  DocumentReference get dbRef { 
-    return _db.collection('posts').doc(uid);
-  }
 
   Future<PostModel> get updated async {
     final postSnapshot = await _db.collection('posts').doc(uid).get();
     final postData = postSnapshot.data()!;
-    final portal = await PortalModel.portalFromFirebase(postData['portal'].id);
+    final portal = await PortalModel(postData['portal'].id).updated;
     final poster = await UserModel(postData['poster'].id).updated;
 
     _portal =  portal;
@@ -73,21 +74,21 @@ class PostModel {
     return _likes!.contains(user.dbRef);
   }
 
-  void addUserToLikes(UserModel user) {
+  Future<void> addUserToLikes(UserModel user) async {
     // only add to likes if not already liked
     if (!isLikedBy(user)) { 
       _likes!.add(user.dbRef);
       _likeCount = _likeCount! + 1;
-      dbRef.update({ 'likes': FieldValue.arrayUnion(_likes!), 'likeCount': _likeCount });
+      await dbRef.update({ 'likes': FieldValue.arrayUnion([user.dbRef]), 'likeCount': _likeCount });
     }
   }
 
-  void removeUserFromLikes(UserModel user) {
+  Future<void> removeUserFromLikes(UserModel user) async {
     // only remove from likes if already liked
     if (isLikedBy(user)) {
       _likes!.remove(user.dbRef);
       _likeCount = _likeCount! - 1;
-      dbRef.update({ 'likes': FieldValue.arrayRemove([user.dbRef]), 'likeCount': _likeCount });
+      await dbRef.update({ 'likes': FieldValue.arrayRemove([user.dbRef]), 'likeCount': _likeCount });
     }
   }
 
@@ -113,7 +114,7 @@ class PostModel {
 
   static Future<PostModel> postFromSnapshot(DocumentSnapshot<Map<String, dynamic>> snapshot) async {
     final postData = snapshot.data()!;
-    final portal = await PortalModel.portalFromFirebase(postData['portal'].id);
+    final portal = await PortalModel(postData['portal'].id).updated;
     final poster = await UserModel(postData['poster'].id).updated;
     log('post from snapshot: ${snapshot.id}, ${postData['caption']}, ${portal.name}, ${poster.username}');
     final post = PostModel(uid: snapshot.id);

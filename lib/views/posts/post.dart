@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pawrtal/models/comments/comment_model.dart';
 import 'package:pawrtal/models/posts/post_model.dart';
 import 'package:pawrtal/models/user/user_model.dart';
+import 'package:pawrtal/views/portals/portal.dart';
 import 'package:pawrtal/views/posts/comments/comment_tile.dart';
 import 'package:pawrtal/views/posts/post_tile.dart';
 
@@ -17,12 +18,14 @@ class PostView extends ConsumerStatefulWidget {
 class _PostViewState extends ConsumerState<PostView> {
   late final TextEditingController _commentController;
   late final UserModel _user;
+  late final PostModel _post;
 
   @override 
   void initState() {
     super.initState();
     _commentController = TextEditingController();
     _user = ref.read(appUserProvider).value!;
+    _post = widget.post;
   }
 
   @override 
@@ -39,25 +42,36 @@ class _PostViewState extends ConsumerState<PostView> {
         child: Scaffold(
           body: NestedScrollView( 
             headerSliverBuilder: (context, _) => [
-              const SliverAppBar( 
+              SliverAppBar( 
                 scrolledUnderElevation: 0.0,
                 backgroundColor: Colors.white,
-                title: Text(
-                  'Post',
-                  style: TextStyle(  
-                    fontWeight: FontWeight.bold
+                title: GestureDetector(
+                  onTap: () { 
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => PortalView(portal: _post.portal!)));
+                  },
+                  child: Text(
+                    'p/${_post.portal!.name!}',
+                    style: const TextStyle(  
+                      fontWeight: FontWeight.bold
+                    ),
                   ),
                 ),
+                snap: true,
+                floating: true,
               ),
             ],
             body: StreamBuilder<List<CommentModel>>(
-              stream: widget.post.comments,
+              stream: _post.comments,
               builder: (context, snapshot) => snapshot.hasData ? Column(
                 children: [
                   Expanded(
                     child: ListView(
                       children: [ 
-                        PostTile(post: widget.post, showDescription: true),
+                        PostTile(
+                          post: widget.post,
+                          showDescription: true, 
+                          userInsteadOfPortal: true
+                        ),
                         if (snapshot.data!.isEmpty)
                           const Center( 
                             child: Padding(

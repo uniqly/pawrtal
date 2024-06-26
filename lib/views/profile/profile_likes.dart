@@ -24,7 +24,7 @@ class _ProfileLikesViewState extends ConsumerState<ProfileLikesView> with Automa
     return profileViewModel.when( 
       loading: () => const CircularProgressIndicator(),
       error: (err, stack) => Text('error: $err'),
-      data: (viewmodel) => PostListView(postStream: viewmodel.likedPosts),
+      data: (viewmodel) => PostListView(postStream: viewmodel.likedPosts, emptyMessage: 'User has no Likes',),
     );
   }
 }

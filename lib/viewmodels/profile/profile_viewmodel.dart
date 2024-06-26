@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:pawrtal/models/portals/portal_model.dart';
 import 'package:pawrtal/models/posts/post_model.dart';
 import 'package:pawrtal/models/user/user_model.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -85,6 +86,23 @@ class ProfileViewModel {
       log('$images');
       return images;
     });
+  }
+
+  Stream<List<PortalModel>> get portals {
+    return _db.collection('portals')
+      .where('members', arrayContains: _profile.dbRef)
+      .orderBy('memberCount', descending: true)
+      .snapshots()
+      .asyncMap( 
+        (querySnapshot) async {
+          var portals = <PortalModel>[];
+          for (var documentSnapshot in querySnapshot.docs) {
+            await PortalModel.portalFromSnapshot(documentSnapshot).then((portal) => portals.add(portal));
+          }
+          log('$portals');
+          return portals;
+        }
+      );
   }
 
   Future<void> updateProfile(File? pfp, File? banner, String displayName, String username, String bio, String location) async { 

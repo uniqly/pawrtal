@@ -7,7 +7,7 @@ part of 'home_viewmodel.dart';
 // **************************************************************************
 
 String _$homeViewModelNotifierHash() =>
-    r'd49a602c59a2e982f29934c89e424213eaf8b996';
+    r'a8fc9c4ba14c0ba5211a7a6546a9466c22848fd8';
 
 /// See also [HomeViewModelNotifier].
 @ProviderFor(HomeViewModelNotifier)

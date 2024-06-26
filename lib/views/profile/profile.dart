@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:pawrtal/viewmodels/profile/profile_viewmodel.dart';
+import 'package:pawrtal/views/profile/profile_communities.dart';
 import 'package:pawrtal/views/profile/profile_edit.dart';
 import 'package:pawrtal/views/profile/profile_likes.dart';
 import 'package:pawrtal/views/profile/profile_media.dart';
@@ -68,6 +69,7 @@ class ProfileView extends ConsumerWidget {
                                 child: Container(
                                   height: 150,
                                   decoration: BoxDecoration(
+                                    color: Theme.of(context).colorScheme.secondaryContainer,
                                     image: DecorationImage(
                                       fit: BoxFit.fitWidth,
                                       image: NetworkImage(userData['banner']),
@@ -221,7 +223,7 @@ class ProfileView extends ConsumerWidget {
                       ProfilePostsView(userId: userId),
                       ProfileMediaView(userId: userId),
                       ProfileLikesView(userId: userId),
-                      const Text('communitites'),
+                      ProfileCommunititesView(userId: userId),
                     ],
                   )
                 ),

@@ -5,10 +5,16 @@ import 'package:pawrtal/views/posts/post_tile.dart';
 
 class PostListView extends StatelessWidget {
   final Stream<List<PostModel>> postStream;
+  final bool showDescription;
+  final bool userInsteadOfPortal;
+  final String emptyMessage;
 
   const PostListView({
     super.key,
     required this.postStream,
+    this.showDescription = false,
+    this.userInsteadOfPortal = false,
+    this.emptyMessage = 'No Posts Found',
   });
 
   @override
@@ -23,8 +29,14 @@ class PostListView extends StatelessWidget {
                 onTap: () { 
                   Navigator.push(context, MaterialPageRoute(builder: (context) => PostView(post: post)));
                 },
-                child: PostTile(post: post)
-              )
+                child: PostTile( 
+                  post: post,
+                  showDescription: showDescription,
+                  userInsteadOfPortal: userInsteadOfPortal,
+                )
+              ),
+            if (snapshot.data!.isEmpty)
+              Center(child: Text(emptyMessage)),
           ], 
         ) : const Center(child: SizedBox(height: 30, width: 30, child: CircularProgressIndicator()));
       },

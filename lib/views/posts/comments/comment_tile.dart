@@ -26,7 +26,7 @@ class CommentTile extends StatelessWidget {
                       backgroundImage: NetworkImage(poster.pfp!),
                     ),
                     const SizedBox(width: 5.0),
-                    Text(poster.displayName!),
+                    Text('@${poster.username!}'),
                   ],
                 ),
               ),
