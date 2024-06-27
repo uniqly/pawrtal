@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pawrtal/services/auth.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -16,6 +18,8 @@ class UserModel {
   String? _bio;
   int? _followerCount;
   int? _followingCount;
+  List<DocumentReference>? _followers;
+  List<DocumentReference>? _following;
   
   static final Map<String, UserModel> _cache = {};
 
@@ -40,8 +44,10 @@ class UserModel {
     user._displayName = snapshot['displayName'] ?? '<NO NAME>';
     user._location = snapshot['location'] ?? '';
     user._bio = snapshot['bio'] ?? '';
-    user._followerCount = snapshot['followers'] ?? 0;
-    user._followingCount = snapshot['following'] ?? 0;
+    user._followerCount = snapshot['followerCount'] ?? 0;
+    user._followingCount = snapshot['followingCount'] ?? 0;
+    user._followers = List.from(snapshot['followers'] ?? const Iterable.empty());
+    user._following = List.from(snapshot['following'] ?? const Iterable.empty());
     user._pfp = snapshot['pfp'] ?? '';
     user._banner = snapshot['banner'] ?? '';
     return user;
@@ -62,11 +68,53 @@ class UserModel {
       _banner = data['banner'];
       _location = data['location'];
       _bio = data['bio'];
-      _followerCount = data['followers'];
-      _followingCount = data['following'];
+      _followerCount = data['followerCount'];
+      _followingCount = data['followingCount'];
+      _followers = List.from(data['followers'] ?? const Iterable.empty());
+      _following = List.from(data['following'] ?? const Iterable.empty());
     }
 
     return this;
+  }
+
+  bool hasFollower(UserModel user) { 
+    return _followers!.contains(user.dbRef);
+  }
+
+  Future<void> addFollower(UserModel user) async {
+    if (!hasFollower(user)) {
+      _followers!.add(user.dbRef);
+      _followerCount = _followerCount! + 1;
+      await dbRef.update({ 'followers': FieldValue.arrayUnion([user.dbRef]), 'followerCount': _followerCount });
+    }
+  }
+
+  Future<void> removeFollower(UserModel user) async {
+    if (hasFollower(user)) {
+      _followers!.remove(user.dbRef);
+      _followerCount = _followerCount! - 1;
+      await dbRef.update({ 'followers': FieldValue.arrayRemove([user.dbRef]), 'followerCount': _followerCount });
+    }
+  }
+
+  bool isFollowing(UserModel user) { 
+    return _following!.contains(user.dbRef);
+  }
+
+  Future<void> follow(UserModel user) async {
+    if (!isFollowing(user)) {
+      _following!.add(user.dbRef);
+      _followingCount = _followingCount! + 1;
+      await dbRef.update({ 'following': FieldValue.arrayUnion([user.dbRef]), 'followingCount': _followingCount });
+    }
+  }
+
+  Future<void> unfollow(UserModel user) async {
+    if (isFollowing(user)) {
+      _following!.remove(user.dbRef);
+      _followingCount = _followingCount! - 1;
+      await dbRef.update({ 'following': FieldValue.arrayRemove([user.dbRef]), 'followingCount': _followingCount });
+    }
   }
 
   @override

@@ -46,6 +46,7 @@ class CommentModel {
   static Future<CommentModel> commentFromSnapshot(DocumentSnapshot<Map<String, dynamic>> snapshot) async {
     log('${snapshot['commenter'].id}');
     final poster = await UserModel(snapshot['commenter'].id).updated;
+    log('$poster');
     final commentData = snapshot.data()!;
     final comment = CommentModel(snapshot.id);
     comment._poster = poster;

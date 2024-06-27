@@ -8,16 +8,23 @@ import 'package:pawrtal/views/profile/profile_likes.dart';
 import 'package:pawrtal/views/profile/profile_media.dart';
 import 'package:pawrtal/views/profile/profile_posts.dart';
 
-class ProfileView extends ConsumerWidget {
+class ProfileView extends ConsumerStatefulWidget {
   final String userId;
   const ProfileView({super.key, required this.userId});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final profileViewModel = ref.watch(ProfileViewModelNotifierProvider(uid: userId));
+  ConsumerState<ProfileView> createState() => _ProfileViewState();
+}
+
+class _ProfileViewState extends ConsumerState<ProfileView> {
+@override
+  Widget build(BuildContext context) {
+    final profileViewModel = ref.watch(ProfileViewModelNotifierProvider(uid: widget.userId));
     
     return profileViewModel.when( 
-      loading: () => const CircularProgressIndicator(),
+      skipLoadingOnReload: true,
+      loading: () => const Center(child: SizedBox(height: 30, width: 30, child: CircularProgressIndicator())),
+      //loading: () => const Loading(),
       error: (err, stack) => Text('error: $err'),
       data: (viewmodel) { 
         final userData = viewmodel.profileInfo;
@@ -113,12 +120,10 @@ class ProfileView extends ConsumerWidget {
                                         foregroundColor: Theme.of(context).colorScheme.surface,
                                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                       ),
-                                      onPressed: () {
-                                        //ref.read(mainUserProvider.notifier).incrFollows();
-                                      },
-                                      child: const Text(
-                                        'Follow',
-                                        style: TextStyle(fontWeight: FontWeight.bold),
+                                      onPressed: viewmodel.toggleFollow,
+                                      child: Text(
+                                        viewmodel.isUserFollowingProfile ? 'Following' : 'Follow',
+                                        style: const TextStyle(fontWeight: FontWeight.bold),
                                       ), 
                                     ),
                                   ],
@@ -220,10 +225,10 @@ class ProfileView extends ConsumerWidget {
                   ],
                   body: TabBarView( 
                     children: [ 
-                      ProfilePostsView(userId: userId),
-                      ProfileMediaView(userId: userId),
-                      ProfileLikesView(userId: userId),
-                      ProfileCommunititesView(userId: userId),
+                      ProfilePostsView(userId: widget.userId),
+                      ProfileMediaView(userId: widget.userId),
+                      ProfileLikesView(userId: widget.userId),
+                      ProfileCommunititesView(userId: widget.userId),
                     ],
                   )
                 ),

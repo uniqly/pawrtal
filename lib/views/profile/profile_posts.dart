@@ -22,7 +22,8 @@ class _ProfilePostsViewState extends ConsumerState<ProfilePostsView> with Automa
     final profileViewModel = ref.watch(ProfileViewModelNotifierProvider(uid: widget.userId));
 
     return profileViewModel.when( 
-      loading: () => const CircularProgressIndicator(),
+      skipLoadingOnReload: true,
+      loading: () => const Center(child: SizedBox(height: 30, width: 30, child: CircularProgressIndicator())),
       error: (err, stack) => Text('error: $err'),
       data: (viewmodel) => PostListView(postStream: viewmodel.posts),
     );

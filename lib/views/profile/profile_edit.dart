@@ -21,7 +21,7 @@ class ProfileEditView extends ConsumerStatefulWidget {
 
 class _ProfileEditViewState extends ConsumerState<ProfileEditView> {
   late final UserModel _profile;
-  late final Future<void> Function(File? pfp, File? banner, String displayName,
+  late Future<void> Function(File? pfp, File? banner, String displayName,
     String userName, String bio, String location) _saveEdits;
   bool _updatedBanner = false;
   bool _updatedProfile = false;
@@ -39,11 +39,21 @@ class _ProfileEditViewState extends ConsumerState<ProfileEditView> {
     super.initState();
     _profile = ref.read(appUserProvider).value!;
     _saveEdits = ref.read(profileViewModelNotifierProvider(uid: _profile.uid)).value!.updateProfile;
-    log(_profile.toString());
-    _displayNameController = TextEditingController(text: _profile.displayName);
-    _usernameController = TextEditingController(text: _profile.username);
-    _bioController = TextEditingController(text: _profile.bio);
-    _locationController = TextEditingController(text: _profile.location);
+    _displayNameController = TextEditingController();
+    _usernameController = TextEditingController();
+    _bioController = TextEditingController();
+    _locationController = TextEditingController();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _saveEdits = ref.read(profileViewModelNotifierProvider(uid: _profile.uid)).value!.updateProfile;
+    _displayNameController.text = _profile.displayName!;
+    _usernameController.text = _profile.username!;
+    _bioController.text = _profile.bio!;
+    _locationController.text = _profile.location!;
+    log('edit: $_hasChanges, $_notSubmitted');
   }
 
   @override
@@ -82,6 +92,7 @@ class _ProfileEditViewState extends ConsumerState<ProfileEditView> {
 
   // TODO: check for unique username before allowing
   bool get _hasChanges {
+    log(_profile.toString());
     // only allow to save if fields have been changed
     // username not changed to empty
     final textcheck =
@@ -90,6 +101,7 @@ class _ProfileEditViewState extends ConsumerState<ProfileEditView> {
       _usernameController.text != _profile.username || 
       _bioController.text != _profile.bio || 
       _locationController.text != _profile.location);
+    log('edit (change): ${_bioController.text}, ${_profile.bio}');
     return textcheck || _updatedBanner || _updatedProfile;
   }
 
@@ -117,6 +129,7 @@ class _ProfileEditViewState extends ConsumerState<ProfileEditView> {
                 disabledForegroundColor: Theme.of(context).colorScheme.surfaceDim,
               ),
               onPressed: _hasChanges && _notSubmitted ? () async { 
+                log('edit (pfp before): $_profile');
                 setState(() { // lock form when button is pressed
                   _notSubmitted = false;
                 });
@@ -126,7 +139,12 @@ class _ProfileEditViewState extends ConsumerState<ProfileEditView> {
                       content: Text('Saved Profile!'),
                     );
                     ScaffoldMessenger.of(context).showSnackBar(success);
-                    Navigator.of(context).pop();
+                    setState(() {
+                      _notSubmitted = true;
+                    });
+                    log('edit (pfp after): $_profile');
+                    log('edit: $_hasChanges, $_notSubmitted');
+                    //Navigator.of(context).pop();
                     //await ref.read(mainUserProvider.notifier).refresh();
                   }).onError((s, e) { 
                     final error = SnackBar( 

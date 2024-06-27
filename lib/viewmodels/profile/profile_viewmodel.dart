@@ -35,6 +35,25 @@ class ProfileViewModel {
 
   bool get isCurrUserProfile => _profile.uid == _currUser.uid;
   
+  bool get isUserFollowingProfile => _currUser.isFollowing(_profile);
+
+  Future<void> toggleFollow() async {
+    // for some reason, updaing curruser first then profile causes desync issues
+    // might be due to viewmodel reloading immediately on updating curr user
+    log('toggle follow');
+    if (isUserFollowingProfile) {
+      log('toggle follow: unfollow');
+      await _profile.removeFollower(_currUser);
+      await _currUser.unfollow(_profile);
+    } else {
+      log('toggle follow: follow');
+      await _profile.addFollower(_currUser);
+      await _currUser.follow(_profile);
+      log('toggle follow after: $_profile');
+    }
+    log('toggle follow: ${_profile.followerCount}');
+  }
+  
   // get posts for the user
   Stream<List<PostModel>> get posts {
     // gets the posts ordered in reverse chronological order
@@ -131,7 +150,7 @@ class ProfileViewModel {
       'pfp': pfpString,
     };  
     
-    _db.collection('users').doc(_currUser.uid).update(updated);
+    await _db.collection('users').doc(_currUser.uid).update(updated);
   }
 }
 
