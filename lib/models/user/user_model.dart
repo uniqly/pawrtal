@@ -16,6 +16,8 @@ class UserModel {
   String? _bio;
   int? _followerCount;
   int? _followingCount;
+  
+  static final Map<String, UserModel> _cache = {};
 
   String? get displayName => _displayName;
   String? get username => _username;
@@ -26,7 +28,11 @@ class UserModel {
   int? get followerCount => _followerCount;
   int? get followingCount => _followingCount;
 
-  UserModel(this.uid);
+  UserModel._internal(this.uid);
+
+  factory UserModel(String uid) {
+    return _cache.putIfAbsent(uid, () => UserModel._internal(uid));
+  }
 
   static Future<UserModel> fromSnapshot({required String uid, required DocumentSnapshot<Map<String, dynamic>> snapshot}) async {
     final user = UserModel(uid);
@@ -83,5 +89,27 @@ Stream<UserModel?> appUser(AppUserRef ref) async* {
     });
   } else {
    yield null;
+  }
+}
+
+@riverpod
+class UserNotifier extends _$UserNotifier {
+  @override
+  Future<UserModel> build({required String uid}) async {
+    return UserModel(uid).updated;
+  }
+
+  Future<void> refresh() async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async { 
+      return await state.value!.updated;
+    });
+  }
+
+  Future<void> pushSnapshot(DocumentSnapshot<Map<String, dynamic>> snapshot) async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async { 
+      return UserModel.fromSnapshot(uid: snapshot.id, snapshot: snapshot);
+    });
   }
 }

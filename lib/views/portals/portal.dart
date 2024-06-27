@@ -44,6 +44,7 @@ class _PortalViewState extends ConsumerState<PortalView> {
             headerSliverBuilder: (context, _) => [ 
               const SliverAppBar( 
                 scrolledUnderElevation: 0.0,
+                backgroundColor: Colors.white,
                 title: Text( 
                   'Subpawrtal',
                   style: TextStyle( 

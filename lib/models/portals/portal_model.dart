@@ -14,7 +14,13 @@ class PortalModel {
   int? _memberCount;
   List<DocumentReference>? _members;
 
-  PortalModel(this.uid);
+  static final Map<String, PortalModel> _cache = {};
+
+  PortalModel._internal(this.uid);
+
+  factory PortalModel(String uid) {
+    return _cache.putIfAbsent(uid, () => PortalModel._internal(uid));
+  }
   
   String? get name => _name;
   String? get banner => _banner;

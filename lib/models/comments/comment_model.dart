@@ -10,6 +10,14 @@ class CommentModel {
   String? _message;
   Timestamp? _timestamp;
 
+  static final Map<String, CommentModel> _cache = {};
+
+  CommentModel._internal(this.uid);
+
+  factory CommentModel(String uid) {
+    return _cache.putIfAbsent(uid, () => CommentModel._internal(uid));
+  }
+
   UserModel? get poster => _poster;
   String? get message => _message;
   DateTime? get postedDate => _timestamp?.toDate();
@@ -30,8 +38,6 @@ class CommentModel {
     return 'unknown date';
   }
 
-  CommentModel({required this.uid});
-
   @override
   String toString() {
     return 'comment: {$_poster}, $_message, $postedDate';
@@ -41,7 +47,7 @@ class CommentModel {
     log('${snapshot['commenter'].id}');
     final poster = await UserModel(snapshot['commenter'].id).updated;
     final commentData = snapshot.data()!;
-    final comment = CommentModel(uid: snapshot.id);
+    final comment = CommentModel(snapshot.id);
     comment._poster = poster;
     comment._message = commentData['message'];
     comment._timestamp = commentData['timestamp'] as Timestamp;

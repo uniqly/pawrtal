@@ -40,13 +40,9 @@ class _PostTileState extends ConsumerState<PostTile> {
       await widget.post.addUserToLikes(_currUser);
     }
 
-    /*
     if (mounted) {
-      setState(() {
-        //_isLiked = _post.isLikedBy(_currUser);
-      });
+      setState(() {});
     }
-    */
   }
 
   // TODO: Implement likes / bookmark logic

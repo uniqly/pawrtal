@@ -19,6 +19,8 @@ class PostModel {
   int? _likeCount;
   int? _commentCount;
 
+  static final Map<String, PostModel> _cache = {};
+
   PortalModel? get portal => _portal;
   UserModel? get poster => _poster;
   String? get caption => _caption;
@@ -28,7 +30,11 @@ class PostModel {
   int? get commentCount => _commentCount;
 
   // TODO: Implement Likes and Bookmarks
-  PostModel({required this.uid});
+  PostModel._internal(this.uid);
+
+  factory PostModel(String uid) {
+    return _cache.putIfAbsent(uid, () => PostModel._internal(uid));
+  }
 
   DocumentReference get dbRef { 
     return _db.collection('posts').doc(uid);
@@ -117,7 +123,7 @@ class PostModel {
     final portal = await PortalModel(postData['portal'].id).updated;
     final poster = await UserModel(postData['poster'].id).updated;
     log('post from snapshot: ${snapshot.id}, ${postData['caption']}, ${portal.name}, ${poster.username}');
-    final post = PostModel(uid: snapshot.id);
+    final post = PostModel(snapshot.id);
     post._portal = portal;
     post._poster = poster;
     post._caption = postData['caption'];
