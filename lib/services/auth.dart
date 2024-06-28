@@ -31,24 +31,34 @@ class AuthService {
     }
   }
 
-  // sign in with username
-  static Future<MyUser?> signInWithUsernameAndPassword(String username, String password) async {
-    try {
-      // Assuming you have a Firestore collection 'users' with documents having fields 'username' and 'email'
-      final userSnapshot = await FirebaseFirestore.instance
-          .collection('users')
-          .where('username', isEqualTo: username)
-          .limit(1)
-          .get();
 
-      if (userSnapshot.docs.isEmpty) {
-        throw FirebaseAuthException(
-          code: 'user-not-found',
-          message: 'No user found for that username.',
-        );
+  // sign in with username
+  static Future<MyUser?> signInWithUsernameAndPassword(String input, String password) async {
+    try {
+      String email;
+      // Check if the input is an email
+      bool isEmail = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(input);
+      
+      if (isEmail) {
+        email = input;
+      } else {
+        // Fetch the email associated with the username
+        final userSnapshot = await FirebaseFirestore.instance
+            .collection('users')
+            .where('username', isEqualTo: input)
+            .limit(1)
+            .get();
+
+        if (userSnapshot.docs.isEmpty) {
+          throw FirebaseAuthException(
+            code: 'user-not-found',
+            message: 'No user found for that username.',
+          );
+        }
+
+        email = userSnapshot.docs.first.get('email');
       }
 
-      final email = userSnapshot.docs.first.get('email');
       UserCredential result = await _auth.signInWithEmailAndPassword(email: email, password: password);
       User? user = result.user;
       return _userFromFirebaseUser(user);

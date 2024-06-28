@@ -62,7 +62,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                         IconButton( 
                           onPressed: () {},
                           icon: const Icon(Icons.messenger)
-                        )
+                        ),
                       ],
                     ),
                     SliverToBoxAdapter(

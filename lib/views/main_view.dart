@@ -6,6 +6,7 @@ import 'package:pawrtal/models/user/user_model.dart';
 import 'package:pawrtal/shared/loading.dart';
 import 'package:pawrtal/views/auth/authenticate.dart';
 import 'package:pawrtal/views/create/create.dart';
+import 'package:pawrtal/views/menu_view.dart';
 import 'package:pawrtal/views/profile/profile.dart';
 
 import 'home/home.dart';
@@ -17,7 +18,7 @@ class MainView extends ConsumerStatefulWidget {
   ConsumerState<MainView> createState() => _MainViewState();
 }
 
-enum PageTab { home, profile }
+enum PageTab { home, profile, none }
 
 class _MainViewState extends ConsumerState<MainView> {
   var currTab = PageTab.home;
@@ -27,13 +28,13 @@ class _MainViewState extends ConsumerState<MainView> {
   void initState() {
     super.initState();
     Future(() async {
-        final auth = ref.read(appUserProvider.future);
-        final user = await auth;
-        if (user == null && mounted) {
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Authenticate()));
-        }
+      final auth = ref.read(appUserProvider.future);
+      final user = await auth;
+      if (user == null && mounted) {
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => const Authenticate()));
       }
-    );
+    });
   }
 
   @override
@@ -71,6 +72,16 @@ class _MainViewState extends ConsumerState<MainView> {
                 case 2: {
                   currTab = PageTab.profile;
                 }
+                case 3:
+                  setState(() {
+                    currTab = PageTab.none;
+                  });
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const MenuView()),
+                  );
+                  break;
               }
             },
             labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
@@ -102,6 +113,17 @@ class _MainViewState extends ConsumerState<MainView> {
                   ),
                 ),
                 label: '',
+              ),
+              const NavigationDestination(
+                icon: Icon(
+                  Icons.menu,
+                  size: 28,
+                ),
+                selectedIcon: Icon(
+                  Icons.menu,
+                  size: 28,
+                ),
+                label: 'Menu',
               ),
             ],
           ),

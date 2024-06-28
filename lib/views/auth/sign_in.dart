@@ -55,10 +55,10 @@ class _SignInState extends State<SignIn> {
                 const SizedBox(height: 50.0),
                 TextFormField(
                   decoration: textInputDecoration.copyWith(
-                    hintText: 'Username',
+                    hintText: 'Email or Username',
                     prefixIcon: const Icon(Icons.email), // Add the email icon
                   ),
-                  validator: (val) => val!.isEmpty ? 'Enter a username' : null,
+                  validator: (val) => val!.isEmpty ? 'Enter a username or email' : null,
                   onChanged: (val) {
                     setState(() => username = val);
                   },
