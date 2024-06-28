@@ -4,6 +4,7 @@ import 'package:pawrtal/shared/loading.dart';
 import 'package:pawrtal/viewmodels/messaging/message_view.dart';
 import 'package:pawrtal/views/events/events_view.dart';
 import 'package:pawrtal/views/main_view.dart';
+import 'package:pawrtal/views/portals/portal_list.dart';
 
 class MenuView extends StatefulWidget {
   const MenuView({super.key});
@@ -65,7 +66,11 @@ class _MenuViewState extends State<MenuView> {
                           // Navigate to Events page
                         }),
                          _buildGridTile(Icons.reddit, 'Subpawrtals', () {
-                          // Navigate to Profile Settings page
+                          Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => PortalsList()),
+                        );
                         }),
                         _buildGridTile(Icons.settings, 'Profile Settings', () {
                           // Navigate to Profile Settings page

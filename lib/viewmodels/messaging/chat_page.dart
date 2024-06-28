@@ -71,100 +71,98 @@ class _ChatPageState extends State<ChatPage> {
       );
   }
 
-  // build message item
   Widget _buildMessageItem(DocumentSnapshot document) {
     Map<String, dynamic> data = document.data() as Map<String, dynamic>;
 
-    // align the messages to the right if sender is current useer, otherwise to the left
+    // Determine alignment based on sender
     var alignment = (data['senderId'] == _firebaseAuth.currentUser!.uid)
-      ? Alignment.centerRight 
-      : Alignment.centerLeft;
+        ? CrossAxisAlignment.end
+        : CrossAxisAlignment.start;
 
-    return Container(
-      alignment: alignment,
-      padding: const EdgeInsets.all(8.0),
+    // Determine background color based on sender
+    var backgroundColor = (data['senderId'] == _firebaseAuth.currentUser!.uid)
+        ? Colors.blue[100]
+        : Colors.grey[300];
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start, // Aligns texts to the start
+        crossAxisAlignment: alignment, // Use CrossAxisAlignment.end or CrossAxisAlignment.start
         children: [
-          // Container for senderDisplayName
           Container(
             padding: const EdgeInsets.all(8.0),
             decoration: BoxDecoration(
-              color: Colors.grey[300],
+              color: backgroundColor,
               borderRadius: BorderRadius.circular(12.0),
             ),
-            child: Text(
-              data['senderDisplayName'] ?? 'Unknown', // Use 'Unknown' if senderDisplayName is null
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(data['message']),
+                const SizedBox(height: 4.0),
+                Text(
+                  _formatTimestamp(data['timestamp']), // Format timestamp here
+                  style: const TextStyle(
+                    fontSize: 12.0,
+                    color: Colors.grey,
+                  ),
+                ),
+              ],
             ),
-          ),
-          const SizedBox(height: 4.0), // Spacing between the boxes
-          // Container for message
-          Container(
-            padding: const EdgeInsets.all(12.0),
-            decoration: BoxDecoration(
-              color: Colors.blue[100],
-              borderRadius: BorderRadius.circular(12.0),
-            ),
-            child: Text(data['message']),
           ),
         ],
       ),
     );
   }
-    
 
+  // Helper method to format timestamp in 24-hour format
+  String _formatTimestamp(Timestamp timestamp) {
+    // Example format: HH:mm
+    var date = DateTime.fromMillisecondsSinceEpoch(timestamp.millisecondsSinceEpoch);
+    return '${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
+  }
+    
   // build message input
-Widget _buildMessageInput() {
-  return Padding(
-    padding: const EdgeInsets.all(8.0),
-    child: Row(
-      children: [
-        // Text field inside a decorated box
-        Expanded(
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(24.0),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.5),
-                  spreadRadius: 2,
-                  blurRadius: 5,
-                  offset: const Offset(0, 3), // changes position of shadow
-                ),
-              ],
-            ),
-            child: TextField(
-              controller: _messageController,
-              decoration: const InputDecoration(
-                contentPadding: EdgeInsets.symmetric(horizontal: 16.0), // Add padding inside the text field
-                hintText: 'Enter Message',
-                border: InputBorder.none,
+  Widget _buildMessageInput() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        children: [
+          // Text field inside a decorated box
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(24.0),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 2,
+                    blurRadius: 5,
+                    offset: const Offset(0, 3), // changes position of shadow
+                  ),
+                ],
               ),
-              obscureText: false,
+              child: TextField(
+                controller: _messageController,
+                decoration: const InputDecoration(
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16.0), // Add padding inside the text field
+                  hintText: 'Enter Message',
+                  border: InputBorder.none,
+                ),
+                obscureText: false,
+              ),
             ),
           ),
-        ),
-        const SizedBox(width: 1.0), // Reduce the space between the input and the button
-        // Circular send button
-        RawMaterialButton(
-          onPressed: sendMessage,
-          elevation: 2.0,
-          fillColor: Colors.blue[300],
-          padding: const EdgeInsets.all(12.0), // Adjust padding for the circular button
-          shape: const CircleBorder(),
-          child: const Icon(
-            Icons.arrow_forward,
-            size: 30.0,
-            color: Colors.white,
+          const SizedBox(width: 1.0), // Reduce the space between the input and the button
+          // Circular send button
+          IconButton(
+            icon: const Icon(Icons.send),
+            onPressed: sendMessage,
           ),
-        ),
-      ],
-    ),
-  );
-}
+        ],
+      ),
+    );
+  }
 }

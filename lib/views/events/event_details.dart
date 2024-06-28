@@ -2,13 +2,17 @@ import 'package:flutter/material.dart';
 
 class EventDetailsScreen extends StatelessWidget {
   final String title;
-  final String details;
+  final String dateRange;
+  final String location;
+  final String description;
   final String imagePath;
 
   const EventDetailsScreen({
     super.key,
     required this.title,
-    required this.details,
+    required this.dateRange,
+    required this.location,
+    required this.description,
     required this.imagePath,
   });
 
@@ -26,7 +30,7 @@ class EventDetailsScreen extends StatelessWidget {
             _loadEventImage(imagePath),
             const SizedBox(height: 16.0),
             Text(
-              details,
+              'Date: $dateRange\nLocation: $location\nDescription: $description',
               style: const TextStyle(
                 fontSize: 16.0,
               ),
