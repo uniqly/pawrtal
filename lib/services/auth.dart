@@ -138,8 +138,8 @@ class AuthService {
           'createdAt': FieldValue.serverTimestamp(),
           'location': '',
           'bio': '',
-          'followers': 0,
-          'following': 0,
+          'followerCount': 0,
+          'followingCount': 0,
           'pfp': pfp,
           'banner': banner,
         });

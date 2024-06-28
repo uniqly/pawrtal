@@ -105,7 +105,7 @@ class _CreateViewState extends ConsumerState<CreateView> {
             floatingActionButton: SizedBox(
               height: 75,
               width: 75,
-              child: FloatingActionButton( // TODO: Implement picture picker
+              child: FloatingActionButton( 
                 onPressed: () { 
                   _pickImages(); 
                 },

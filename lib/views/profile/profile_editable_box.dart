@@ -22,7 +22,7 @@ class ProfileEditableBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    log(controller?.text ?? 'no controller');
+    log(controller.text);
     return Container(
       padding: const EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
       child: Column( 

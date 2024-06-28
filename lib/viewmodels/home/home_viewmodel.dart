@@ -1,6 +1,5 @@
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:pawrtal/models/posts/post_model.dart';
 import 'package:pawrtal/models/user/user_model.dart';
 import 'package:pawrtal/test/test_user.dart';
@@ -12,9 +11,8 @@ class HomeViewModel {
   static final _db = FirebaseFirestore.instance;
 
   final UserModel user;
-  final Stream<List<PostModel>> _posts;
 
-  HomeViewModel(this.user, this._posts);
+  HomeViewModel(this.user);
 
   Stream<List<PostModel>> get posts {
     // gets the posts ordered in reverse chronological order
@@ -34,8 +32,7 @@ class HomeViewModel {
           final temp = [for (var p in posts) p.caption];
           log('homeposts: $temp');
           return posts;
-        }
-      ); 
+        });
   }  
 }
 
@@ -45,6 +42,6 @@ class HomeViewModelNotifier extends _$HomeViewModelNotifier {
   Future<HomeViewModel> build() async { 
     final user = await ref.watch(mainUserProvider.future);
 
-    return HomeViewModel(user, const Stream.empty());
+    return HomeViewModel(user);
   }
 }

@@ -17,37 +17,45 @@ class _ProfileMediaViewState extends ConsumerState<ProfileMediaView> with Automa
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final profileViewModel = ref.watch(ProfileViewModelNotifierProvider(uid: widget.userId));
 
     return profileViewModel.when( 
-      loading: () => const CircularProgressIndicator(),
+      loading: () => const Center(child: SizedBox(height: 30, width: 30, child: CircularProgressIndicator())),
       error: (err, stack) => Text('error: $err'),
       data: (viewmodel) { 
         return StreamBuilder(  
           stream: viewmodel.media,
           builder: (context, snapshot) { 
-            return snapshot.hasData ? GridView.builder( 
-              itemCount: snapshot.data!.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount( 
-                crossAxisCount: 2,
-              ), 
-              itemBuilder: (context, index) {
-                return Padding(
-                  padding: const EdgeInsets.all(4.0),
-                  child: ClipRRect( 
-                    borderRadius: BorderRadius.circular(5.0),
-                    child: Container( 
-                      color: Colors.grey[400],
-                      child: Image( 
-                        fit: BoxFit.cover,
-                        image: NetworkImage(snapshot.data![index]),
-                        errorBuilder: (context, err, stack) => const SizedBox.shrink(),
+            return snapshot.hasData ? ListView(
+              children: [
+                GridView.builder( 
+                  shrinkWrap: true,
+                  itemCount: snapshot.data!.length,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount( 
+                    crossAxisCount: 2,
+                  ), 
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: const EdgeInsets.all(4.0),
+                      child: ClipRRect( 
+                        borderRadius: BorderRadius.circular(5.0),
+                        child: Container( 
+                          color: Colors.grey[400],
+                          child: Image( 
+                            fit: BoxFit.cover,
+                            image: NetworkImage(snapshot.data![index]),
+                            errorBuilder: (context, err, stack) => const SizedBox.shrink(),
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                );
-              }
-            ) : const CircularProgressIndicator();
+                    );
+                  }
+                ),
+                if (snapshot.data!.isEmpty)
+                  const Center(child: Text('No Media Found')),
+              ],
+            ) : const Center(child: SizedBox(height: 30, width: 30, child: CircularProgressIndicator()));
           },
         );
       }
