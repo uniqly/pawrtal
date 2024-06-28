@@ -1,7 +1,6 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:pawrtal/main.dart';
 import 'package:pawrtal/views/auth/forget_password.dart';
 import 'package:pawrtal/services/auth.dart';
 import 'package:pawrtal/shared/constants.dart';
@@ -19,8 +18,6 @@ class SignIn extends StatefulWidget {
 }
 
 class _SignInState extends State<SignIn> {
-
-  final AuthService _auth = AuthService();
   final _formKey = GlobalKey<FormState>();
   bool loading = false;
 

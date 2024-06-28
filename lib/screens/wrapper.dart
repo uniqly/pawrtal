@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:pawrtal/main.dart';
 import 'package:pawrtal/views/auth/authenticate.dart';
 import 'package:pawrtal/screens/onboarding/welcome.dart';
-import 'package:pawrtal/views/main_view.dart';
 import 'package:provider/provider.dart';
 import 'package:pawrtal/models/myuser.dart';
 

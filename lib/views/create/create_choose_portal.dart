@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:pawrtal/models/portals/portal_model.dart';
 import 'package:pawrtal/test/placeholder_images.dart';
-import 'package:pawrtal/test/test_user.dart';
 import 'package:pawrtal/viewmodels/create/create_post_viewmodel.dart';
 
 class CreateChoosePortalView extends ConsumerStatefulWidget {
@@ -18,6 +17,13 @@ class _CreateChoosePortalViewState extends ConsumerState<CreateChoosePortalView>
   String query = '';
   int? selectedIndex;
   String? selectedPortalId;
+  late final TextEditingController _choosePortalController;
+  
+  @override
+  void initState() {
+    super.initState();
+    _choosePortalController = TextEditingController();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,8 +80,34 @@ class _CreateChoosePortalViewState extends ConsumerState<CreateChoosePortalView>
               padding: const EdgeInsets.symmetric(horizontal: 12.0),
               child: Column( 
                 children: [ 
-                  TextFormField( 
-                    onFieldSubmitted: (value) => setState(() => query = value),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 6.0),
+                    child: SizedBox(
+                      height: 40,
+                      child: TextFormField(
+                        controller: _choosePortalController,
+                        style: TextStyle( 
+                          color: Theme.of(context).colorScheme.onPrimaryContainer,
+                        ),
+                        decoration: InputDecoration(  
+                          isDense: true,
+                          contentPadding: EdgeInsets.zero,
+                          hintText: 'search for subpawrtal',
+                          hintStyle: TextStyle( 
+                            color: Theme.of(context).colorScheme.onPrimaryContainer,
+                          ),
+                          prefixIcon: const Icon(Icons.search_rounded),
+                          fillColor: Theme.of(context).colorScheme.primaryContainer,
+                          prefixIconColor: Theme.of(context).colorScheme.onPrimaryContainer,
+                          filled: true,
+                          border: OutlineInputBorder( 
+                            borderRadius: BorderRadius.circular(25.0),
+                            borderSide: BorderSide.none,
+                          )
+                        ),
+                        onFieldSubmitted: (value) => setState(() => query = value),
+                      ),
+                    ),
                   ),
                   Expanded(
                     child: StreamBuilder<List<PortalModel>>( 
@@ -90,6 +122,9 @@ class _CreateChoosePortalViewState extends ConsumerState<CreateChoosePortalView>
                               final portal = data[index];
                               return Card( 
                                 child: ListTile( 
+                                  shape: RoundedRectangleBorder(  
+                                    borderRadius: BorderRadius.circular(10.0)
+                                  ),
                                   enabled: true,
                                   selected: index == selectedIndex,
                                   leading: CircleAvatar( 
@@ -100,6 +135,8 @@ class _CreateChoosePortalViewState extends ConsumerState<CreateChoosePortalView>
                                   trailing: selectedIndex == index ? const Icon(Icons.check_circle_outline) : null,
                                   title: Text('p/${portal.name}'),
                                   subtitle: Text('${NumberFormat.compact().format(portal.memberCount)} members'),
+                                  tileColor: Theme.of(context).colorScheme.secondaryContainer,
+                                  selectedTileColor: Theme.of(context).colorScheme.secondaryFixedDim,
                                   onTap: () { 
                                     setState(() {
                                       if (index == selectedIndex) { // toggle off

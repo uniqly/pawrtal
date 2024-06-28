@@ -6,6 +6,7 @@ import 'package:pawrtal/services/auth.dart';
 import 'package:pawrtal/shared/constants.dart';
 import 'package:pawrtal/shared/loading.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:pawrtal/views/main_view.dart';
 
 class Register extends StatefulWidget {
 
@@ -17,7 +18,6 @@ class Register extends StatefulWidget {
 }
 
 class _RegisterState extends State<Register> {
-  final AuthService _auth = AuthService();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -192,6 +192,10 @@ class _RegisterState extends State<Register> {
                             });
                           } else {
                             log('Signed in with Google: ${result.user?.email}');
+                            // Navigate to home screen
+                            if (context.mounted) {
+                              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const MainView()));
+                            }
                           }
                         },
                         label: const Text(

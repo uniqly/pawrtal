@@ -3,9 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pawrtal/models/user/user_model.dart';
-import 'package:pawrtal/services/auth.dart';
 import 'package:pawrtal/shared/loading.dart';
-import 'package:pawrtal/test/test_user.dart';
 import 'package:pawrtal/views/auth/authenticate.dart';
 import 'package:pawrtal/views/create/create.dart';
 import 'package:pawrtal/views/profile/profile.dart';
@@ -27,7 +25,6 @@ class _MainViewState extends ConsumerState<MainView> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     Future(() async {
         final auth = ref.read(appUserProvider.future);
@@ -42,9 +39,8 @@ class _MainViewState extends ConsumerState<MainView> {
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(appUserProvider);
-    //TODO: add state for user and posts
     return user.when( 
-      loading: () => const CircularProgressIndicator(),
+      loading: () => const Loading(),
       error: (err, stack) { 
         log('$stack');
         return Text('error: $err');
@@ -79,13 +75,12 @@ class _MainViewState extends ConsumerState<MainView> {
             },
             labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
             destinations: [
-              const NavigationDestination( 
-                icon: Icon(
-                  Icons.home_outlined,
-                  size: 28,
-                ),
-                selectedIcon: Icon(
+              NavigationDestination( 
+                icon: currTab == PageTab.home ? const Icon(
                   Icons.home,
+                  size: 28,
+                ) : const  Icon(
+                  Icons.home_outlined,
                   size: 28,
                 ),
                 label: '',
@@ -94,16 +89,12 @@ class _MainViewState extends ConsumerState<MainView> {
                 icon: Icon(
                   Icons.add_rounded,
                   size: 28,
-                ),
-                selectedIcon: Icon(
-                  Icons.add_rounded,
-                  size: 32,
                 ),
                 label: '',
               ),
               NavigationDestination( 
                 icon: CircleAvatar(
-                  backgroundColor: pageIndex == 2 ? Colors.pinkAccent : Colors.transparent,
+                  backgroundColor: currTab == PageTab.profile ? Colors.pinkAccent : Colors.transparent,
                   radius: 22,
                   child: CircleAvatar( 
                     backgroundImage: NetworkImage(mainUser.pfp!),

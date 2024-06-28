@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/foundation.dart';
+import 'package:pawrtal/models/portals/portal_model.dart';
 import 'package:pawrtal/models/posts/post_model.dart';
 import 'package:pawrtal/models/user/user_model.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -35,6 +35,25 @@ class ProfileViewModel {
 
   bool get isCurrUserProfile => _profile.uid == _currUser.uid;
   
+  bool get isUserFollowingProfile => _currUser.isFollowing(_profile);
+
+  Future<void> toggleFollow() async {
+    // for some reason, updaing curruser first then profile causes desync issues
+    // might be due to viewmodel reloading immediately on updating curr user
+    log('toggle follow');
+    if (isUserFollowingProfile) {
+      log('toggle follow: unfollow');
+      await _profile.removeFollower(_currUser);
+      await _currUser.unfollow(_profile);
+    } else {
+      log('toggle follow: follow');
+      await _profile.addFollower(_currUser);
+      await _currUser.follow(_profile);
+      log('toggle follow after: $_profile');
+    }
+    log('toggle follow: ${_profile.followerCount}');
+  }
+  
   // get posts for the user
   Stream<List<PostModel>> get posts {
     // gets the posts ordered in reverse chronological order
@@ -56,6 +75,26 @@ class ProfileViewModel {
       ); 
   }
 
+  // gets liked posts of the user excluding self likes
+  Stream<List<PostModel>> get likedPosts {
+    return _db.collection('posts')
+      .where('likes', arrayContains: _profile.dbRef)
+      .where('poster', isNotEqualTo: _profile.dbRef)
+      .orderBy('timestamp', descending: true)
+      .snapshots()
+      .asyncMap(
+        (querySnapshot) async {
+          var posts = <PostModel>[];
+          for (var docSnapshot in querySnapshot.docs) {
+            await PostModel.postFromSnapshot(docSnapshot).then((post) => posts.add(post));
+          }
+          final temp = [for (var p in posts) p.caption];
+          log('homeposts: $temp');
+          return posts;
+        }
+      );
+  }
+
   // get media from the user
   Stream<List<String>> get media {
     return posts.asyncMap((posts) async { 
@@ -66,6 +105,23 @@ class ProfileViewModel {
       log('$images');
       return images;
     });
+  }
+
+  Stream<List<PortalModel>> get portals {
+    return _db.collection('portals')
+      .where('members', arrayContains: _profile.dbRef)
+      .orderBy('memberCount', descending: true)
+      .snapshots()
+      .asyncMap( 
+        (querySnapshot) async {
+          var portals = <PortalModel>[];
+          for (var documentSnapshot in querySnapshot.docs) {
+            await PortalModel.portalFromSnapshot(documentSnapshot).then((portal) => portals.add(portal));
+          }
+          log('$portals');
+          return portals;
+        }
+      );
   }
 
   Future<void> updateProfile(File? pfp, File? banner, String displayName, String username, String bio, String location) async { 
@@ -94,7 +150,7 @@ class ProfileViewModel {
       'pfp': pfpString,
     };  
     
-    _db.collection('users').doc(_currUser.uid).set(updated, SetOptions(merge: true));
+    await _db.collection('users').doc(_currUser.uid).update(updated);
   }
 }
 
