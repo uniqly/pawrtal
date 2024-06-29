@@ -150,196 +150,207 @@ class EventsView extends StatelessWidget {
     );
   }
 
-  Widget _buildEventCard(
-    BuildContext context, 
-    String eventId, 
-    String title, 
-    String dateRange, 
-    String location, 
-    String description, 
-    String imagePath, 
-    String creatorId) {
-      return Card(
-        margin: const EdgeInsets.all(10.0),
-        child: InkWell(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => EventDetailsView(
-                  title: title,
-                  dateRange: dateRange,
-                  location: location,
-                  description: description,
-                  imagePath: imagePath,
-                  creatorId: creatorId,
-                  eventId: eventId,
+  Widget _buildEventCard(BuildContext context, String eventId, String title, String dateRange, String location, String description, String imagePath, String creatorId) {
+    return Card(
+      margin: const EdgeInsets.all(10.0),
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => EventDetailsView(
+                eventId: eventId, // Pass eventId to EventDetailsView
+                title: title,
+                dateRange: dateRange,
+                location: location,
+                description: description,
+                imagePath: imagePath,
+                creatorId: creatorId,
+              ),
+            ),
+          );
+        },
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _loadEventImage(imagePath),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+              child: Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-            );
-          },
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _loadEventImage(imagePath),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-            child: Text(
-              title,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-            child: Text(
-              dateRange,
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.black,
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-            child: Text(
-              location,
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.black,
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          // Handle "Interested" button press
-                        },
-                        icon: const Icon(Icons.star),
-                        label: const Text('Interested'),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          // Handle "Share" button press
-                        },
-                        icon: const Icon(Icons.share),
-                        label: const Text('Share'),
-                      ),
-                    ),
-                  ],
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+              child: Text(
+                dateRange,
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Colors.black,
                 ),
-                FutureBuilder<String?>(
-                  future: AuthService().getCurrentUserId(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const CircularProgressIndicator();
-                    }
-                    if (snapshot.hasData) {
-                      String currentUserId = snapshot.data!;
-                      if (creatorId == currentUserId) {
-                        return Padding(
-                          padding: const EdgeInsets.only(top: 10.0),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    // Navigate to edit event page
-                                  },
-                                  child: const Text('Edit'),
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: ElevatedButton(
-                                  onPressed: () async {
-                                    // Show delete confirmation dialog
-                                    bool? confirmDelete = await showDialog<bool>(
-                                      context: context,
-                                      builder: (context) {
-                                        return AlertDialog(
-                                          title: const Text('Delete Event'),
-                                          content: const Text('Are you sure you want to delete this event?'),
-                                          actions: [
-                                            TextButton(
-                                              onPressed: () {
-                                                Navigator.of(context).pop(false);
-                                              },
-                                              child: const Text('Cancel'),
-                                            ),
-                                            TextButton(
-                                              onPressed: () {
-                                                Navigator.of(context).pop(true);
-                                              },
-                                              child: const Text('Delete'),
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                    );
-
-                                    if (confirmDelete == true) {
-                                      await _deleteEvent(eventId);
-                                    }
-                                  },
-                                  child: const Text('Delete'),
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      } else {
-                        return Container();
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+              child: Text(
+                location,
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            // Handle "Interested" button press
+                          },
+                          icon: const Icon(Icons.star),
+                          label: const Text('Interested'),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            // Handle "Share" button press
+                          },
+                          icon: const Icon(Icons.share),
+                          label: const Text('Share'),
+                        ),
+                      ),
+                    ],
+                  ),
+                  FutureBuilder<String?>(
+                    future: AuthService().getCurrentUserId(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const CircularProgressIndicator();
                       }
-                    } else {
-                      return const Text('User not authenticated');
-                    }
-                  },
-                ),
-              ],
+                      if (snapshot.hasData) {
+                        String currentUserId = snapshot.data!;
+                        if (creatorId == currentUserId) {
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 10.0),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: ElevatedButton(
+                                    onPressed: () async {
+                                      Map<String, dynamic>? data = await fetchEventData(eventId);
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => CreateEventView(
+                                            eventId: eventId,
+                                            eventData: data,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    child: const Text('Edit'),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: ElevatedButton(
+                                    onPressed: () async {
+                                      // Show delete confirmation dialog
+                                      bool? confirmDelete = await showDialog<bool>(
+                                        context: context,
+                                        builder: (context) {
+                                          return AlertDialog(
+                                            title: const Text('Delete Event'),
+                                            content: const Text('Are you sure you want to delete this event?'),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.of(context).pop(false);
+                                                },
+                                                child: const Text('Cancel'),
+                                              ),
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.of(context).pop(true);
+                                                },
+                                                child: const Text('Delete'),
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
+
+                                      if (confirmDelete == true) {
+                                        await _deleteEvent(eventId);
+                                      }
+                                    },
+                                    child: const Text('Delete'),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        } else {
+                          return Container();
+                        }
+                      } else {
+                        return const Text('User not authenticated');
+                      }
+                    },
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ),
-  );
-}
-
-Future<void> _deleteEvent(String eventId) async {
-  try {
-    await FirebaseFirestore.instance.collection('events').doc(eventId).delete();
-  } catch (e) {
-    print('Error deleting event: $e');
-    // Show an error dialog or handle the error as needed
+    );
   }
-}
 
-  Widget _loadEventImage(String imagePath) {
-    if (imagePath.startsWith('http')) {
+  Future<void> _deleteEvent(String eventId) async {
+    try {
+      await FirebaseFirestore.instance.collection('events').doc(eventId).delete();
+    } catch (e) {
+      print('Error deleting event: $e');
+    }
+  }
+
+  Widget _loadEventImage(String? imagePath) {
+    if (imagePath != null && imagePath.isNotEmpty) {
       return Image.network(
         imagePath,
-        fit: BoxFit.cover,
-        height: 250, // Adjust the height as needed
         width: double.infinity,
+        height: 200,
+        fit: BoxFit.cover,
       );
     } else {
+      // Display default image
       return Image.asset(
-        imagePath,
-        fit: BoxFit.cover,
-        height: 250, // Adjust the height as needed
+        'assets/default_event_image.jpg', // Update this path to your default image
         width: double.infinity,
+        height: 200,
+        fit: BoxFit.cover,
       );
+    }
+  }
+
+  Future<Map<String, dynamic>?> fetchEventData(String eventId) async {
+    try {
+      DocumentSnapshot eventSnapshot = await FirebaseFirestore.instance.collection('events').doc(eventId).get();
+      return eventSnapshot.data() as Map<String, dynamic>?;
+    } catch (e) {
+      print('Error fetching event data: $e');
+      return null;
     }
   }
 }
