@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:pawrtal/models/myuser.dart';
@@ -31,6 +30,13 @@ class AuthService {
     }
   }
 
+  Future<String?> getCurrentUserId() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      return user.uid;
+    }
+    return null; // Return null or handle appropriately if user is not authenticated
+  }
 
   // sign in with username
   static Future<MyUser?> signInWithUsernameAndPassword(String input, String password) async {
@@ -100,8 +106,10 @@ class AuthService {
             'createdAt': FieldValue.serverTimestamp(),
             'location': '',
             'bio': '',
-            'followers': 0,
-            'following': 0,
+            'followerCount': 0,
+            'followingCount': 0,
+            'following': FieldValue.arrayUnion([]),
+            'followers': FieldValue.arrayUnion([]),
             'pfp': pfp,
             'banner': banner,
           });
@@ -140,6 +148,8 @@ class AuthService {
           'bio': '',
           'followerCount': 0,
           'followingCount': 0,
+          'following': FieldValue.arrayUnion([]),
+          'followers': FieldValue.arrayUnion([]),
           'pfp': pfp,
           'banner': banner,
         });

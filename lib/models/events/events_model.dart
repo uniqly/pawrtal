@@ -1,15 +1,17 @@
 class Event {
-  final String eventName;
-  final String eventDate;
-  final String eventTime;
-  final String eventLocation;
-  final String eventDescription;
+  final String title;
+  final String dateRange;
+  final String location;
+  final String description;
+  final String imagePath;
+  final String creatorId;
 
   Event({
-    required this.eventName,
-    required this.eventDate,
-    required this.eventTime,
-    required this.eventLocation,
-    required this.eventDescription,
+    required this.title,
+    required this.dateRange,
+    required this.location,
+    required this.description,
+    required this.imagePath,
+    required this.creatorId,
   });
 }

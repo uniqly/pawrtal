@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
+import 'package:pawrtal/services/auth.dart';  // Import AuthService
 
 class CreateEventView extends StatefulWidget {
   const CreateEventView({super.key});
@@ -23,6 +24,8 @@ class _CreateEventViewState extends State<CreateEventView> {
   String _eventLocation = '';
   String _eventDescription = '';
   File? _eventImage;
+  String eventId = '';
+  String creatorId = '';
 
   final ImagePicker _picker = ImagePicker();
   final TextEditingController _startDateController = TextEditingController();
@@ -116,11 +119,18 @@ class _CreateEventViewState extends State<CreateEventView> {
           child: ListView(
             children: [
               _eventImage == null
-                  ? const Placeholder(
-                      fallbackHeight: 200.0,
-                      fallbackWidth: double.infinity,
+                  ? Image.asset(
+                      'assets/app/default_image.png',
+                      height: 200.0,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
                     )
-                  : Image.file(_eventImage!),
+                  : Image.file(
+                      _eventImage!,
+                      height: 200.0,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    ),
               const SizedBox(height: 10.0),
               TextButton(
                 style: TextButton.styleFrom(backgroundColor: Colors.pink[100]),
@@ -269,6 +279,9 @@ class _CreateEventViewState extends State<CreateEventView> {
                       // Upload image and get URL
                       String? imageUrl = await _uploadImage();
 
+                      // Get the current user ID
+                      String? creatorId = await AuthService().getCurrentUserId();
+
                       // Add a new document with a generated ID
                       await firestore.collection('events').add({
                         'eventName': _eventName,
@@ -279,6 +292,8 @@ class _CreateEventViewState extends State<CreateEventView> {
                         'eventLocation': _eventLocation,
                         'eventDescription': _eventDescription,
                         'eventImage': imageUrl,
+                        'creatorId': creatorId,
+                        'eventId': eventId,
                       });
 
                       // Navigate back to the previous screen

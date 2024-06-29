@@ -29,6 +29,9 @@ class ChatService extends ChangeNotifier{
     String chatRoomId = ids.join(
       "_" // combine the ids into a single string to use as a chatroomID
     );
+
+    //create chat room if doesnt exists already
+    await _firestore.collection('chat_rooms').doc(chatRoomId).set({'users': FieldValue.arrayUnion(ids)}, SetOptions(merge: true));
     
     //add new message to database
     await _firestore

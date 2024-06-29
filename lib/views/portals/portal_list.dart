@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pawrtal/models/portals/portal_model.dart';
+import 'package:pawrtal/views/portals/portal.dart';
 
 class PortalsList extends StatelessWidget {
   @override
@@ -8,7 +9,16 @@ class PortalsList extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.amber[200],
-        title: const Text('Pawrtals'),
+        title: const Text(
+          'Subpawrtals',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 20,
+            fontFamily: 'Roboto',
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance.collection('portals').snapshots(),
@@ -43,7 +53,9 @@ class PortalsList extends StatelessWidget {
                           ),
                     title: Text(portal.name ?? 'No Name'),
                     subtitle: Text('${portal.memberCount ?? 0} members'),
-                    onTap: () {},
+                    onTap: () { 
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => PortalView(portal: portal)));
+                    },
                   );
                 },
               );
