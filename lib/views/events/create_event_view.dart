@@ -7,7 +7,10 @@ import 'package:intl/intl.dart';
 import 'package:pawrtal/services/auth.dart';  // Import AuthService
 
 class CreateEventView extends StatefulWidget {
-  const CreateEventView({super.key});
+  final String? eventId; // Add eventId for editing
+  final Map<String, dynamic>? eventData; // Add eventData for editing
+
+  const CreateEventView({super.key, this.eventId, this.eventData});
 
   @override
   _CreateEventViewState createState() => _CreateEventViewState();
@@ -33,6 +36,55 @@ class _CreateEventViewState extends State<CreateEventView> {
   final TextEditingController _endDateController = TextEditingController();
   final TextEditingController _endTimeController = TextEditingController();
 
+  @override
+void initState() {
+  super.initState();
+
+  // Initialize fields with existing event data if editing
+  if (widget.eventData != null) {
+    _eventName = widget.eventData!['eventName'] ?? '';
+    _eventLocation = widget.eventData!['eventLocation'] ?? '';
+    _eventDescription = widget.eventData!['eventDescription'] ?? '';
+
+    // Parse date and time fields if they exist
+    if (widget.eventData!['startDate'] != null) {
+      try {
+        _startDate = DateTime.parse(widget.eventData!['startDate']);
+        _startDateController.text = DateFormat('yyyy-MM-dd').format(_startDate!);
+      } catch (e) {
+        print('Error parsing startDate: $e');
+      }
+    }
+
+    if (widget.eventData!['endDate'] != null) {
+      try {
+        _endDate = DateTime.parse(widget.eventData!['endDate']);
+        _endDateController.text = DateFormat('yyyy-MM-dd').format(_endDate!);
+      } catch (e) {
+        print('Error parsing endDate: $e');
+      }
+    }
+
+    if (widget.eventData!['startTime'] != null) {
+      try {
+        _startTime = TimeOfDay.fromDateTime(DateTime.parse(widget.eventData!['startTime']));
+        _startTimeController.text = _startTime!.format(context);
+      } catch (e) {
+        print('Error parsing startTime: $e');
+      }
+    }
+
+    if (widget.eventData!['endTime'] != null) {
+      try {
+        _endTime = TimeOfDay.fromDateTime(DateTime.parse(widget.eventData!['endTime']));
+        _endTimeController.text = _endTime!.format(context);
+      } catch (e) {
+        print('Error parsing endTime: $e');
+      }
+    }
+  }
+}
+
   Future<void> _pickImage() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
@@ -56,7 +108,7 @@ class _CreateEventViewState extends State<CreateEventView> {
   Future<void> _selectStartDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
+      initialDate: _startDate ?? DateTime.now(),
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
     );
@@ -70,7 +122,7 @@ class _CreateEventViewState extends State<CreateEventView> {
 
   Future<void> _selectStartTime(BuildContext context) async {
     final TimeOfDay? picked =
-        await showTimePicker(context: context, initialTime: TimeOfDay.now());
+        await showTimePicker(context: context, initialTime: _startTime ?? TimeOfDay.now());
     if (picked != null && picked != _startTime) {
       setState(() {
         _startTime = picked;
@@ -82,7 +134,7 @@ class _CreateEventViewState extends State<CreateEventView> {
   Future<void> _selectEndDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
+      initialDate: _endDate ?? DateTime.now(),
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
     );
@@ -96,7 +148,7 @@ class _CreateEventViewState extends State<CreateEventView> {
 
   Future<void> _selectEndTime(BuildContext context) async {
     final TimeOfDay? picked =
-        await showTimePicker(context: context, initialTime: TimeOfDay.now());
+        await showTimePicker(context: context, initialTime: _endTime ?? TimeOfDay.now());
     if (picked != null && picked != _endTime) {
       setState(() {
         _endTime = picked;
@@ -105,11 +157,62 @@ class _CreateEventViewState extends State<CreateEventView> {
     }
   }
 
+  Future<void> _saveEvent() async {
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+
+      try {
+        // Get a Firestore instance
+        final firestore = FirebaseFirestore.instance;
+
+        // Upload image and get URL
+        String? imageUrl = await _uploadImage();
+
+        // Get the current user ID
+        String? creatorId = await AuthService().getCurrentUserId();
+
+        if (widget.eventId != null) {
+          // Editing existing event
+          await firestore.collection('events').doc(widget.eventId).update({
+            'eventName': _eventName,
+            'startDate': _startDate?.toIso8601String(),
+            'startTime': _startTime?.format(context),
+            'endDate': _endDate?.toIso8601String(),
+            'endTime': _endTime?.format(context),
+            'eventLocation': _eventLocation,
+            'eventDescription': _eventDescription,
+            'eventImage': imageUrl,
+            'creatorId': creatorId,
+          });
+        } else {
+          // Creating new event
+          await firestore.collection('events').add({
+            'eventName': _eventName,
+            'startDate': _startDate?.toIso8601String(),
+            'startTime': _startTime?.format(context),
+            'endDate': _endDate?.toIso8601String(),
+            'endTime': _endTime?.format(context),
+            'eventLocation': _eventLocation,
+            'eventDescription': _eventDescription,
+            'eventImage': imageUrl,
+            'creatorId': creatorId,
+          });
+        }
+
+        // Navigate back to the previous screen
+        Navigator.pop(context);
+      } catch (e) {
+        print('Error saving event: $e');
+        // Show an error dialog or handle the error as needed
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Create Event'),
+        title: Text(widget.eventId != null ? 'Edit Event' : 'Create Event'),
       ),
       body: Container(
         color: const Color.fromARGB(255, 241, 232, 245),
@@ -139,6 +242,7 @@ class _CreateEventViewState extends State<CreateEventView> {
               ),
               const SizedBox(height: 10.0),
               TextFormField(
+                initialValue: _eventName,
                 decoration: const InputDecoration(
                   labelText: 'Event Name',
                   border: OutlineInputBorder(),
@@ -235,13 +339,14 @@ class _CreateEventViewState extends State<CreateEventView> {
               ),
               const SizedBox(height: 10.0),
               TextFormField(
+                initialValue: _eventLocation,
                 decoration: const InputDecoration(
-                  labelText: 'Location',
+                  labelText: 'Event Location',
                   border: OutlineInputBorder(),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter location';
+                    return 'Please enter event location';
                   }
                   return null;
                 },
@@ -251,60 +356,26 @@ class _CreateEventViewState extends State<CreateEventView> {
               ),
               const SizedBox(height: 10.0),
               TextFormField(
+                initialValue: _eventDescription,
+                maxLines: 3,
                 decoration: const InputDecoration(
-                  labelText: 'Description',
+                  labelText: 'Event Description',
                   border: OutlineInputBorder(),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter description';
+                    return 'Please enter event description';
                   }
                   return null;
                 },
                 onSaved: (value) {
                   _eventDescription = value!;
                 },
-                maxLines: 3,
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 20.0),
               ElevatedButton(
-                onPressed: () async {
-                  if (_formKey.currentState!.validate()) {
-                    _formKey.currentState!.save();
-
-                    try {
-                      // Get a Firestore instance
-                      final firestore = FirebaseFirestore.instance;
-
-                      // Upload image and get URL
-                      String? imageUrl = await _uploadImage();
-
-                      // Get the current user ID
-                      String? creatorId = await AuthService().getCurrentUserId();
-
-                      // Add a new document with a generated ID
-                      await firestore.collection('events').add({
-                        'eventName': _eventName,
-                        'startDate': _startDate?.toIso8601String(),
-                        'startTime': _startTime?.format(context),
-                        'endDate': _endDate?.toIso8601String(),
-                        'endTime': _endTime?.format(context),
-                        'eventLocation': _eventLocation,
-                        'eventDescription': _eventDescription,
-                        'eventImage': imageUrl,
-                        'creatorId': creatorId,
-                        'eventId': eventId,
-                      });
-
-                      // Navigate back to the previous screen
-                      Navigator.pop(context);
-                    } catch (e) {
-                      print('Error saving event: $e');
-                      // Show an error dialog or handle the error as needed
-                    }
-                  }
-                },
-                child: const Text('Create Event'),
+                onPressed: _saveEvent,
+                child: Text(widget.eventId != null ? 'Update Event' : 'Create Event'),
               ),
             ],
           ),
