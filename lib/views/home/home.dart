@@ -4,6 +4,7 @@ import 'package:pawrtal/views/auth/authenticate.dart';
 import 'package:pawrtal/views/posts/post_list_view.dart';
 import 'package:pawrtal/viewmodels/home/home_viewmodel.dart';
 import 'package:pawrtal/services/auth.dart';
+import 'package:pawrtal/viewmodels/messaging/message_view.dart';
 
 class HomeView extends ConsumerStatefulWidget {
   const HomeView({
@@ -55,26 +56,14 @@ class _HomeViewState extends ConsumerState<HomeView> with AutomaticKeepAliveClie
                       ),
                       // messages button
                       IconButton( 
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const MessageView()),
+                          );
+                        },
                         icon: const Icon(Icons.messenger)
                       ),
-                      // logout button
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          foregroundColor: Colors.grey[400], // background color
-                        ),
-                        child: const Text(
-                          'Logout',
-                          style: TextStyle(color: Colors.black),
-                        ),
-                        onPressed: () async {
-                          await AuthService.signOut();
-                          // Navigate to Authenticate screen
-                          if (context.mounted) {
-                            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Authenticate()));
-                          }
-                        },
-                      )
                     ],
                   ),
                 ],

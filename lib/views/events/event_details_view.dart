@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pawrtal/models/events/events_model.dart';
 
 class EventDetailsView extends StatelessWidget {
   final String title;
@@ -6,6 +7,8 @@ class EventDetailsView extends StatelessWidget {
   final String location;
   final String description;
   final String imagePath;
+  final String creatorId;
+  final String eventId;
 
   const EventDetailsView({
     super.key,
@@ -14,6 +17,8 @@ class EventDetailsView extends StatelessWidget {
     required this.location,
     required this.description,
     required this.imagePath,
+    required this.creatorId,
+    required this.eventId,
   });
 
   @override

@@ -1,15 +1,14 @@
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pawrtal/viewmodels/messaging/chat_page.dart';
-
 class MessageView extends StatefulWidget {
   const MessageView({super.key});
 
   @override
   State<MessageView> createState() => _MessageViewState();
 }
-
 class _MessageViewState extends State<MessageView> {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
@@ -47,22 +46,28 @@ class _MessageViewState extends State<MessageView> {
             itemCount: users.length,
             itemBuilder: (context, index) {
               var user = users[index];
-              return FutureBuilder<QuerySnapshot>(
-                future: FirebaseFirestore.instance
-                    .collection('users')
-                    .doc(user.id)
+              var chatRoomId = ([user.id, currentUser.uid]..sort()).join('_');
+              log('chatroom: $chatRoomId');
+              return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                stream: FirebaseFirestore.instance
+                    .collection('chat_rooms')
+                    .doc(chatRoomId)
                     .collection('messages')
                     .orderBy('timestamp', descending: true)
                     .limit(1)
-                    .get(),
+                    .snapshots(),
                 builder: (context, messageSnapshot) {
+                  String lastMessage = 'No Messages Yet';
+                  log('$chatRoomId ${messageSnapshot.hasData}');
                   if (!messageSnapshot.hasData) {
                     return const Center(child: CircularProgressIndicator());
+                  } else if (messageSnapshot.hasError) {
+                    log(messageSnapshot.error.toString());
+                  } else if (messageSnapshot.data!.docs.isNotEmpty) {
+                    log('${messageSnapshot.data!.docs}');
+                    final messageData = messageSnapshot.data!.docs.first.data();
+                    lastMessage = messageData['message'];
                   }
-
-                  var lastMessage = messageSnapshot.data!.docs.isNotEmpty
-                      ? messageSnapshot.data!.docs.first['messages'] // Ensure this matches your Firestore field
-                      : 'No messages yet';
 
                   return InkWell(
                     onTap: () {
@@ -81,7 +86,7 @@ class _MessageViewState extends State<MessageView> {
                         backgroundImage: NetworkImage(user['pfp'] ?? 'https://via.placeholder.com/150'),
                       ),
                       title: Text(user['displayName'] ?? 'No Display Name'),
-                      subtitle: Text(lastMessage),
+                      subtitle: Text(lastMessage, style: TextStyle(color: Colors.grey[600]),),
                     ),
                   );
                 },
