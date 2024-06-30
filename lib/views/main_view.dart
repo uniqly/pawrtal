@@ -32,7 +32,7 @@ class _MainViewState extends ConsumerState<MainView> {
       final user = await auth;
       if (user == null && mounted) {
         Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => const Authenticate()));
+          context, MaterialPageRoute(builder: (context) => const Authenticate()));
       }
     });
   }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:pawrtal/models/events/events_model.dart';
 
 class EventDetailsView extends StatelessWidget {
   final String title;

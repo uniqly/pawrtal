@@ -53,6 +53,9 @@ class _ProfileEditViewState extends ConsumerState<ProfileEditView> {
     _usernameController.text = _profile.username!;
     _bioController.text = _profile.bio!;
     _locationController.text = _profile.location!;
+    _updatedBanner = false;
+    _updatedProfile = false;
+    _notSubmitted = true;
     log('edit: $_hasChanges, $_notSubmitted');
   }
 

@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:pawrtal/views/auth/authenticate.dart';
 import 'package:pawrtal/views/posts/post_list_view.dart';
 import 'package:pawrtal/viewmodels/home/home_viewmodel.dart';
-import 'package:pawrtal/services/auth.dart';
 import 'package:pawrtal/viewmodels/messaging/message_view.dart';
 
 class HomeView extends ConsumerStatefulWidget {
