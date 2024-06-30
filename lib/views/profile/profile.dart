@@ -7,6 +7,8 @@ import 'package:pawrtal/views/profile/profile_edit.dart';
 import 'package:pawrtal/views/profile/profile_likes.dart';
 import 'package:pawrtal/views/profile/profile_media.dart';
 import 'package:pawrtal/views/profile/profile_posts.dart';
+import 'package:pawrtal/viewmodels/messaging/message_view.dart';
+
 
 class ProfileView extends ConsumerStatefulWidget {
   final String userId;
@@ -60,7 +62,13 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                         ),
                         // messages button
                         IconButton( 
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const MessageView()),
+                            );
+                          },
                           icon: const Icon(Icons.messenger)
                         ),
                       ],
