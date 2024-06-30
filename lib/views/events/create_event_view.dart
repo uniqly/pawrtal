@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
-import 'package:pawrtal/services/auth.dart';  // Import AuthService
+import 'package:pawrtal/services/auth.dart'; // Import AuthService
 
 class CreateEventView extends StatefulWidget {
   final String? eventId; // Add eventId for editing
@@ -37,53 +37,56 @@ class _CreateEventViewState extends State<CreateEventView> {
   final TextEditingController _endTimeController = TextEditingController();
 
   @override
-void initState() {
-  super.initState();
+  void initState() {
+    super.initState();
 
-  // Initialize fields with existing event data if editing
-  if (widget.eventData != null) {
-    _eventName = widget.eventData!['eventName'] ?? '';
-    _eventLocation = widget.eventData!['eventLocation'] ?? '';
-    _eventDescription = widget.eventData!['eventDescription'] ?? '';
+    // Initialize fields with existing event data if editing
+    if (widget.eventData != null) {
+      _eventName = widget.eventData!['eventName'] ?? '';
+      _eventLocation = widget.eventData!['eventLocation'] ?? '';
+      _eventDescription = widget.eventData!['eventDescription'] ?? '';
 
-    // Parse date and time fields if they exist
-    if (widget.eventData!['startDate'] != null) {
-      try {
-        _startDate = DateTime.parse(widget.eventData!['startDate']);
-        _startDateController.text = DateFormat('yyyy-MM-dd').format(_startDate!);
-      } catch (e) {
-        print('Error parsing startDate: $e');
+      // Parse date and time fields if they exist
+      if (widget.eventData!['startDate'] != null) {
+        try {
+          _startDate = DateTime.parse(widget.eventData!['startDate']);
+          _startDateController.text = DateFormat('yyyy-MM-dd').format(_startDate!);
+        } catch (e) {
+          print('Error parsing startDate: $e');
+        }
+      }
+
+      if (widget.eventData!['endDate'] != null) {
+        try {
+          _endDate = DateTime.parse(widget.eventData!['endDate']);
+          _endDateController.text = DateFormat('yyyy-MM-dd').format(_endDate!);
+        } catch (e) {
+          print('Error parsing endDate: $e');
+        }
+      }
+
+      if (widget.eventData!['startTime'] != null) {
+        try {
+          _startTime = TimeOfDay.fromDateTime(DateTime.parse(widget.eventData!['startTime']));
+          _startTimeController.text = _startTime!.format(context);
+        } catch (e) {
+          print('Error parsing startTime: $e');
+        }
+      }
+
+      if (widget.eventData!['endTime'] != null) {
+        try {
+          _endTime = TimeOfDay.fromDateTime(DateTime.parse(widget.eventData!['endTime']));
+          _endTimeController.text = _endTime!.format(context);
+        } catch (e) {
+          print('Error parsing endTime: $e');
+        }
       }
     }
 
-    if (widget.eventData!['endDate'] != null) {
-      try {
-        _endDate = DateTime.parse(widget.eventData!['endDate']);
-        _endDateController.text = DateFormat('yyyy-MM-dd').format(_endDate!);
-      } catch (e) {
-        print('Error parsing endDate: $e');
-      }
-    }
-
-    if (widget.eventData!['startTime'] != null) {
-      try {
-        _startTime = TimeOfDay.fromDateTime(DateTime.parse(widget.eventData!['startTime']));
-        _startTimeController.text = _startTime!.format(context);
-      } catch (e) {
-        print('Error parsing startTime: $e');
-      }
-    }
-
-    if (widget.eventData!['endTime'] != null) {
-      try {
-        _endTime = TimeOfDay.fromDateTime(DateTime.parse(widget.eventData!['endTime']));
-        _endTimeController.text = _endTime!.format(context);
-      } catch (e) {
-        print('Error parsing endTime: $e');
-      }
-    }
+    // Assign eventId for editing or generate a new one for creation
+    eventId = widget.eventId ?? FirebaseFirestore.instance.collection('events').doc().id;
   }
-}
 
   Future<void> _pickImage() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
@@ -183,10 +186,11 @@ void initState() {
             'eventDescription': _eventDescription,
             'eventImage': imageUrl,
             'creatorId': creatorId,
+            'eventId': eventId,
           });
         } else {
           // Creating new event
-          await firestore.collection('events').add({
+          await firestore.collection('events').doc(eventId).set({
             'eventName': _eventName,
             'startDate': _startDate?.toIso8601String(),
             'startTime': _startTime?.format(context),
@@ -196,6 +200,7 @@ void initState() {
             'eventDescription': _eventDescription,
             'eventImage': imageUrl,
             'creatorId': creatorId,
+            'eventId': eventId,
           });
         }
 
@@ -357,11 +362,11 @@ void initState() {
               const SizedBox(height: 10.0),
               TextFormField(
                 initialValue: _eventDescription,
-                maxLines: 3,
                 decoration: const InputDecoration(
                   labelText: 'Event Description',
                   border: OutlineInputBorder(),
                 ),
+                maxLines: 3,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter event description';
@@ -374,8 +379,9 @@ void initState() {
               ),
               const SizedBox(height: 20.0),
               ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.pink[100]),
                 onPressed: _saveEvent,
-                child: Text(widget.eventId != null ? 'Update Event' : 'Create Event'),
+                child: const Text('Create Event'),
               ),
             ],
           ),
