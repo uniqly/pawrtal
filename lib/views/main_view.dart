@@ -18,7 +18,7 @@ class MainView extends ConsumerStatefulWidget {
   ConsumerState<MainView> createState() => _MainViewState();
 }
 
-enum PageTab { home, profile, none }
+enum PageTab { home, profile }
 
 class _MainViewState extends ConsumerState<MainView> {
   var currTab = PageTab.home;
@@ -73,15 +73,11 @@ class _MainViewState extends ConsumerState<MainView> {
                   currTab = PageTab.profile;
                 }
                 case 3:
-                  setState(() {
-                    currTab = PageTab.none;
-                  });
                   await Navigator.push(
                     context,
                     MaterialPageRoute(
                         builder: (context) => const MenuView()),
                   );
-                  break;
               }
             },
             labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,

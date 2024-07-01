@@ -17,6 +17,7 @@ class _CreateChoosePortalViewState extends ConsumerState<CreateChoosePortalView>
   String query = '';
   int? selectedIndex;
   String? selectedPortalId;
+  bool _notSubmitted = true;
   late final TextEditingController _choosePortalController;
   
   @override
@@ -48,8 +49,11 @@ class _CreateChoosePortalViewState extends ConsumerState<CreateChoosePortalView>
                 Padding(
                   padding: const EdgeInsets.only(right: 12.0),
                   child: TextButton( 
-                    onPressed: selectedIndex != null ? () async { 
+                    onPressed: selectedIndex != null && _notSubmitted ? () async { 
                       viewmodel.updateForm(portalId: selectedPortalId);
+                      setState(() {
+                        _notSubmitted = false;
+                      });
                       await viewmodel.createPost().whenComplete(() async {
                         const success = SnackBar( 
                           content: Text('Success!'),
@@ -62,6 +66,9 @@ class _CreateChoosePortalViewState extends ConsumerState<CreateChoosePortalView>
                           content: Text('Error with upload, $e'),
                         );
                         ScaffoldMessenger.of(context).showSnackBar(error);
+                        setState(() {
+                          _notSubmitted = true;
+                        });
                       });
                     } : null,
                     style: TextButton.styleFrom( 

@@ -23,7 +23,7 @@ class _HomeViewState extends ConsumerState<HomeView> with AutomaticKeepAliveClie
     final homeViewModel = ref.watch(homeViewModelNotifierProvider);
 
     return homeViewModel.when( 
-      loading: () => const CircularProgressIndicator(),
+      loading: () => const Center(child: SizedBox(height: 30, width: 30, child: CircularProgressIndicator())),
       error: (err, stack) => Text('Error: $err'),
       data: (viewmodel) { 
         return Container(
