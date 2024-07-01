@@ -144,6 +144,8 @@ class _ProfileEditViewState extends ConsumerState<ProfileEditView> {
                     ScaffoldMessenger.of(context).showSnackBar(success);
                     setState(() {
                       _notSubmitted = true;
+                      _updatedBanner = false;
+                      _updatedProfile = false;
                     });
                     log('edit (pfp after): $_profile');
                     log('edit: $_hasChanges, $_notSubmitted');
