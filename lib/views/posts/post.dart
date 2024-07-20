@@ -118,8 +118,11 @@ class _PostViewState extends ConsumerState<PostView> {
                                   filled: true,
                                   suffixIcon: _commentController.text.isNotEmpty ? IconButton( 
                                     onPressed: () async {
+                                      // clear the comment field when pressing the submit button
+                                      final temp = _commentController.text;
+                                      _commentController.text = '';
                                       await widget.post.uploadComment(
-                                        message: _commentController.text,
+                                        message: temp,
                                         commenter: _user
                                       ).whenComplete(() {
                                         const success = SnackBar( 
@@ -132,6 +135,7 @@ class _PostViewState extends ConsumerState<PostView> {
                                           content: Text('Error with upload, $e'),
                                         );
                                         ScaffoldMessenger.of(context).showSnackBar(error);
+                                        _commentController.text = temp;
                                       });
                                     },
                                     icon: const Icon(Icons.send_rounded),
