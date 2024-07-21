@@ -104,7 +104,7 @@ class _MainViewState extends ConsumerState<MainView> {
                   backgroundColor: currTab == PageTab.profile ? Colors.pinkAccent : Colors.transparent,
                   radius: 22,
                   child: CircleAvatar( 
-                    backgroundImage: NetworkImage(mainUser.pfp!),
+                    backgroundImage: NetworkImage(mainUser.pfp),
                     radius: 20,
                   ),
                 ),

@@ -47,10 +47,10 @@ class _PostViewState extends ConsumerState<PostView> {
                 backgroundColor: Colors.white,
                 title: GestureDetector(
                   onTap: () { 
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => PortalView(portal: _post.portal!)));
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => PortalView(portal: _post.portal)));
                   },
                   child: Text(
-                    'p/${_post.portal!.name!}',
+                    'p/${_post.portal.name}',
                     style: const TextStyle(  
                       fontWeight: FontWeight.bold
                     ),
@@ -95,7 +95,7 @@ class _PostViewState extends ConsumerState<PostView> {
                             width: 40,
                             child: CircleAvatar( 
                               backgroundColor: Colors.white,  
-                              backgroundImage: NetworkImage(_user.pfp!),
+                              backgroundImage: NetworkImage(_user.pfp),
                             ),
                           ),
                           const SizedBox(width: 5),

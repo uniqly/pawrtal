@@ -1,8 +1,11 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:pawrtal/views/notifications/notification_view.dart';
 import 'package:pawrtal/views/posts/post_list_view.dart';
 import 'package:pawrtal/viewmodels/home/home_viewmodel.dart';
-import 'package:pawrtal/viewmodels/messaging/message_view.dart';
+import 'package:pawrtal/views/messaging/message_view.dart';
 
 class HomeView extends ConsumerStatefulWidget {
   const HomeView({
@@ -49,8 +52,21 @@ class _HomeViewState extends ConsumerState<HomeView> with AutomaticKeepAliveClie
                       ),
                       // notifications button
                       IconButton( 
-                        onPressed: () {},
-                        icon: const Icon(Icons.favorite_outline)
+                        onPressed: () { 
+                          log('mew');
+                          Navigator.push( 
+                            context,
+                            MaterialPageRoute(builder: (context) => const NotificationView())
+                          );
+                        },
+                        icon: Badge(  
+                          isLabelVisible: true,
+                          label: Text('${viewmodel.user.notificationCount}'),
+                          offset: const Offset(8, 8),
+                          child: const Icon(  
+                            Icons.notifications,
+                          ),
+                        )
                       ),
                       // messages button
                       IconButton( 

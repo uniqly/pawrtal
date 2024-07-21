@@ -67,7 +67,7 @@ class _PortalViewState extends ConsumerState<PortalView> {
                           decoration: BoxDecoration(  
                             color: Theme.of(context).colorScheme.surfaceContainerHigh,
                             image: DecorationImage(  
-                              image: NetworkImage(_portal.banner!),
+                              image: NetworkImage(_portal.banner),
                               fit: BoxFit.cover,
                             ),
                           ),
@@ -83,7 +83,7 @@ class _PortalViewState extends ConsumerState<PortalView> {
                               backgroundColor: Colors.white,
                               child: CircleAvatar(  
                                 radius: 40, 
-                                backgroundImage: NetworkImage(_portal.picture!),
+                                backgroundImage: NetworkImage(_portal.picture),
                               ),
                             ),
                             const SizedBox(width: 5.0,),
@@ -91,7 +91,7 @@ class _PortalViewState extends ConsumerState<PortalView> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [  
                                 Text(
-                                  'p/${_portal.name!}',
+                                  'p/${_portal.name}',
                                   style: TextStyle(  
                                     color: Theme.of(context).colorScheme.onPrimaryContainer,
                                     fontSize: 22,
@@ -99,7 +99,7 @@ class _PortalViewState extends ConsumerState<PortalView> {
                                   ),
                                 ),
                                 Text(
-                                  '${NumberFormat.compact().format(_portal.memberCount!)} members', 
+                                  '${NumberFormat.compact().format(_portal.memberCount)} members', 
                                   style: const TextStyle(  
                                     fontWeight: FontWeight.bold,
                                     fontSize: 14,

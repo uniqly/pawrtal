@@ -2,7 +2,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:pawrtal/viewmodels/messaging/chat_page.dart';
+import 'package:pawrtal/views/messaging/chat_page.dart';
 class MessageView extends StatefulWidget {
   const MessageView({super.key});
 

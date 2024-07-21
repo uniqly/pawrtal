@@ -2,7 +2,6 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pawrtal/models/posts/post_model.dart';
 import 'package:pawrtal/models/user/user_model.dart';
-import 'package:pawrtal/test/test_user.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'home_viewmodel.g.dart';
@@ -40,8 +39,8 @@ class HomeViewModel {
 class HomeViewModelNotifier extends _$HomeViewModelNotifier {
   @override
   Future<HomeViewModel> build() async { 
-    final user = await ref.watch(mainUserProvider.future);
+    final user = await ref.watch(appUserProvider.future);
 
-    return HomeViewModel(user);
+    return HomeViewModel(user!);
   }
 }

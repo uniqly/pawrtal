@@ -18,7 +18,7 @@ class PostTile extends ConsumerStatefulWidget {
     required this.post,
     this.showDescription = false,
     this.userInsteadOfPortal = false,
-  }) { log('${post.caption}'); }
+  }) { log(post.caption); }
 
   @override
   ConsumerState<PostTile> createState() => _PostTileState();
@@ -56,10 +56,10 @@ class _PostTileState extends ConsumerState<PostTile> {
           onTap: () { 
             widget.userInsteadOfPortal ? Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => ProfileView(userId: widget.post.poster!.uid)), 
+              MaterialPageRoute(builder: (context) => ProfileView(userId: widget.post.poster.uid)), 
             ) : Navigator.push(  
               context, 
-              MaterialPageRoute(builder: (context) => PortalView(portal: widget.post.portal!)),
+              MaterialPageRoute(builder: (context) => PortalView(portal: widget.post.portal)),
             );
           },
           child: Padding(
@@ -68,12 +68,12 @@ class _PostTileState extends ConsumerState<PostTile> {
               children: [ 
                 CircleAvatar( 
                   backgroundImage: NetworkImage(
-                    widget.userInsteadOfPortal ? widget.post.poster!.pfp! : widget.post.portal!.picture!
+                    widget.userInsteadOfPortal ? widget.post.poster.pfp : widget.post.portal.picture
                   ),
                 ),
                 const SizedBox(width: 5.0,),
                 Text( 
-                  widget.userInsteadOfPortal ? '@${widget.post.poster!.username}' : 'p/${widget.post.portal!.name}',
+                  widget.userInsteadOfPortal ? '@${widget.post.poster.username}' : 'p/${widget.post.portal.name}',
                   style: TextStyle(color: Colors.grey.shade700, fontSize: 18.0),
                 )
               ],
@@ -86,20 +86,20 @@ class _PostTileState extends ConsumerState<PostTile> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                widget.post.caption!,
+                widget.post.caption,
                 style: const TextStyle( 
                   fontWeight: FontWeight.bold,
                   fontSize: 28,
                 ),
               ),
-              if (widget.showDescription && widget.post.description!.isNotEmpty)
-              Text(widget.post.description!),
+              if (widget.showDescription && widget.post.description.isNotEmpty)
+              Text(widget.post.description),
             ],
           ),
         ),
         // content (images)
-        if (widget.post.images!.isNotEmpty) 
-        PostImageGallery(imageStrings: widget.post.images!),
+        if (widget.post.images.isNotEmpty) 
+        PostImageGallery(imageStrings: widget.post.images),
         // actions bar of post
         Row( 
           children: [

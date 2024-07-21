@@ -7,7 +7,7 @@ import 'package:pawrtal/views/profile/profile_edit.dart';
 import 'package:pawrtal/views/profile/profile_likes.dart';
 import 'package:pawrtal/views/profile/profile_media.dart';
 import 'package:pawrtal/views/profile/profile_posts.dart';
-import 'package:pawrtal/viewmodels/messaging/message_view.dart';
+import 'package:pawrtal/views/messaging/message_view.dart';
 
 
 class ProfileView extends ConsumerStatefulWidget {

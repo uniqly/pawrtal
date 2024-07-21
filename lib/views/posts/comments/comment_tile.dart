@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pawrtal/models/comments/comment_model.dart';
 import 'package:pawrtal/views/profile/profile.dart';
+import 'package:timeago_flutter/timeago_flutter.dart';
 
 class CommentTile extends StatelessWidget {
   final CommentModel comment;
@@ -8,7 +9,7 @@ class CommentTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final poster = comment.poster!;
+    final poster = comment.poster;
     return Padding(
       padding: const EdgeInsets.all(6.0),
       child: Column(  
@@ -23,18 +24,21 @@ class CommentTile extends StatelessWidget {
                 child: Row(
                   children: [
                     CircleAvatar(  
-                      backgroundImage: NetworkImage(poster.pfp!),
+                      backgroundImage: NetworkImage(poster.pfp),
                     ),
                     const SizedBox(width: 5.0),
-                    Text('@${poster.username!}'),
+                    Text('@${poster.username}'),
                   ],
                 ),
               ),
               const Spacer(),
-              Text(comment.postedDateString),
+              Timeago( 
+                builder: (_, value) => Text(value), 
+                date: comment.postedDate 
+              ),
             ],
           ),
-          Text(comment.message!),
+          Text(comment.message),
           const Divider(height: 0),
         ],
       ),

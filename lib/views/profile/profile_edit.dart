@@ -49,10 +49,10 @@ class _ProfileEditViewState extends ConsumerState<ProfileEditView> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     _saveEdits = ref.read(profileViewModelNotifierProvider(uid: _profile.uid)).value!.updateProfile;
-    _displayNameController.text = _profile.displayName!;
-    _usernameController.text = _profile.username!;
-    _bioController.text = _profile.bio!;
-    _locationController.text = _profile.location!;
+    _displayNameController.text = _profile.displayName;
+    _usernameController.text = _profile.username;
+    _bioController.text = _profile.bio;
+    _locationController.text = _profile.location;
     _updatedBanner = false;
     _updatedProfile = false;
     _notSubmitted = true;
@@ -182,7 +182,7 @@ class _ProfileEditViewState extends ConsumerState<ProfileEditView> {
                         decoration: BoxDecoration( 
                           image: DecorationImage( 
                             fit: BoxFit.cover,
-                            image: !_updatedBanner ? NetworkImage(_profile.banner!) : FileImage(_newBanner!) as ImageProvider<Object>,
+                            image: !_updatedBanner ? NetworkImage(_profile.banner) : FileImage(_newBanner!) as ImageProvider<Object>,
                           ),
                         ),
                       ),
@@ -203,7 +203,7 @@ class _ProfileEditViewState extends ConsumerState<ProfileEditView> {
                       backgroundColor: Colors.white,
                       child: CircleAvatar( 
                         radius: 75,
-                        backgroundImage: !_updatedProfile ? NetworkImage(_profile.pfp!) : FileImage(_newPfp!) as ImageProvider<Object>,
+                        backgroundImage: !_updatedProfile ? NetworkImage(_profile.pfp) : FileImage(_newPfp!) as ImageProvider<Object>,
                       ),
                     ),
                     IconButton.filled(  

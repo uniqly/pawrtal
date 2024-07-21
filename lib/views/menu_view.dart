@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pawrtal/shared/loading.dart';
-import 'package:pawrtal/viewmodels/messaging/message_view.dart';
 import 'package:pawrtal/views/events/events_view.dart';
+import 'package:pawrtal/views/messaging/message_view.dart';
 import 'package:pawrtal/views/portals/portal_list.dart';
 
 class MenuView extends StatefulWidget {
@@ -68,7 +68,7 @@ class _MenuViewState extends State<MenuView> {
                         Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => PortalsList()),
+                            builder: (context) => const PortalsList()),
                       );
                       }),
                       _buildGridTile(Icons.settings, 'Profile Settings', () {
