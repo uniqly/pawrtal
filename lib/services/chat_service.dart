@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pawrtal/models/message/message.dart';
+import 'package:pawrtal/models/notifications/notification_model.dart';
 import 'package:pawrtal/models/user/user_model.dart';
 
 class ChatService extends ChangeNotifier{
@@ -41,7 +42,16 @@ class ChatService extends ChangeNotifier{
       .collection('chat_rooms')
       .doc(chatRoomId)
       .collection('messages')
-      .add(newMessage.toMap());
+      .add(newMessage.toMap())
+      .then((_) => NotificationModel.sendNotification( 
+        receiver: UserModel(receiverId),
+        data: { 
+          'type': NotificationType.message,
+          'sender': UserModel(currentUserId).dbRef,
+          'message': message,
+          'timestamp': timestamp,
+        } 
+      ));
   }
   // recieve message
   Stream<QuerySnapshot> getMesasges(String userId, String otherUserId) {

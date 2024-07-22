@@ -13,6 +13,7 @@ enum NotificationType {
   commentPost,
   followUser,
   followUpload,
+  message,
 }
 
 abstract class NotificationModel {
@@ -46,6 +47,7 @@ abstract class NotificationModel {
         final notifications = <NotificationModel>[];
         for (var docSnapshot in querySnapshot.docs) {
           notifications.add(await notificationFromSnapshot(docSnapshot));
+          log(notifications.last.uid);
         }
         return notifications;
       }).handleError((error) {
@@ -81,6 +83,12 @@ abstract class NotificationModel {
       case NotificationType.followUpload: 
         final notif = _FollowedUserPostNotification(uid);
         notif._post = await PostModel(data['post'].id).updated;
+        notif._timestamp = data['timestamp'];
+        return notif;
+      case NotificationType.message:
+        final notif = _MessageNotification(uid);
+        notif._sender = await UserModel(data['sender'].id).updated;
+        notif._message = data['message'];
         notif._timestamp = data['timestamp'];
         return notif;
       default:
@@ -212,4 +220,24 @@ class _FollowedUserPostNotification extends NotificationModel {
 
   @override
   String? get message => '"${_post.caption}"';
+}
+
+class _MessageNotification extends NotificationModel { 
+  late UserModel _sender;
+  late String _message;
+
+  _MessageNotification._internal(super.uid) : super._internal();
+
+  factory _MessageNotification(String uid) {
+    return NotificationModel._cache.putIfAbsent(uid, () => _MessageNotification._internal(uid)) as _MessageNotification;
+  }
+
+  @override
+  String? get image => _sender.pfp;
+
+  @override
+  String? get title => '${_sender.displayName} (@${_sender.username}) sent you a message';
+
+  @override
+  String? get message => '"$_message"';
 }

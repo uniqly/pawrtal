@@ -31,6 +31,11 @@ class _NotificationTileState extends State<NotificationTile> {
     _timer.cancel();
   }
 
+  void _clearNotification() async {
+    await widget.notification.clear()
+      .then((_) => setState(() {}));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(  
@@ -61,7 +66,7 @@ class _NotificationTileState extends State<NotificationTile> {
           ) : null,
           trailing: IconButton(  
             icon: const Icon(Icons.close),
-            onPressed: widget.notification.clear,
+            onPressed: _clearNotification,
           ),
           subtitle: widget.notification.message != null ? Text(
             widget.notification.message!,
