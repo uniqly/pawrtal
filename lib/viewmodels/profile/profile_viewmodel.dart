@@ -22,14 +22,15 @@ class ProfileViewModel {
   // get info to display onto page
   Map<String, dynamic> get profileInfo {
     return { 
-      "name": _profile.displayName,
-      "username": _profile.username,
-      "pfp": _profile.pfp,
-      "bio": _profile.bio,
-      "banner": _profile.banner,
-      "location": _profile.location,
-      "followers": _profile.followerCount,
-      "following": _profile.followingCount,
+      'uid': _profile.uid,
+      'name': _profile.displayName,
+      'username': _profile.username,
+      'pfp': _profile.pfp,
+      'bio': _profile.bio,
+      'banner': _profile.banner,
+      'location': _profile.location,
+      'followers': _profile.followerCount,
+      'following': _profile.followingCount,
     };
   }
 

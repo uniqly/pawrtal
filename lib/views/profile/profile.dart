@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:pawrtal/viewmodels/profile/profile_viewmodel.dart';
+import 'package:pawrtal/views/messaging/chat_page.dart';
 import 'package:pawrtal/views/profile/profile_communities.dart';
 import 'package:pawrtal/views/profile/profile_edit.dart';
 import 'package:pawrtal/views/profile/profile_likes.dart';
@@ -95,7 +96,6 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                               Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 12.0),
                                 child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
                                     CircleAvatar( 
@@ -106,6 +106,30 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                                         radius: 50,
                                       ),
                                     ),
+                                    const Spacer(),
+                                    if (!viewmodel.isCurrUserProfile)
+                                      Padding(
+                                        padding: const EdgeInsets.only(right: 6.0),
+                                        child: TextButton( 
+                                          style: TextButton.styleFrom(  
+                                            backgroundColor: Theme.of(context).colorScheme.primary,
+                                            foregroundColor: Theme.of(context).colorScheme.surface,
+                                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                          ),
+                                          onPressed: () { 
+                                            Navigator.push(context, MaterialPageRoute(builder: (context) => 
+                                              ChatPage(
+                                                receiveUserID: userData['uid'],
+                                                receiverDisplayName: userData['name']
+                                              )
+                                            ));
+                                          },
+                                          child: const Text( 
+                                            'Send Message',
+                                            style: TextStyle(fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                      ),
                                     // button depending on userprofile
                                     viewmodel.isCurrUserProfile ? TextButton(
                                       style: TextButton.styleFrom( 

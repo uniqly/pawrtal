@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:intl/intl.dart';
 import 'package:pawrtal/services/chat_service.dart';
 
 class ChatPage extends StatefulWidget {
@@ -62,13 +63,49 @@ class _ChatPageState extends State<ChatPage> {
           return const Text('Loading...');
         }
 
+        final messages = snapshot.data!.docs;
+
         return ListView(
+          /*
           children: snapshot.data!.docs
             .map((document) => _buildMessageItem(document))
             .toList(),
           );
+          */
+            children: [ 
+              for (var idx = 0; idx < messages.length; idx++) ...[
+                if (idx == 0 || _isDiffDay(messages[idx-1]['timestamp'], messages[idx]['timestamp']))
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container( 
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                          decoration: BoxDecoration( 
+                            color: Colors.grey[300],
+                            borderRadius: BorderRadius.circular(12.0),
+                          ),
+                          child: Text(
+                            DateFormat.MMMMd().format(messages[idx]['timestamp'].toDate()) ,
+                            style: const TextStyle( 
+                              fontWeight: FontWeight.bold,
+                            ),
+                          )
+                        ),
+                      ],
+                    ),
+                  ),
+                _buildMessageItem(messages[idx])
+              ],
+            ]
+          );
         }
       );
+  }
+
+  bool _isDiffDay(Timestamp prev, Timestamp next) {
+    return !DateUtils.isSameDay(prev.toDate(), next.toDate());
   }
 
   Widget _buildMessageItem(DocumentSnapshot document) {

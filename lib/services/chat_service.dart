@@ -46,7 +46,7 @@ class ChatService extends ChangeNotifier{
       .then((_) => NotificationModel.sendNotification( 
         receiver: UserModel(receiverId),
         data: { 
-          'type': NotificationType.message,
+          'type': NotificationType.message.name,
           'sender': UserModel(currentUserId).dbRef,
           'message': message,
           'timestamp': timestamp,
