@@ -95,12 +95,26 @@ class ProfileViewModel {
       );
   }
 
+  Stream<List<PostModel>> get bookmarkedPosts {
+    return _db.collection('posts')
+      .where('bookmarks', arrayContains: _profile.dbRef)
+      .orderBy('timestamp', descending: true)
+      .snapshots()
+      .asyncMap((querySnapshot) async { 
+        final posts = <PostModel>[];
+        for (var docSnapshot in querySnapshot.docs) {
+          posts.add(await PostModel.postFromSnapshot(docSnapshot));
+        }
+        return posts;
+      });
+  }
+
   // get media from the user
   Stream<List<String>> get media {
     return posts.asyncMap((posts) async { 
       final images = <String>[];
       for (var post in posts) {
-        images.addAll(post.images ?? const Iterable.empty());
+        images.addAll(post.images);
       }
       log('$images');
       return images;

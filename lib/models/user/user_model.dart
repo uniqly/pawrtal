@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pawrtal/models/notifications/notification_model.dart';
+import 'package:pawrtal/models/posts/post_model.dart';
 import 'package:pawrtal/services/auth.dart';
 import 'package:pawrtal/services/chat_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -137,6 +138,7 @@ class UserModel {
         ));
     }
   }
+
 
   Future<void> receiveNotification() async {
     // increments notification count

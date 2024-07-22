@@ -25,7 +25,7 @@ class HomeViewModel {
           for (var docSnapshot in querySnapshot.docs) {
             //await PostModel.postFromSnapshot(docSnapshot).then((post) => posts.add(post));
             final post = await PostModel.postFromSnapshot(docSnapshot);
-            log(post.caption ?? '');
+            log(post.caption);
             posts.add(post);
           }
           final temp = [for (var p in posts) p.caption];

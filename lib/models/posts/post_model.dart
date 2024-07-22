@@ -19,6 +19,7 @@ class PostModel {
   late List<DocumentReference> _likes;
   late int _likeCount;
   late int _commentCount;
+  late List<DocumentReference> _bookmarks;
 
   static final Map<String, PostModel> _cache = {};
 
@@ -73,6 +74,7 @@ class PostModel {
     _likes = List.from(postData['likes'] ?? const Iterable.empty());
     _likeCount = postData['likeCount'];
     _commentCount = postData['commentCount'];
+    _bookmarks = List.from(postData['bookmarks'] ?? const Iterable.empty());
 
     return this;
   }
@@ -119,6 +121,24 @@ class PostModel {
           }
         )
       );
+    }
+  }
+
+  bool hasBookmark(UserModel user) {
+    return _bookmarks.contains(user.dbRef);
+  }
+
+  Future<void> removeBookmark(UserModel user) async {
+    if (hasBookmark(user)) {
+      _bookmarks.remove(user.dbRef);
+      await dbRef.update({ 'bookmarks': FieldValue.arrayRemove([user.dbRef]) });
+    }
+  }
+
+  Future<void> addBookmark(UserModel user) async {
+    if (!hasBookmark(user)) {
+      _bookmarks.add(user.dbRef);
+      await dbRef.update(( {'bookmarks': FieldValue.arrayUnion([user.dbRef]) }));
     }
   }
 
@@ -172,6 +192,7 @@ class PostModel {
     post._likeCount = postData['likeCount'];
     post._likes = List.from(postData['likes'] ?? const Iterable.empty());
     post._commentCount = postData['commentCount'];
+    post._bookmarks = List.from(postData['bookmarks'] ?? const Iterable.empty());
 
     log('post: $post');
     return post;

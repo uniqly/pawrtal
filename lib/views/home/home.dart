@@ -61,7 +61,7 @@ class _HomeViewState extends ConsumerState<HomeView> with AutomaticKeepAliveClie
                         },
                         icon: Badge(  
                           isLabelVisible: true,
-                          label: Text('${viewmodel.user.notificationCount}'),
+                          label: viewmodel.user.notificationCount > 0 ? Text('${viewmodel.user.notificationCount}') : null,
                           offset: const Offset(8, 8),
                           child: const Icon(  
                             Icons.notifications,

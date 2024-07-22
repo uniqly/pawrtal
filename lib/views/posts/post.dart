@@ -70,7 +70,8 @@ class _PostViewState extends ConsumerState<PostView> {
                         PostTile(
                           post: widget.post,
                           showDescription: true, 
-                          userInsteadOfPortal: true
+                          userInsteadOfPortal: true,
+                          chatRedirect: false,
                         ),
                         if (snapshot.data!.isEmpty)
                           const Center( 

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pawrtal/models/user/user_model.dart';
 import 'package:pawrtal/views/portals/portal.dart';
+import 'package:pawrtal/views/posts/post.dart';
 import 'package:pawrtal/views/posts/post_image_gallery.dart';
 import 'package:pawrtal/models/posts/post_model.dart';
 import 'package:pawrtal/views/profile/profile.dart';
@@ -12,12 +13,14 @@ class PostTile extends ConsumerStatefulWidget {
   final PostModel post;
   final bool showDescription;
   final bool userInsteadOfPortal;
+  final bool chatRedirect;
   
   PostTile({
     super.key,
     required this.post,
     this.showDescription = false,
     this.userInsteadOfPortal = false,
+    this.chatRedirect = true,
   }) { log(post.caption); }
 
   @override
@@ -45,6 +48,43 @@ class _PostTileState extends ConsumerState<PostTile> {
     }
   }
 
+  void _toggleBookmark() async { 
+    if (widget.post.hasBookmark(_currUser)) {
+      log('remove bookmark');
+      await widget.post.removeBookmark(_currUser);
+    } else {
+      log('add to bookmark');
+      await widget.post.addBookmark(_currUser);
+    }
+
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  void _goToPortal(BuildContext context) { 
+    if (widget.userInsteadOfPortal) { 
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => ProfileView(userId: widget.post.poster.uid)), 
+      ); 
+    } else { 
+      Navigator.push(  
+        context, 
+        MaterialPageRoute(builder: (context) => PortalView(portal: widget.post.portal)),
+      );
+    }
+  }
+
+  void _openPost(BuildContext context) { 
+    if (widget.chatRedirect) {
+      Navigator.push( 
+        context,
+        MaterialPageRoute(builder: (context) => PostView(post: widget.post)),
+      );
+    }
+  }
+
   // TODO: Implement likes / bookmark logic
   @override
   Widget build(BuildContext context) {
@@ -53,15 +93,7 @@ class _PostTileState extends ConsumerState<PostTile> {
       children: [ 
         // subportal picture and name
         GestureDetector(
-          onTap: () { 
-            widget.userInsteadOfPortal ? Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => ProfileView(userId: widget.post.poster.uid)), 
-            ) : Navigator.push(  
-              context, 
-              MaterialPageRoute(builder: (context) => PortalView(portal: widget.post.portal)),
-            );
-          },
+          onTap: () => _goToPortal(context),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 6.0),
             child: Row( 
@@ -111,16 +143,15 @@ class _PostTileState extends ConsumerState<PostTile> {
               label: Text('${widget.post.likeCount}'),
             ),
             TextButton.icon(
-              onPressed: () {},
+              onPressed: () => _openPost(context),
               icon: const Icon(Icons.message_outlined),
               label: Text('${widget.post.commentCount}'),
             ),
             IconButton( 
-              onPressed: () {},
-              //icon: _post.isBookmarked
-              //  ? const Icon(Icons.bookmark) 
-              //  : const Icon(Icons.bookmark_outline),
-              icon: const Icon(Icons.bookmark_outline),
+              onPressed: _toggleBookmark,
+              icon: widget.post.hasBookmark(_currUser)
+                ? const Icon(Icons.bookmark)
+                : const Icon(Icons.bookmark_outline),
             ),
           ],
         ),

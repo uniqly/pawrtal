@@ -38,7 +38,7 @@ class _ProfileEditViewState extends ConsumerState<ProfileEditView> {
   void initState() {
     super.initState();
     _profile = ref.read(appUserProvider).value!;
-    _saveEdits = ref.read(profileViewModelNotifierProvider(uid: _profile.uid)).value!.updateProfile;
+    //_saveEdits = ref.read(profileViewModelNotifierProvider(uid: _profile.uid)).value!.updateProfile;
     _displayNameController = TextEditingController();
     _usernameController = TextEditingController();
     _bioController = TextEditingController();
@@ -46,9 +46,9 @@ class _ProfileEditViewState extends ConsumerState<ProfileEditView> {
   }
 
   @override
-  void didChangeDependencies() {
+  void didChangeDependencies() async {
     super.didChangeDependencies();
-    _saveEdits = ref.read(profileViewModelNotifierProvider(uid: _profile.uid)).value!.updateProfile;
+    _saveEdits = (await ref.read(profileViewModelNotifierProvider(uid: _profile.uid).future)).updateProfile;
     _displayNameController.text = _profile.displayName;
     _usernameController.text = _profile.username;
     _bioController.text = _profile.bio;
