@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:pawrtal/viewmodels/profile/profile_viewmodel.dart';
 import 'package:pawrtal/views/messaging/chat_page.dart';
+import 'package:pawrtal/views/notifications/notification_view.dart';
 import 'package:pawrtal/views/profile/profile_communities.dart';
 import 'package:pawrtal/views/profile/profile_edit.dart';
 import 'package:pawrtal/views/profile/profile_likes.dart';
@@ -30,7 +31,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
       //loading: () => const Loading(),
       error: (err, stack) => Text('error: $err'),
       data: (viewmodel) { 
-        final userData = viewmodel.profileInfo;
+        final viewedUser = viewmodel.profile;
         return Container(
           color: Colors.white,
           child: SafeArea(
@@ -56,10 +57,21 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                           onPressed: () {},
                           icon: const Icon(Icons.search),
                         ),
-                        // notifications button
                         IconButton( 
-                          onPressed: () {},
-                          icon: const Icon(Icons.favorite_outline)
+                          onPressed: () { 
+                            Navigator.push( 
+                              context,
+                              MaterialPageRoute(builder: (context) => const NotificationView())
+                            );
+                          },
+                          icon: Badge(  
+                            isLabelVisible: true,
+                            label: viewmodel.currUser.notificationCount > 0 ? Text('${viewmodel.currUser.notificationCount}') : null,
+                            offset: const Offset(8, 8),
+                            child: const Icon(  
+                              Icons.notifications,
+                            ),
+                          )
                         ),
                         // messages button
                         IconButton( 
@@ -88,7 +100,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                                     color: Theme.of(context).colorScheme.secondaryContainer,
                                     image: DecorationImage(
                                       fit: BoxFit.fitWidth,
-                                      image: NetworkImage(userData['banner']),
+                                      image: NetworkImage(viewedUser.banner),
                                     ),
                                   ),
                                 ),
@@ -102,7 +114,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                                       backgroundColor: Colors.white,
                                       radius: 51,
                                       child: CircleAvatar( 
-                                        backgroundImage: NetworkImage(userData['pfp']),
+                                        backgroundImage: NetworkImage(viewedUser.pfp),
                                         radius: 50,
                                       ),
                                     ),
@@ -119,8 +131,8 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                                           onPressed: () { 
                                             Navigator.push(context, MaterialPageRoute(builder: (context) => 
                                               ChatPage(
-                                                receiveUserID: userData['uid'],
-                                                receiverDisplayName: userData['name']
+                                                receiveUserID: viewedUser.uid,
+                                                receiverDisplayName: viewedUser.displayName,
                                               )
                                             ));
                                           },
@@ -171,7 +183,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                                 SizedBox(
                                   height: 40,
                                   child: Text(
-                                    userData['name'],
+                                    viewedUser.displayName,
                                     style: const TextStyle( 
                                       fontSize: 32,
                                       fontWeight: FontWeight.bold,
@@ -179,14 +191,14 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                                   ),
                                 ),
                                 Text(
-                                  '@${userData['username']}',
+                                  '@${viewedUser.username}',
                                   style: TextStyle( 
                                     fontSize: 14,
                                     color: Theme.of(context).colorScheme.surfaceTint,
                                   ),
                                 ),
                                 Text(
-                                  userData['bio'].isEmpty ? '- empty bio -' : userData['bio'],
+                                  viewedUser.bio.isEmpty ? '- empty bio -' : viewedUser.bio,
                                   style: const TextStyle( 
                                     fontSize: 14,
                                   ),
@@ -198,7 +210,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                                       color: Theme.of(context).colorScheme.secondary,
                                     ),
                                     Text(
-                                      userData['location'].isEmpty ? 'Unknown Location' : userData['location'],
+                                      viewedUser.location.isEmpty ? 'Unknown Location' : viewedUser.location,
                                       style: TextStyle( 
                                         color: Theme.of(context).colorScheme.secondary, 
                                       ),
@@ -208,14 +220,14 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                                 Row( 
                                   children: [ 
                                     Text(
-                                      '${NumberFormat.compact().format(userData['following'])} following',
+                                      '${NumberFormat.compact().format(viewedUser.followingCount)} following',
                                       style: const TextStyle( 
                                         fontWeight: FontWeight.bold,
                                       ),   
                                     ),
                                     const SizedBox(width: 20,),
                                     Text(
-                                      '${NumberFormat.compact().format(userData['followers'])} followers',
+                                      '${NumberFormat.compact().format(viewedUser.followerCount)} followers',
                                       style: const TextStyle( 
                                         fontWeight: FontWeight.bold,
                                       ),   
