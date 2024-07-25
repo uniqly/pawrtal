@@ -4,6 +4,8 @@ import 'package:pawrtal/models/portals/portal_model.dart';
 import 'package:pawrtal/views/portals/portal.dart';
 
 class PortalsList extends StatelessWidget {
+  const PortalsList({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,9 +46,9 @@ class PortalsList extends StatelessWidget {
 
                   var portal = portalSnapshot.data!;
                   return ListTile(
-                    leading: portal.picture != null && portal.picture!.isNotEmpty
+                    leading: portal.picture.isNotEmpty
                         ? CircleAvatar(
-                            backgroundImage: NetworkImage(portal.picture!),
+                            backgroundImage: NetworkImage(portal.picture),
                           )
                         : const CircleAvatar(
                             child: Icon(Icons.image),

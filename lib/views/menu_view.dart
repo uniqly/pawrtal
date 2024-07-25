@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:pawrtal/models/user/user_model.dart';
+import 'package:pawrtal/services/auth.dart';
 import 'package:pawrtal/shared/loading.dart';
-import 'package:pawrtal/viewmodels/messaging/message_view.dart';
+import 'package:pawrtal/views/auth/authenticate.dart';
 import 'package:pawrtal/views/events/events_view.dart';
+import 'package:pawrtal/views/messaging/message_view.dart';
+import 'package:pawrtal/views/notifications/notification_view.dart';
 import 'package:pawrtal/views/portals/portal_list.dart';
+import 'package:pawrtal/views/profile/profile_bookmarks.dart';
+import 'package:pawrtal/views/profile/profile_edit.dart';
 
 class MenuView extends StatefulWidget {
   const MenuView({super.key});
@@ -13,7 +20,6 @@ class MenuView extends StatefulWidget {
 }
 
 class _MenuViewState extends State<MenuView> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
   bool loading = false;
 
   @override
@@ -68,26 +74,34 @@ class _MenuViewState extends State<MenuView> {
                         Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => PortalsList()),
+                            builder: (context) => const PortalsList()),
                       );
                       }),
                       _buildGridTile(Icons.settings, 'Profile Settings', () {
                         // Navigate to Profile Settings page
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => const ProfileEditView()));
                       }),
                       _buildGridTile(Icons.notifications, 'Notifications', () {
                         // Navigate to Notifications page
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => const NotificationView()));
                       }),
                       _buildGridTile(Icons.bookmark, 'Saved Posts', () {
                         // Navigate to Saved Posts page
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => const ProfileBookmarksView()));
                       }),
                       _buildGridTile(Icons.logout, 'Logout', () async {
                         setState(() {
                           loading = true;
                         });
-                        await _auth.signOut();
-                        if (mounted) {
-                          Navigator.pushReplacementNamed(context, '/');
-                        }
+                        await AuthService.signOut().then((_) {
+                          if (context.mounted) {
+                            Navigator.pushAndRemoveUntil( 
+                              context,
+                              MaterialPageRoute(builder: (context) => const Authenticate()),
+                              (route) => route.isFirst
+                            );
+                          }
+                        });
                         setState(() {
                           loading = false;
                         });

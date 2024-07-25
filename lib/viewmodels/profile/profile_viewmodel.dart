@@ -14,28 +14,15 @@ class ProfileViewModel {
   static final _db = FirebaseFirestore.instance;
   static final _storage = FirebaseStorage.instance.ref();
 
-  final UserModel _profile;
-  final UserModel _currUser;
+  final UserModel profile;
+  final UserModel currUser;
 
-  ProfileViewModel(this._profile, this._currUser);
+  ProfileViewModel(this.profile, this.currUser);
 
   // get info to display onto page
-  Map<String, dynamic> get profileInfo {
-    return { 
-      "name": _profile.displayName,
-      "username": _profile.username,
-      "pfp": _profile.pfp,
-      "bio": _profile.bio,
-      "banner": _profile.banner,
-      "location": _profile.location,
-      "followers": _profile.followerCount,
-      "following": _profile.followingCount,
-    };
-  }
-
-  bool get isCurrUserProfile => _profile.uid == _currUser.uid;
+  bool get isCurrUserProfile => profile.uid == currUser.uid;
   
-  bool get isUserFollowingProfile => _currUser.isFollowing(_profile);
+  bool get isUserFollowingProfile => currUser.isFollowing(profile);
 
   Future<void> toggleFollow() async {
     // for some reason, updaing curruser first then profile causes desync issues
@@ -43,23 +30,23 @@ class ProfileViewModel {
     log('toggle follow');
     if (isUserFollowingProfile) {
       log('toggle follow: unfollow');
-      await _profile.removeFollower(_currUser);
-      await _currUser.unfollow(_profile);
+      await profile.removeFollower(currUser);
+      await currUser.unfollow(profile);
     } else {
       log('toggle follow: follow');
-      await _profile.addFollower(_currUser);
-      await _currUser.follow(_profile);
-      log('toggle follow after: $_profile');
+      await profile.addFollower(currUser);
+      await currUser.follow(profile);
+      log('toggle follow after: $profile');
     }
-    log('toggle follow: ${_profile.followerCount}');
+    log('toggle follow: ${profile.followerCount}');
   }
-  
+
   // get posts for the user
   Stream<List<PostModel>> get posts {
     // gets the posts ordered in reverse chronological order
-    log('${_profile.dbRef}');
+    log('${profile.dbRef}');
     return _db.collection('posts')
-      .where('poster', isEqualTo: _profile.dbRef)
+      .where('poster', isEqualTo: profile.dbRef)
       .orderBy('timestamp', descending: true)
       .snapshots()
       .asyncMap(
@@ -78,8 +65,8 @@ class ProfileViewModel {
   // gets liked posts of the user excluding self likes
   Stream<List<PostModel>> get likedPosts {
     return _db.collection('posts')
-      .where('likes', arrayContains: _profile.dbRef)
-      .where('poster', isNotEqualTo: _profile.dbRef)
+      .where('likes', arrayContains: profile.dbRef)
+      .where('poster', isNotEqualTo: profile.dbRef)
       .orderBy('timestamp', descending: true)
       .snapshots()
       .asyncMap(
@@ -95,12 +82,26 @@ class ProfileViewModel {
       );
   }
 
+  Stream<List<PostModel>> get bookmarkedPosts {
+    return _db.collection('posts')
+      .where('bookmarks', arrayContains: profile.dbRef)
+      .orderBy('timestamp', descending: true)
+      .snapshots()
+      .asyncMap((querySnapshot) async { 
+        final posts = <PostModel>[];
+        for (var docSnapshot in querySnapshot.docs) {
+          posts.add(await PostModel.postFromSnapshot(docSnapshot));
+        }
+        return posts;
+      });
+  }
+
   // get media from the user
   Stream<List<String>> get media {
     return posts.asyncMap((posts) async { 
       final images = <String>[];
       for (var post in posts) {
-        images.addAll(post.images ?? const Iterable.empty());
+        images.addAll(post.images);
       }
       log('$images');
       return images;
@@ -109,7 +110,7 @@ class ProfileViewModel {
 
   Stream<List<PortalModel>> get portals {
     return _db.collection('portals')
-      .where('members', arrayContains: _profile.dbRef)
+      .where('members', arrayContains: profile.dbRef)
       .orderBy('memberCount', descending: true)
       .snapshots()
       .asyncMap( 
@@ -126,17 +127,17 @@ class ProfileViewModel {
 
   Future<void> updateProfile(File? pfp, File? banner, String displayName, String username, String bio, String location) async { 
     // check for banner to upload 
-    var bannerString = _currUser.banner;
+    var bannerString = currUser.banner;
     if (banner != null) {
-      bannerString = await _storage.child('images/users/${_currUser.uid}-banner.png').putFile(banner).then((snapshot) =>
+      bannerString = await _storage.child('images/users/${currUser.uid}-banner.png').putFile(banner).then((snapshot) =>
         snapshot.ref.getDownloadURL()
       );
     }
 
     // check for pfp to upload
-    var pfpString = _currUser.pfp;
+    var pfpString = currUser.pfp;
     if (pfp != null) {
-      pfpString = await _storage.child('images/users/${_currUser.uid}-pfp.png').putFile(pfp).then((snapshot) =>
+      pfpString = await _storage.child('images/users/${currUser.uid}-pfp.png').putFile(pfp).then((snapshot) =>
         snapshot.ref.getDownloadURL()
       );
     }
@@ -150,7 +151,7 @@ class ProfileViewModel {
       'pfp': pfpString,
     };  
     
-    await _db.collection('users').doc(_currUser.uid).update(updated);
+    await _db.collection('users').doc(currUser.uid).update(updated);
   }
 }
 
@@ -160,7 +161,7 @@ class ProfileViewModelNotifier extends _$ProfileViewModelNotifier {
   Future<ProfileViewModel> build({required String uid}) async {
     log('getting user: $uid');
     final profile = await UserModel(uid).updated;
-    final mainUser = ref.watch(appUserProvider).value!;
-    return ProfileViewModel(profile, mainUser);
+    final currUser = ref.watch(appUserProvider).value!;
+    return ProfileViewModel(profile, currUser);
   }
 }

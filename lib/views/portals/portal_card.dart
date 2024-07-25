@@ -60,7 +60,7 @@ class _PortalCardState extends ConsumerState<PortalCard> {
                     decoration: BoxDecoration(  
                       color: Theme.of(context).colorScheme.surfaceContainerHigh,
                       image: DecorationImage(  
-                        image: NetworkImage(widget.portal.banner!),
+                        image: NetworkImage(widget.portal.banner),
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -76,7 +76,7 @@ class _PortalCardState extends ConsumerState<PortalCard> {
                         backgroundColor: Theme.of(context).colorScheme.surfaceTint,
                         child: CircleAvatar(  
                           radius: 40, 
-                          backgroundImage: NetworkImage(widget.portal.picture!),
+                          backgroundImage: NetworkImage(widget.portal.picture),
                         ),
                       ),
                       const SizedBox(width: 5.0,),
@@ -84,7 +84,7 @@ class _PortalCardState extends ConsumerState<PortalCard> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [  
                           Text(
-                            'p/${widget.portal.name!}',
+                            'p/${widget.portal.name}',
                             style: TextStyle(  
                               color: Theme.of(context).colorScheme.onPrimaryContainer,
                               fontSize: 22,
@@ -92,7 +92,7 @@ class _PortalCardState extends ConsumerState<PortalCard> {
                             ),
                           ),
                           Text(
-                            '${NumberFormat.compact().format(widget.portal.memberCount!)} members', 
+                            '${NumberFormat.compact().format(widget.portal.memberCount)} members', 
                             style: const TextStyle(  
                               fontWeight: FontWeight.bold,
                               fontSize: 14,

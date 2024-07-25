@@ -7,11 +7,11 @@ class PortalModel {
   static final _db = FirebaseFirestore.instance;
 
   final String uid;
-  String? _name;
-  String? _banner;
-  String? _picture;
-  int? _memberCount;
-  List<DocumentReference>? _members;
+  late String _name;
+  late String _banner;
+  late String _picture;
+  late int _memberCount;
+  late List<DocumentReference> _members;
 
   static final Map<String, PortalModel> _cache = {};
 
@@ -21,10 +21,10 @@ class PortalModel {
     return _cache.putIfAbsent(uid, () => PortalModel._internal(uid));
   }
   
-  String? get name => _name;
-  String? get banner => _banner;
-  String? get picture => _picture;
-  int? get memberCount => _memberCount;
+  String get name => _name;
+  String get banner => _banner;
+  String get picture => _picture;
+  int get memberCount => _memberCount;
 
   DocumentReference get dbRef { 
     return _db.collection('portals').doc(uid);
@@ -50,25 +50,25 @@ class PortalModel {
 
   @override
   String toString() {
-    return 'portal: $_name, $_memberCount, ${_members?.map((m) => m.id)}';
+    return 'portal: $_name, $_memberCount, ${_members.map((m) => m.id)}';
   }
 
   bool hasUser(UserModel user) { 
-    return _members!.contains(user.dbRef);
+    return _members.contains(user.dbRef);
   }
 
   Future<void> addUser(UserModel user) async {
     if (!hasUser(user)) {
-      _members!.add(user.dbRef);
-      _memberCount = _memberCount! + 1;
+      _members.add(user.dbRef);
+      _memberCount = _memberCount + 1;
       await dbRef.update({ 'members': FieldValue.arrayUnion([user.dbRef]), 'memberCount': _memberCount });
     }
   }
 
   Future<void> removeUser(UserModel user) async {
     if (hasUser(user)) {
-      _members!.remove(user.dbRef);
-      _memberCount = _memberCount! - 1;
+      _members.remove(user.dbRef);
+      _memberCount = _memberCount - 1;
       await dbRef.update({ 'members': FieldValue.arrayRemove([user.dbRef]), 'memberCount': _memberCount});
     }
   }

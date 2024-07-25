@@ -7,6 +7,7 @@ class PostListView extends StatelessWidget {
   final Stream<List<PostModel>> postStream;
   final bool showDescription;
   final bool userInsteadOfPortal;
+  final bool chatRedirect;
   final String emptyMessage;
 
   const PostListView({
@@ -14,6 +15,7 @@ class PostListView extends StatelessWidget {
     required this.postStream,
     this.showDescription = false,
     this.userInsteadOfPortal = false,
+    this.chatRedirect = true,
     this.emptyMessage = 'No Posts Found',
   });
 

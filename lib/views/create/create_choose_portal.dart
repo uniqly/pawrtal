@@ -135,7 +135,7 @@ class _CreateChoosePortalViewState extends ConsumerState<CreateChoosePortalView>
                                   enabled: true,
                                   selected: index == selectedIndex,
                                   leading: CircleAvatar( 
-                                    backgroundImage: NetworkImage(portal.picture!),
+                                    backgroundImage: NetworkImage(portal.picture),
                                     onBackgroundImageError: (err, s) => const AssetImage(pfpOther),
                                     radius: 35.0,
                                   ),

@@ -47,10 +47,10 @@ class _PostViewState extends ConsumerState<PostView> {
                 backgroundColor: Colors.white,
                 title: GestureDetector(
                   onTap: () { 
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => PortalView(portal: _post.portal!)));
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => PortalView(portal: _post.portal)));
                   },
                   child: Text(
-                    'p/${_post.portal!.name!}',
+                    'p/${_post.portal.name}',
                     style: const TextStyle(  
                       fontWeight: FontWeight.bold
                     ),
@@ -70,7 +70,8 @@ class _PostViewState extends ConsumerState<PostView> {
                         PostTile(
                           post: widget.post,
                           showDescription: true, 
-                          userInsteadOfPortal: true
+                          userInsteadOfPortal: true,
+                          chatRedirect: false,
                         ),
                         if (snapshot.data!.isEmpty)
                           const Center( 
@@ -95,7 +96,7 @@ class _PostViewState extends ConsumerState<PostView> {
                             width: 40,
                             child: CircleAvatar( 
                               backgroundColor: Colors.white,  
-                              backgroundImage: NetworkImage(_user.pfp!),
+                              backgroundImage: NetworkImage(_user.pfp),
                             ),
                           ),
                           const SizedBox(width: 5),
@@ -118,8 +119,11 @@ class _PostViewState extends ConsumerState<PostView> {
                                   filled: true,
                                   suffixIcon: _commentController.text.isNotEmpty ? IconButton( 
                                     onPressed: () async {
+                                      // clear the comment field when pressing the submit button
+                                      final temp = _commentController.text;
+                                      _commentController.text = '';
                                       await widget.post.uploadComment(
-                                        message: _commentController.text,
+                                        message: temp,
                                         commenter: _user
                                       ).whenComplete(() {
                                         const success = SnackBar( 
@@ -132,6 +136,7 @@ class _PostViewState extends ConsumerState<PostView> {
                                           content: Text('Error with upload, $e'),
                                         );
                                         ScaffoldMessenger.of(context).showSnackBar(error);
+                                        _commentController.text = temp;
                                       });
                                     },
                                     icon: const Icon(Icons.send_rounded),

@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:pawrtal/models/notifications/notification_model.dart';
 import 'package:pawrtal/models/portals/portal_model.dart';
 import 'package:pawrtal/models/user/user_model.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -74,6 +75,8 @@ class CreatePostViewModel {
     log('$images');
     
     // upload post to firestore
+    final uploadRef = _db.collection('posts').doc(newUuid);
+    final timestamp = FieldValue.serverTimestamp();
     final upload = { 
       'poster': _db.doc('users/${_poster.uid}'),
       'portal': _db.doc('portals/$_portalId'),
@@ -82,10 +85,15 @@ class CreatePostViewModel {
       'commentCount': 0,
       'likeCount': 0,
       'images': images,
-      'timestamp': FieldValue.serverTimestamp(),
+      'timestamp': timestamp,
     };
-    _db.collection('posts').doc(newUuid).set(upload, SetOptions(merge: true));
-
+    await uploadRef.set(upload, SetOptions(merge: true)) 
+      .then((_) => _poster.notifyFollowers( 
+        data: { 
+          'type': NotificationType.followUpload.name,
+          'post': uploadRef,
+          'timestamp': timestamp,
+      }));
   }
 
 }

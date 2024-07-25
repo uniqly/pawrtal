@@ -1,14 +1,13 @@
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:intl/intl.dart';
 import 'package:pawrtal/models/user/user_model.dart';
 
 class CommentModel {
   final String uid;
-  UserModel? _poster;
-  String? _message;
-  Timestamp? _timestamp;
+  late UserModel _poster;
+  late String _message;
+  late Timestamp _timestamp;
 
   static final Map<String, CommentModel> _cache = {};
 
@@ -18,25 +17,9 @@ class CommentModel {
     return _cache.putIfAbsent(uid, () => CommentModel._internal(uid));
   }
 
-  UserModel? get poster => _poster;
-  String? get message => _message;
-  DateTime? get postedDate => _timestamp?.toDate();
-
-  String get postedDateString { 
-    if (postedDate != null) {
-      final now = DateTime.now();
-      final time = DateFormat.Hm().format(postedDate!);
-      if (now.day == postedDate!.day) { // posted today
-        return 'Today at $time';
-      } else if (now.day == postedDate!.day + 1) {
-        return 'Yesterday at $time';
-      } else {
-        final date = DateFormat.yMd().format(postedDate!);
-        return '$date at $time';
-      }
-    }
-    return 'unknown date';
-  }
+  UserModel get poster => _poster;
+  String get message => _message;
+  DateTime get postedDate => _timestamp.toDate();
 
   @override
   String toString() {

@@ -2,7 +2,6 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pawrtal/models/posts/post_model.dart';
 import 'package:pawrtal/models/user/user_model.dart';
-import 'package:pawrtal/test/test_user.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'home_viewmodel.g.dart';
@@ -26,7 +25,7 @@ class HomeViewModel {
           for (var docSnapshot in querySnapshot.docs) {
             //await PostModel.postFromSnapshot(docSnapshot).then((post) => posts.add(post));
             final post = await PostModel.postFromSnapshot(docSnapshot);
-            log(post.caption ?? '');
+            log(post.caption);
             posts.add(post);
           }
           final temp = [for (var p in posts) p.caption];
@@ -40,8 +39,8 @@ class HomeViewModel {
 class HomeViewModelNotifier extends _$HomeViewModelNotifier {
   @override
   Future<HomeViewModel> build() async { 
-    final user = await ref.watch(mainUserProvider.future);
+    final user = await ref.watch(appUserProvider.future);
 
-    return HomeViewModel(user);
+    return HomeViewModel(user!);
   }
 }

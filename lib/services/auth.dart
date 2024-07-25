@@ -110,6 +110,7 @@ class AuthService {
             'followingCount': 0,
             'following': FieldValue.arrayUnion([]),
             'followers': FieldValue.arrayUnion([]),
+            'notificationCount': 0,
             'pfp': pfp,
             'banner': banner,
           });
@@ -150,6 +151,7 @@ class AuthService {
           'followingCount': 0,
           'following': FieldValue.arrayUnion([]),
           'followers': FieldValue.arrayUnion([]),
+          'notificationCount': 0,
           'pfp': pfp,
           'banner': banner,
         });
