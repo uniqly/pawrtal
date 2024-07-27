@@ -2,13 +2,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
+import 'package:pawrtal/models/user/user_model.dart';
 import 'package:pawrtal/services/chat_service.dart';
+import 'package:pawrtal/views/profile/profile.dart';
 
 class ChatPage extends StatefulWidget {
-  final String receiveUserID;
-  final String receiverDisplayName;
+  final UserModel receiver;
 
-  const ChatPage({super.key, required this.receiveUserID, required this.receiverDisplayName});
+  const ChatPage({super.key, required this.receiver});
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -23,7 +24,7 @@ class _ChatPageState extends State<ChatPage> {
     // only send message if there is something to send
     if (_messageController.text.isNotEmpty) {
       await _chatService.sendMessage(
-        widget.receiveUserID, _messageController.text);
+        widget.receiver.uid, _messageController.text);
       
       // clear the text controller affter sending message
       _messageController.clear();
@@ -34,33 +35,41 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.purple[200],
-        title: Text(widget.receiverDisplayName)),
-        body: Column(
-          children: [
-            // messages
-            Expanded(
-              child: _buildMessageList(),
-              ),
+        backgroundColor: Colors.white,
+        title: GestureDetector(
+          onTap: () => Navigator.push(context, MaterialPageRoute(
+            builder: (context) => ProfileView(userId: widget.receiver.uid))),
+          child: Text(
+            '@${widget.receiver.username}', 
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+        )
+      ),
+      body: Column(
+        children: [
+          // messages
+          Expanded(
+            child: _buildMessageList(),
+            ),
 
-              // user input
-              _buildMessageInput(),
-          ],
-        ),
-      );
+            // user input
+            _buildMessageInput(),
+        ],
+      ),
+    );
   }
 
   // build meesage list
   Widget _buildMessageList() {
     return StreamBuilder(
       stream: _chatService.getMesasges(
-        widget.receiveUserID, _firebaseAuth.currentUser!.uid),
+        widget.receiver.uid, _firebaseAuth.currentUser!.uid),
       builder : (context, snapshot) {
         if (snapshot.hasError) {
           return Text('Error${snapshot.error}');
         }
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Text('Loading...');
+          return const Center(child: SizedBox(height: 30, width: 30, child: CircularProgressIndicator()));
         }
 
         final messages = snapshot.data!.docs;
@@ -73,6 +82,26 @@ class _ChatPageState extends State<ChatPage> {
           );
           */
             children: [ 
+              if (messages.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                        decoration: BoxDecoration( 
+                          color: Colors.grey[300],
+                          borderRadius: BorderRadius.circular(12.0),
+                        ),
+                        child: const Text(
+                          'No Messages Yet', 
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               for (var idx = 0; idx < messages.length; idx++) ...[
                 if (idx == 0 || _isDiffDay(messages[idx-1]['timestamp'], messages[idx]['timestamp']))
                   Padding(

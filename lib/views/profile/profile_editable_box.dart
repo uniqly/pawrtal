@@ -39,7 +39,8 @@ class ProfileEditableBox extends StatelessWidget {
           TextFormField( 
             controller: controller,
             decoration: InputDecoration( 
-              prefix: controller.text.isNotEmpty ? prefix : null,
+              //prefix: controller.text.isNotEmpty ? prefix : null,
+              prefix: prefix,
             ),
             onChanged: onChanged,
           )

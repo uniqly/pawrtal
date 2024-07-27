@@ -99,7 +99,7 @@ class _SignInState extends State<SignIn> {
                         setState(() => loading = true);
                         //dynamic result = await _auth.signInWithUsernameAndPassword(username, password);
                         final result = await AuthService.signInWithUsernameAndPassword(username, password);
-                        if (result == null) {
+                        if (result == AuthResult.failure) {
                           setState(() {
                             error = 'Could not sign in with those credentials';
                             loading = false;

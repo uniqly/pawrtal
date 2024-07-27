@@ -49,7 +49,7 @@ class CreatePostViewModel {
         .where('name', isLessThan: endQuery);
       log('query: ($query, $endQuery)');
     }
-    await ref.get().then((querySnapshot) async { 
+    await ref.orderBy('memberCount', descending: true).get().then((querySnapshot) async { 
       for (var docSnapshot in querySnapshot.docs) {
         log('portal: $docSnapshot');
         await PortalModel.portalFromSnapshot(docSnapshot).then((portal) => portals.add(portal));

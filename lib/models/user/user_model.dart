@@ -42,7 +42,7 @@ class UserModel {
     return _cache.putIfAbsent(uid, () => UserModel._internal(uid));
   }
 
-  static Future<UserModel> fromSnapshot({required String uid, required DocumentSnapshot<Map<String, dynamic>> snapshot}) async {
+  static UserModel fromSnapshot({required String uid, required DocumentSnapshot<Map<String, dynamic>> snapshot}) {
     final user = UserModel(uid);
     user._username = snapshot['username'] ?? '<NULL>';
     user._displayName = snapshot['displayName'] ?? '<NO NAME>';

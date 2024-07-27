@@ -131,8 +131,7 @@ class _ProfileViewState extends ConsumerState<ProfileView> {
                                           onPressed: () { 
                                             Navigator.push(context, MaterialPageRoute(builder: (context) => 
                                               ChatPage(
-                                                receiveUserID: viewedUser.uid,
-                                                receiverDisplayName: viewedUser.displayName,
+                                                receiver: viewedUser,
                                               )
                                             ));
                                           },

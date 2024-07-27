@@ -60,7 +60,7 @@ class _WelcomeState extends State<Welcome> {
           children: [
             TextButton(
               onPressed: () {
-                Navigator.pushReplacementNamed(context, '/home');
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const MainApp()));
               },
               child: const Text('Skip'),
             ),

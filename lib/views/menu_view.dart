@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:pawrtal/models/user/user_model.dart';
 import 'package:pawrtal/services/auth.dart';
 import 'package:pawrtal/shared/loading.dart';
 import 'package:pawrtal/views/auth/authenticate.dart';
@@ -72,9 +69,9 @@ class _MenuViewState extends State<MenuView> {
                       }),
                        _buildGridTile(Icons.pets, 'Subpawrtals', () {
                         Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const PortalsList()),
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const PortalsList()),
                       );
                       }),
                       _buildGridTile(Icons.settings, 'Profile Settings', () {

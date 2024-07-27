@@ -1,34 +1,18 @@
 import 'dart:developer';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:pawrtal/models/myuser.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'auth.g.dart';
+
+enum AuthResult { success, takenUsername, alreadyExists, failure }
 class AuthService {
 
   static final FirebaseAuth _auth = FirebaseAuth.instance;
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   static final _storage = FirebaseStorage.instance.ref();
-
-  // create user object based on FirebaseUser
-  static MyUser? _userFromFirebaseUser(User? user) {
-    return user != null ? MyUser(uid: user.uid) : null;
-  }
-
-  // sign in anon
-  static Future<MyUser?> signInAnon() async {
-    try {
-      UserCredential result = await _auth.signInAnonymously(); //AuthResult result = await _auth.signInAnonymously();
-      User? user = result.user; // FirebaseUser user = result.user;
-      return _userFromFirebaseUser(user!);
-    } catch(e) {
-      log('error on anon sign in: $e');
-      return null;
-    }
-  }
 
   Future<String?> getCurrentUserId() async {
     final user = FirebaseAuth.instance.currentUser;
@@ -38,39 +22,50 @@ class AuthService {
     return null; // Return null or handle appropriately if user is not authenticated
   }
 
+  static Future<bool> checkUsernameExists(String username) async {
+    // return true if username exists in Firestore
+    final check = await _firestore.collection('users').where('username', isEqualTo: username).limit(1).get();
+    return check.docs.isNotEmpty;
+  }
+
+  static Future<bool> checkEmailExists(String email) async {
+    // return true if email already has an account
+    final check = await _firestore.collection('users').where('email', isEqualTo: email).limit(1).get();
+    return check.docs.isNotEmpty;
+  }
+
   // sign in with username
-  static Future<MyUser?> signInWithUsernameAndPassword(String input, String password) async {
-    try {
-      String email;
-      // Check if the input is an email
-      bool isEmail = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(input);
-      
-      if (isEmail) {
-        email = input;
-      } else {
-        // Fetch the email associated with the username
-        final userSnapshot = await FirebaseFirestore.instance
-            .collection('users')
-            .where('username', isEqualTo: input)
-            .limit(1)
-            .get();
+  static Future<AuthResult> signInWithUsernameAndPassword(String input, String password) async {
+    String email;
+    // Check if the input is an email
+    bool isEmail = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(input);
+    
+    if (isEmail) {
+      email = input;
+      if (!await checkEmailExists(email)) { // email doesnt exist  
+        return AuthResult.failure;
+      }
+    } else {
+      // Fetch the email associated with the username
+      final userSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('username', isEqualTo: input)
+          .limit(1)
+          .get();
 
-        if (userSnapshot.docs.isEmpty) {
-          throw FirebaseAuthException(
-            code: 'user-not-found',
-            message: 'No user found for that username.',
-          );
-        }
-
-        email = userSnapshot.docs.first.get('email');
+      if (userSnapshot.docs.isEmpty) { // username doesnt exist
+        return AuthResult.failure;
       }
 
-      UserCredential result = await _auth.signInWithEmailAndPassword(email: email, password: password);
-      User? user = result.user;
-      return _userFromFirebaseUser(user);
+      email = userSnapshot.docs.first.get('email');
+    }
+
+    try {
+      await _auth.signInWithEmailAndPassword(email: email, password: password); // attempt to log in
+      return AuthResult.success;
     } catch (e) {
-      log('error on username sign in: $e');
-      return null;
+      log('invalid login: $e');
+      return AuthResult.failure;
     }
   }
 
@@ -125,7 +120,15 @@ class AuthService {
   }
 
   // register with email and password
-  static Future<MyUser?> registerWithEmailandPassword(String email, String username, String password) async {
+  static Future<AuthResult> registerWithEmailandPassword(String email, String username, String password) async {
+    if (await checkEmailExists(email)) {
+      log('account already exists: $email');
+      return AuthResult.alreadyExists;
+    }
+    else if (await checkUsernameExists(username)) {
+      log('username: $username already exists, cannot create account');
+      return AuthResult.takenUsername;
+    }
     try {
       UserCredential result = await _auth.createUserWithEmailAndPassword(email: email, password: password);
       User? user = result.user;
@@ -157,10 +160,10 @@ class AuthService {
         });
       }
       
-      return _userFromFirebaseUser(user);
+      return AuthResult.success;
     } catch(e) {
       log('error while registering: $e');
-      return null;
+      return AuthResult.failure;
     }
   }
 

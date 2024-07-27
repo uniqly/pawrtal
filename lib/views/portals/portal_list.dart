@@ -10,7 +10,7 @@ class PortalsList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.amber[200],
+        backgroundColor: Colors.white,
         title: const Text(
           'Subpawrtals',
           style: TextStyle(
@@ -23,7 +23,7 @@ class PortalsList extends StatelessWidget {
         
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance.collection('portals').snapshots(),
+        stream: FirebaseFirestore.instance.collection('portals').orderBy('memberCount', descending: true).snapshots(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             return const Center(child: CircularProgressIndicator());
@@ -53,8 +53,8 @@ class PortalsList extends StatelessWidget {
                         : const CircleAvatar(
                             child: Icon(Icons.image),
                           ),
-                    title: Text(portal.name ?? 'No Name'),
-                    subtitle: Text('${portal.memberCount ?? 0} members'),
+                    title: Text('p/${portal.name}'),
+                    subtitle: Text('${portal.memberCount} members'),
                     onTap: () { 
                       Navigator.push(context, MaterialPageRoute(builder: (context) => PortalView(portal: portal)));
                     },

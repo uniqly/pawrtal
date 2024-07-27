@@ -36,17 +36,28 @@ class _RegisterState extends State<Register> {
       String password = _passwordController.text;
 
       try {
-        dynamic result = await AuthService.registerWithEmailandPassword(email, username, password);
-        if (result == null) {
-          setState(() {
-            error = 'Registration failed. Please try again.';
-            loading = false;
-          });
-        } else {
-          if (mounted) {
-            log('reg');
-            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Welcome(username: username)));
-          }
+        AuthResult result = await AuthService.registerWithEmailandPassword(email, username, password);
+        switch (result) { 
+          case AuthResult.success:
+            if (mounted) {
+              log('reg');
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Welcome(username: username)));
+            }
+          case AuthResult.alreadyExists:
+            setState(() {
+              error = 'Email is already in use. Please try another email.';
+              loading = false;
+            });
+          case AuthResult.takenUsername: 
+            setState(() {
+              error = 'Username is taken. Please try another username.';
+              loading = false;
+            });
+          case AuthResult.failure:
+            setState(() {
+              error = 'Registration failed. Please try again.';
+              loading = false;
+            });
         }
       } catch (e) {
         log('Error registering user: $e');

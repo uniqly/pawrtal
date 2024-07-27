@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pawrtal/models/user/user_model.dart';
+import 'package:pawrtal/services/auth.dart';
 import 'package:pawrtal/viewmodels/profile/profile_viewmodel.dart';
 
 import 'profile_editable_box.dart';
@@ -136,30 +137,44 @@ class _ProfileEditViewState extends ConsumerState<ProfileEditView> {
                 setState(() { // lock form when button is pressed
                   _notSubmitted = false;
                 });
-                await _saveEdits(_newPfp, _newBanner, _displayNameController.text, 
-                  _usernameController.text, _bioController.text, _locationController.text).whenComplete(() {
-                    const success = SnackBar( 
-                      content: Text('Saved Profile!'),
-                    );
-                    ScaffoldMessenger.of(context).showSnackBar(success);
-                    setState(() {
-                      _notSubmitted = true;
-                      _updatedBanner = false;
-                      _updatedProfile = false;
-                    });
-                    log('edit (pfp after): $_profile');
-                    log('edit: $_hasChanges, $_notSubmitted');
-                    //Navigator.of(context).pop();
-                    //await ref.read(mainUserProvider.notifier).refresh();
-                  }).onError((s, e) { 
-                    final error = SnackBar( 
-                      content: Text('Error with upload, $e'),
-                    );
+                if (_usernameController.text != _profile.username 
+                    && await AuthService.checkUsernameExists(_usernameController.text)) {
+                  const error = SnackBar( 
+                    content: Text('Username already in use, try another username')
+                  );
+                  if (context.mounted) { 
                     ScaffoldMessenger.of(context).showSnackBar(error);
-                    setState(() { // unlock form if unsuccessful
-                      _notSubmitted = true;
-                    });
+                  }
+                  setState(() { // unlock form if unsuccessful
+                    _notSubmitted = true;
+                    _usernameController.text = _profile.username;
                   });
+                } else {
+                  await _saveEdits(_newPfp, _newBanner, _displayNameController.text, 
+                    _usernameController.text, _bioController.text, _locationController.text).whenComplete(() {
+                      const success = SnackBar( 
+                        content: Text('Saved Profile!'),
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(success);
+                      setState(() {
+                        _notSubmitted = true;
+                        _updatedBanner = false;
+                        _updatedProfile = false;
+                      });
+                      log('edit (pfp after): $_profile');
+                      log('edit: $_hasChanges, $_notSubmitted');
+                      //Navigator.of(context).pop();
+                      //await ref.read(mainUserProvider.notifier).refresh();
+                    }).onError((s, e) { 
+                      final error = SnackBar( 
+                        content: Text('Error with upload, $e'),
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(error);
+                      setState(() { // unlock form if unsuccessful
+                        _notSubmitted = true;
+                      });
+                    });
+                }
               } : null,
               child: const Text('Save'), 
             ),

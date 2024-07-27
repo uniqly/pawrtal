@@ -2,7 +2,10 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:pawrtal/models/user/user_model.dart';
 import 'package:pawrtal/views/messaging/chat_page.dart';
+import 'package:pawrtal/views/profile/profile.dart';
+import 'package:timeago_flutter/timeago_flutter.dart';
 class MessageView extends StatefulWidget {
   const MessageView({super.key});
 
@@ -16,7 +19,8 @@ class _MessageViewState extends State<MessageView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.indigo[200],
+        backgroundColor: Colors.white,
+        scrolledUnderElevation: 0.0,
         title: const Text(
           'Users',
           textAlign: TextAlign.left,
@@ -28,7 +32,7 @@ class _MessageViewState extends State<MessageView> {
           ),
         ),
       ),
-      body: StreamBuilder<QuerySnapshot>(
+      body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
         stream: FirebaseFirestore.instance.collection('users').snapshots(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
@@ -45,8 +49,8 @@ class _MessageViewState extends State<MessageView> {
           return ListView.builder(
             itemCount: users.length,
             itemBuilder: (context, index) {
-              var user = users[index];
-              var chatRoomId = ([user.id, currentUser.uid]..sort()).join('_');
+              final user = UserModel.fromSnapshot(uid: users[index].id, snapshot: users[index]);
+              var chatRoomId = ([user.uid, currentUser.uid]..sort()).join('_');
               log('chatroom: $chatRoomId');
               return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
                 stream: FirebaseFirestore.instance
@@ -58,6 +62,7 @@ class _MessageViewState extends State<MessageView> {
                     .snapshots(),
                 builder: (context, messageSnapshot) {
                   String lastMessage = 'No Messages Yet';
+                  dynamic messageData;
                   log('$chatRoomId ${messageSnapshot.hasData}');
                   if (!messageSnapshot.hasData) {
                     return const Center(child: CircularProgressIndicator());
@@ -65,7 +70,7 @@ class _MessageViewState extends State<MessageView> {
                     log(messageSnapshot.error.toString());
                   } else if (messageSnapshot.data!.docs.isNotEmpty) {
                     log('${messageSnapshot.data!.docs}');
-                    final messageData = messageSnapshot.data!.docs.first.data();
+                    messageData = messageSnapshot.data!.docs.first.data();
                     lastMessage = messageData['message'];
                   }
 
@@ -75,18 +80,31 @@ class _MessageViewState extends State<MessageView> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => ChatPage(
-                            receiveUserID: user.id,
-                            receiverDisplayName: user['displayName'] ?? 'No Display Name',
+                            receiver: user,
                           ),
                         ),
                       );
                     },
                     child: ListTile(
-                      leading: CircleAvatar(
-                        backgroundImage: NetworkImage(user['pfp'] ?? 'https://via.placeholder.com/150'),
+                      leading: GestureDetector(
+                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileView(userId: user.uid))),
+                        child: CircleAvatar(
+                          backgroundImage: NetworkImage(user.pfp),
+                        ),
                       ),
-                      title: Text(user['displayName'] ?? 'No Display Name'),
-                      subtitle: Text(lastMessage, style: TextStyle(color: Colors.grey[600]),),
+                      title: Text('${user.displayName} (@${user.username})'),
+                      subtitle: Row(
+                        children: [
+                          Text(lastMessage, style: TextStyle(color: Colors.grey[600]),),
+                          if (lastMessage != 'No Messages Yet') ... [
+                            const Spacer(),
+                            Timeago(
+                              builder: (_, val) => Text(val, style: TextStyle(color: Colors.grey[600])),
+                              date: messageData['timestamp'].toDate()
+                            ),
+                          ]
+                        ],
+                      ),
                     ),
                   );
                 },
