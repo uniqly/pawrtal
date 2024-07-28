@@ -46,10 +46,10 @@ class _CreateEventViewState extends State<CreateEventView> {
 
       // Parse date and time fields if they exist
       _startDateTime = widget.event!.startDateTime;
-      _startDateTimeController.text = DateFormat('yyyy-MM-dd HH:mm').format(_startDateTime!);
+      _startDateTimeController.text = DateFormat('dd MMMM yyyy, HH:mm').format(_startDateTime!);
 
       _endDateTime = widget.event!.endDateTime;
-      _endDateTimeController.text = DateFormat('yyyy-MM-dd HH:mm').format(_endDateTime!);
+      _endDateTimeController.text = DateFormat('dd MMMM yyyy, HH:mm').format(_endDateTime!);
     }
   }
 
