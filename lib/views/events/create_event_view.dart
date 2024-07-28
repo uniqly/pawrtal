@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -13,7 +15,7 @@ class CreateEventView extends StatefulWidget {
   const CreateEventView({super.key, this.event});
 
   @override
-  _CreateEventViewState createState() => _CreateEventViewState();
+  State<CreateEventView> createState() => _CreateEventViewState();
 }
 
 class _CreateEventViewState extends State<CreateEventView> {
@@ -175,11 +177,11 @@ class _CreateEventViewState extends State<CreateEventView> {
         }
 
         // Navigate back to the previous screen
-        if (context.mounted) { 
+        if (mounted) { 
           Navigator.pop(context);
         }
       } catch (e) {
-        print('Error saving event: $e');
+        log('Error saving event: $e');
         // Show an error dialog or handle the error as needed
       }
     } else if (dateValidationMessage != null) {
@@ -208,7 +210,11 @@ class _CreateEventViewState extends State<CreateEventView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.event != null ? 'Edit Event' : 'Create Event'),
+        backgroundColor: Colors.white,
+        title: Text( 
+          widget.event != null ? 'Edit Event' : 'Create Event' ,
+          style: const TextStyle(fontWeight: FontWeight.bold)
+        ),
       ),
       body: Container(
         color: const Color.fromARGB(255, 241, 232, 245),

@@ -1,7 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/widgets.dart';
 import 'package:pawrtal/models/events/events_model.dart';
 import 'package:pawrtal/views/events/event_tile.dart';
 import 'create_event_view.dart';
@@ -70,40 +68,6 @@ class EventsView extends StatelessWidget {
   Widget _buildEvents(Stream<List<EventModel>> eventStream) {
      return StreamBuilder<List<EventModel>>(
       stream: eventStream, 
-      builder: (context, snapshot) { 
-        if (snapshot.hasData) {
-          return ListView( 
-            children: [ 
-              for (var event in snapshot.data!)
-                EventTile(event: event),
-            ],
-          );
-        } else {
-          return const Center(child: SizedBox(height: 30, width: 30, child: CircularProgressIndicator()));
-        }
-      });
-  }
-
-  Widget _buildOngoingEvents() {
-    return StreamBuilder<List<EventModel>>(
-      stream: EventModel.ongoingEvents, 
-      builder: (context, snapshot) { 
-        if (snapshot.hasData) {
-          return ListView( 
-            children: [ 
-              for (var event in snapshot.data!)
-                EventTile(event: event),
-            ],
-          );
-        } else {
-          return const Center(child: SizedBox(height: 30, width: 30, child: CircularProgressIndicator()));
-        }
-      });
-  }
-
-  Widget _buildUpcomingEvents() {
-    return StreamBuilder<List<EventModel>>(
-      stream: EventModel.upcomingEvents, 
       builder: (context, snapshot) { 
         if (snapshot.hasData) {
           return ListView( 
