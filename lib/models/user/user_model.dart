@@ -58,7 +58,7 @@ class UserModel {
     return user;
   }
 
-  DocumentReference get dbRef {
+  DocumentReference<Map<String, dynamic>> get dbRef {
     return _db.collection('users').doc(uid);
   }
 

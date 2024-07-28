@@ -1,9 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:intl/intl.dart';
-import 'package:pawrtal/services/auth.dart';
+import 'package:flutter/widgets.dart';
+import 'package:pawrtal/models/events/events_model.dart';
+import 'package:pawrtal/views/events/event_tile.dart';
 import 'create_event_view.dart';
-import 'event_details_view.dart';
 
 class EventsView extends StatelessWidget {
   const EventsView({super.key});
@@ -12,6 +13,7 @@ class EventsView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.white,
         title: const Text(
           'Events',
           textAlign: TextAlign.left,
@@ -35,22 +37,27 @@ class EventsView extends StatelessWidget {
         ],
       ),
       body: DefaultTabController(
-        length: 2,
+        length: 3,
         child: Column(
           children: <Widget>[
-            const TabBar(
-              tabs: [
-                Tab(text: 'Upcoming'),
-                Tab(text: 'Past'),
-              ],
-              labelColor: Colors.blueAccent,
-              unselectedLabelColor: Colors.grey,
+            Container(
+              color: Colors.white,
+              child: const TabBar(
+                tabs: [
+                  Tab(text: 'Ongoing'),               
+                  Tab(text: 'Upcoming'),
+                  Tab(text: 'Past')
+                ],
+                labelColor: Colors.blueAccent,
+                unselectedLabelColor: Colors.grey,
+              ),
             ),
             Expanded(
               child: TabBarView(
                 children: [
-                  _buildUpcomingEvents(),
-                  _buildPastEvents(),
+                  _buildEvents(EventModel.ongoingEvents),
+                  _buildEvents(EventModel.upcomingEvents),
+                  _buildEvents(EventModel.pastEvents),
                 ],
               ),
             ),
@@ -58,290 +65,57 @@ class EventsView extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget _buildEvents(Stream<List<EventModel>> eventStream) {
+     return StreamBuilder<List<EventModel>>(
+      stream: eventStream, 
+      builder: (context, snapshot) { 
+        if (snapshot.hasData) {
+          return ListView( 
+            children: [ 
+              for (var event in snapshot.data!)
+                EventTile(event: event),
+            ],
+          );
+        } else {
+          return const Center(child: SizedBox(height: 30, width: 30, child: CircularProgressIndicator()));
+        }
+      });
+  }
+
+  Widget _buildOngoingEvents() {
+    return StreamBuilder<List<EventModel>>(
+      stream: EventModel.ongoingEvents, 
+      builder: (context, snapshot) { 
+        if (snapshot.hasData) {
+          return ListView( 
+            children: [ 
+              for (var event in snapshot.data!)
+                EventTile(event: event),
+            ],
+          );
+        } else {
+          return const Center(child: SizedBox(height: 30, width: 30, child: CircularProgressIndicator()));
+        }
+      });
   }
 
   Widget _buildUpcomingEvents() {
-    return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance
-          .collection('events')
-          .where('endDate', isGreaterThanOrEqualTo: DateTime.now().toIso8601String())
-          .snapshots(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        final events = snapshot.data!.docs;
-
-        return ListView.builder(
-          itemCount: events.length,
-          itemBuilder: (context, index) {
-            final event = events[index];
-            final DateTime startDate = DateTime.parse(event['startDate']);
-            final DateTime endDate = DateTime.parse(event['endDate']);
-            final String startTime = event['startTime'];
-            final String endTime = event['endTime'];
-
-            String dateRange;
-            if (startDate == endDate) {
-              dateRange = '${DateFormat('yyyy-MM-dd').format(startDate)} | $startTime - $endTime';
-            } else {
-              dateRange = '${DateFormat('yyyy-MM-dd').format(startDate)} $startTime - ${DateFormat('yyyy-MM-dd').format(endDate)} $endTime';
-            }
-
-            return _buildEventCard(
-              context,
-              event['eventId'],
-              event['eventName'],
-              dateRange,
-              event['eventLocation'],
-              event['eventDescription'],
-              event['eventImage'],
-              event['creatorId'],
-            );
-          },
-        );
-      },
-    );
-  }
-
-  Widget _buildPastEvents() {
-    return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance
-          .collection('events')
-          .where('endDate', isLessThan: DateTime.now().toIso8601String())
-          .snapshots(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        final events = snapshot.data!.docs;
-
-        return ListView.builder(
-          itemCount: events.length,
-          itemBuilder: (context, index) {
-            final event = events[index];
-            final DateTime startDate = DateTime.parse(event['startDate']);
-            final DateTime endDate = DateTime.parse(event['endDate']);
-            final String startTime = event['startTime'];
-            final String endTime = event['endTime'];
-
-            String dateRange;
-            if (startDate == endDate) {
-              dateRange = '${DateFormat('yyyy-MM-dd').format(startDate)} | $startTime - $endTime';
-            } else {
-              dateRange = '${DateFormat('yyyy-MM-dd').format(startDate)} $startTime - ${DateFormat('yyyy-MM-dd').format(endDate)} $endTime';
-            }
-
-            return _buildEventCard(
-              context,
-              event['eventId'],
-              event['eventName'],
-              dateRange,
-              event['eventLocation'],
-              event['eventDescription'],
-              event['eventImage'],
-              event['creatorId'],
-            );
-          },
-        );
-      },
-    );
-  }
-
-  Widget _buildEventCard(BuildContext context, String eventId, String title, String dateRange, String location, String description, String imagePath, String creatorId) {
-    return Card(
-      margin: const EdgeInsets.all(10.0),
-      child: InkWell(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => EventDetailsView(
-                eventId: eventId, // Pass eventId to EventDetailsView
-                title: title,
-                dateRange: dateRange,
-                location: location,
-                description: description,
-                imagePath: imagePath,
-                creatorId: creatorId,
-              ),
-            ),
+    return StreamBuilder<List<EventModel>>(
+      stream: EventModel.upcomingEvents, 
+      builder: (context, snapshot) { 
+        if (snapshot.hasData) {
+          return ListView( 
+            children: [ 
+              for (var event in snapshot.data!)
+                EventTile(event: event),
+            ],
           );
-        },
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _loadEventImage(imagePath),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-              child: Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-              child: Text(
-                dateRange,
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Colors.black,
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-              child: Text(
-                location,
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Colors.black,
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: () {
-                            // Handle "Interested" button press
-                          },
-                          icon: const Icon(Icons.star),
-                          label: const Text('Interested'),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: () {
-                            // Handle "Share" button press
-                          },
-                          icon: const Icon(Icons.share),
-                          label: const Text('Share'),
-                        ),
-                      ),
-                    ],
-                  ),
-                  FutureBuilder<String?>(
-                    future: AuthService().getCurrentUserId(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const CircularProgressIndicator();
-                      }
-                      if (snapshot.hasData) {
-                        String currentUserId = snapshot.data!;
-                        if (creatorId == currentUserId) {
-                          return Padding(
-                            padding: const EdgeInsets.only(top: 10.0),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: ElevatedButton(
-                                    onPressed: () async {
-                                      Map<String, dynamic>? data = await fetchEventData(eventId);
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => CreateEventView(
-                                            eventId: eventId,
-                                            eventData: data,
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                    child: const Text('Edit'),
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  child: ElevatedButton(
-                                    onPressed: () async {
-                                      // Show delete confirmation dialog
-                                      bool? confirmDelete = await showDialog<bool>(
-                                        context: context,
-                                        builder: (context) {
-                                          return AlertDialog(
-                                            title: const Text('Delete Event'),
-                                            content: const Text('Are you sure you want to delete this event?'),
-                                            actions: [
-                                              TextButton(
-                                                onPressed: () {
-                                                  Navigator.of(context).pop(false);
-                                                },
-                                                child: const Text('Cancel'),
-                                              ),
-                                              TextButton(
-                                                onPressed: () {
-                                                  Navigator.of(context).pop(true);
-                                                },
-                                                child: const Text('Delete'),
-                                              ),
-                                            ],
-                                          );
-                                        },
-                                      );
-
-                                      if (confirmDelete == true) {
-                                        await _deleteEvent(eventId);
-                                      }
-                                    },
-                                    child: const Text('Delete'),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        } else {
-                          return Container();
-                        }
-                      } else {
-                        return const Text('User not authenticated');
-                      }
-                    },
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Future<void> _deleteEvent(String eventId) async {
-    try {
-      await FirebaseFirestore.instance.collection('events').doc(eventId).delete();
-    } catch (e) {
-      print('Error deleting event: $e');
-    }
-  }
-
-  Widget _loadEventImage(String? imagePath) {
-    if (imagePath != null && imagePath.isNotEmpty) {
-      return Image.network(
-        imagePath,
-        width: double.infinity,
-        height: 200,
-        fit: BoxFit.cover,
-      );
-    } else {
-      // Display default image
-      return Image.asset(
-        'assets/default_event_image.jpg', // Update this path to your default image
-        width: double.infinity,
-        height: 200,
-        fit: BoxFit.cover,
-      );
-    }
+        } else {
+          return const Center(child: SizedBox(height: 30, width: 30, child: CircularProgressIndicator()));
+        }
+      });
   }
 
   Future<Map<String, dynamic>?> fetchEventData(String eventId) async {

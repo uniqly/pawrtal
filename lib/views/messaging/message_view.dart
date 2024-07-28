@@ -94,10 +94,18 @@ class _MessageViewState extends State<MessageView> {
                       ),
                       title: Text('${user.displayName} (@${user.username})'),
                       subtitle: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(lastMessage, style: TextStyle(color: Colors.grey[600]),),
+                          Flexible(
+                            child: Text(
+                              lastMessage, 
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(color: Colors.grey[600]),
+                            ),
+                          ),
                           if (lastMessage != 'No Messages Yet') ... [
-                            const Spacer(),
+                            const SizedBox(width: 10.0,),
                             Timeago(
                               builder: (_, val) => Text(val, style: TextStyle(color: Colors.grey[600])),
                               date: messageData['timestamp'].toDate()

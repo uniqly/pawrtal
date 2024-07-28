@@ -4,13 +4,13 @@ import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
-import 'package:pawrtal/services/auth.dart'; // Import AuthService
+import 'package:pawrtal/models/events/events_model.dart';
+import 'package:pawrtal/services/auth.dart';
 
 class CreateEventView extends StatefulWidget {
-  final String? eventId; // Add eventId for editing
-  final Map<String, dynamic>? eventData; // Add eventData for editing
+  final EventModel? event;
 
-  const CreateEventView({super.key, this.eventId, this.eventData});
+  const CreateEventView({super.key, this.event});
 
   @override
   _CreateEventViewState createState() => _CreateEventViewState();
@@ -20,148 +20,130 @@ class _CreateEventViewState extends State<CreateEventView> {
   final _formKey = GlobalKey<FormState>();
 
   String _eventName = '';
-  DateTime? _startDate;
-  DateTime? _endDate;
-  TimeOfDay? _startTime;
-  TimeOfDay? _endTime;
+  DateTime? _startDateTime;
+  DateTime? _endDateTime;
   String _eventLocation = '';
   String _eventDescription = '';
-  File? _eventImage;
-  String eventId = '';
+  String _eventImage = '';
   String creatorId = '';
+  File? selectedFile;
 
   final ImagePicker _picker = ImagePicker();
-  final TextEditingController _startDateController = TextEditingController();
-  final TextEditingController _startTimeController = TextEditingController();
-  final TextEditingController _endDateController = TextEditingController();
-  final TextEditingController _endTimeController = TextEditingController();
-
+  final TextEditingController _startDateTimeController = TextEditingController();
+  final TextEditingController _endDateTimeController = TextEditingController();
+  
   @override
   void initState() {
     super.initState();
-
-    // Initialize fields with existing event data if editing
-    if (widget.eventData != null) {
-      _eventName = widget.eventData!['eventName'] ?? '';
-      _eventLocation = widget.eventData!['eventLocation'] ?? '';
-      _eventDescription = widget.eventData!['eventDescription'] ?? '';
+    // check if we are editing the event, and set form state
+    if (widget.event != null) {
+      _eventName = widget.event!.eventTitle;
+      _eventLocation = widget.event!.eventLocation;
+      _eventDescription = widget.event!.description;
+      _eventImage = widget.event!.image;
 
       // Parse date and time fields if they exist
-      if (widget.eventData!['startDate'] != null) {
-        try {
-          _startDate = DateTime.parse(widget.eventData!['startDate']);
-          _startDateController.text = DateFormat('yyyy-MM-dd').format(_startDate!);
-        } catch (e) {
-          print('Error parsing startDate: $e');
-        }
-      }
+      _startDateTime = widget.event!.startDateTime;
+      _startDateTimeController.text = DateFormat('yyyy-MM-dd HH:mm').format(_startDateTime!);
 
-      if (widget.eventData!['endDate'] != null) {
-        try {
-          _endDate = DateTime.parse(widget.eventData!['endDate']);
-          _endDateController.text = DateFormat('yyyy-MM-dd').format(_endDate!);
-        } catch (e) {
-          print('Error parsing endDate: $e');
-        }
-      }
+      _endDateTime = widget.event!.endDateTime;
+      _endDateTimeController.text = DateFormat('yyyy-MM-dd HH:mm').format(_endDateTime!);
+    }
+  }
 
-      if (widget.eventData!['startTime'] != null) {
-        try {
-          _startTime = TimeOfDay.fromDateTime(DateTime.parse(widget.eventData!['startTime']));
-          _startTimeController.text = _startTime!.format(context);
-        } catch (e) {
-          print('Error parsing startTime: $e');
-        }
-      }
-
-      if (widget.eventData!['endTime'] != null) {
-        try {
-          _endTime = TimeOfDay.fromDateTime(DateTime.parse(widget.eventData!['endTime']));
-          _endTimeController.text = _endTime!.format(context);
-        } catch (e) {
-          print('Error parsing endTime: $e');
-        }
-      }
+  String? validateDatesAndTimes() {
+    if (_startDateTime == null || _endDateTime == null) {
+      return 'Start date/time and end date/time cannot be null';
     }
 
-    // Assign eventId for editing or generate a new one for creation
-    eventId = widget.eventId ?? FirebaseFirestore.instance.collection('events').doc().id;
+    if (!_startDateTime!.isBefore(_endDateTime!)) {
+      return 'Start date/time must be before end date/time';
+    }
+
+    return null;
   }
 
   Future<void> _pickImage() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
-        _eventImage = File(pickedFile.path);
+        selectedFile = File(pickedFile.path);
       });
     }
   }
 
   Future<String?> _uploadImage() async {
-    if (_eventImage == null) return null;
+    if (selectedFile == null) {
+      return widget.event != null 
+        ? _eventImage
+        : '';
+    }
 
     final fileName = DateTime.now().millisecondsSinceEpoch.toString();
     final storageRef = FirebaseStorage.instance
         .ref()
         .child('event_images/$fileName');
-    await storageRef.putFile(_eventImage!);
+    await storageRef.putFile(selectedFile!);
     return await storageRef.getDownloadURL();
   }
 
-  Future<void> _selectStartDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
+  Future<void> _selectStartDateTime(BuildContext context) async {
+    final DateTime? pickedDate = await showDatePicker(
       context: context,
-      initialDate: _startDate ?? DateTime.now(),
+      initialDate: _startDateTime ?? DateTime.now(),
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
     );
-    if (picked != null && picked != _startDate) {
-      setState(() {
-        _startDate = picked;
-        _startDateController.text = DateFormat('yyyy-MM-dd').format(picked);
-      });
+    if (pickedDate != null && context.mounted) {
+      final TimeOfDay? pickedTime = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.fromDateTime(_startDateTime ?? DateTime.now()),
+      );
+      if (pickedTime != null) {
+        setState(() {
+          _startDateTime = DateTime(
+            pickedDate.year,
+            pickedDate.month,
+            pickedDate.day,
+            pickedTime.hour,
+            pickedTime.minute,
+          );
+          _startDateTimeController.text = DateFormat('dd MMMM yyyy, HH:mm').format(_startDateTime!);
+        });
+      }
     }
   }
 
-  Future<void> _selectStartTime(BuildContext context) async {
-    final TimeOfDay? picked =
-        await showTimePicker(context: context, initialTime: _startTime ?? TimeOfDay.now());
-    if (picked != null && picked != _startTime) {
-      setState(() {
-        _startTime = picked;
-        _startTimeController.text = picked.format(context);
-      });
-    }
-  }
-
-  Future<void> _selectEndDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
+  Future<void> _selectEndDateTime(BuildContext context) async {
+    final DateTime? pickedDate = await showDatePicker(
       context: context,
-      initialDate: _endDate ?? DateTime.now(),
+      initialDate: _endDateTime ?? DateTime.now(),
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
     );
-    if (picked != null && picked != _endDate) {
-      setState(() {
-        _endDate = picked;
-        _endDateController.text = DateFormat('yyyy-MM-dd').format(picked);
-      });
-    }
-  }
-
-  Future<void> _selectEndTime(BuildContext context) async {
-    final TimeOfDay? picked =
-        await showTimePicker(context: context, initialTime: _endTime ?? TimeOfDay.now());
-    if (picked != null && picked != _endTime) {
-      setState(() {
-        _endTime = picked;
-        _endTimeController.text = picked.format(context);
-      });
+    if (pickedDate != null && context.mounted) {
+      final TimeOfDay? pickedTime = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.fromDateTime(_endDateTime ?? DateTime.now()),
+      );
+      if (pickedTime != null) {
+        setState(() {
+          _endDateTime = DateTime(
+            pickedDate.year,
+            pickedDate.month,
+            pickedDate.day,
+            pickedTime.hour,
+            pickedTime.minute,
+          );
+          _endDateTimeController.text = DateFormat('dd MMMM yyyy, HH:mm').format(_endDateTime!);
+        });
+      }
     }
   }
 
   Future<void> _saveEvent() async {
-    if (_formKey.currentState!.validate()) {
+    final dateValidationMessage = validateDatesAndTimes(); // Call the validateDatesAndTimes method
+    if (_formKey.currentState!.validate() && dateValidationMessage == null) {
       _formKey.currentState!.save();
 
       try {
@@ -174,42 +156,51 @@ class _CreateEventViewState extends State<CreateEventView> {
         // Get the current user ID
         String? creatorId = await AuthService().getCurrentUserId();
 
-        if (widget.eventId != null) {
+        final eventData = {
+          'eventName': _eventName,
+          'startDateTime': _startDateTime,
+          'endDateTime': _endDateTime,
+          'eventLocation': _eventLocation,
+          'eventDescription': _eventDescription,
+          'eventImage': imageUrl,
+          'creatorId': creatorId,
+        };
+
+        if (widget.event != null) {
           // Editing existing event
-          await firestore.collection('events').doc(widget.eventId).update({
-            'eventName': _eventName,
-            'startDate': _startDate?.toIso8601String(),
-            'startTime': _startTime?.format(context),
-            'endDate': _endDate?.toIso8601String(),
-            'endTime': _endTime?.format(context),
-            'eventLocation': _eventLocation,
-            'eventDescription': _eventDescription,
-            'eventImage': imageUrl,
-            'creatorId': creatorId,
-            'eventId': eventId,
-          });
+          await widget.event!.dbRef.update(eventData);
         } else {
           // Creating new event
-          await firestore.collection('events').doc(eventId).set({
-            'eventName': _eventName,
-            'startDate': _startDate?.toIso8601String(),
-            'startTime': _startTime?.format(context),
-            'endDate': _endDate?.toIso8601String(),
-            'endTime': _endTime?.format(context),
-            'eventLocation': _eventLocation,
-            'eventDescription': _eventDescription,
-            'eventImage': imageUrl,
-            'creatorId': creatorId,
-            'eventId': eventId,
-          });
+          await firestore.collection('events').add(eventData);
         }
 
         // Navigate back to the previous screen
-        Navigator.pop(context);
+        if (context.mounted) { 
+          Navigator.pop(context);
+        }
       } catch (e) {
         print('Error saving event: $e');
         // Show an error dialog or handle the error as needed
       }
+    } else if (dateValidationMessage != null) {
+      // Show an error message if date validation fails
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Error'),
+            content: Text(dateValidationMessage),
+            actions: <Widget>[
+              TextButton(
+                child: const Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
     }
   }
 
@@ -217,7 +208,7 @@ class _CreateEventViewState extends State<CreateEventView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.eventId != null ? 'Edit Event' : 'Create Event'),
+        title: Text(widget.event != null ? 'Edit Event' : 'Create Event'),
       ),
       body: Container(
         color: const Color.fromARGB(255, 241, 232, 245),
@@ -226,19 +217,26 @@ class _CreateEventViewState extends State<CreateEventView> {
           key: _formKey,
           child: ListView(
             children: [
-              _eventImage == null
-                  ? Image.asset(
-                      'assets/app/default_image.png',
-                      height: 200.0,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                    )
-                  : Image.file(
-                      _eventImage!,
-                      height: 200.0,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                    ),
+              if (selectedFile != null) 
+                  Image.file(
+                    selectedFile!,
+                    height: 200.0,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  )
+              else widget.event == null
+                ? Image.asset(
+                    'assets/app/default_image.png',
+                    height: 200.0,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  )
+                : Image.network(
+                    _eventImage,
+                    height: 200.0,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  ),
               const SizedBox(height: 10.0),
               TextButton(
                 style: TextButton.styleFrom(backgroundColor: Colors.pink[100]),
@@ -259,88 +257,28 @@ class _CreateEventViewState extends State<CreateEventView> {
                   return null;
                 },
                 onSaved: (value) {
-                  _eventName = value!;
+                  _eventName = value ?? '';
                 },
               ),
               const SizedBox(height: 10.0),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextFormField(
-                      controller: _startDateController,
-                      decoration: const InputDecoration(
-                        labelText: 'Start Date',
-                        border: OutlineInputBorder(),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter a start date';
-                        }
-                        return null;
-                      },
-                      readOnly: true,
-                      onTap: () => _selectStartDate(context),
-                    ),
-                  ),
-                  const SizedBox(width: 10.0),
-                  Expanded(
-                    child: TextFormField(
-                      controller: _startTimeController,
-                      decoration: const InputDecoration(
-                        labelText: 'Start Time',
-                        border: OutlineInputBorder(),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter a start time';
-                        }
-                        return null;
-                      },
-                      readOnly: true,
-                      onTap: () => _selectStartTime(context),
-                    ),
-                  ),
-                ],
+              TextFormField(
+                controller: _startDateTimeController,
+                readOnly: true,
+                decoration: const InputDecoration(
+                  labelText: 'Start Date & Time',
+                  border: OutlineInputBorder(),
+                ),
+                onTap: () => _selectStartDateTime(context),
               ),
               const SizedBox(height: 10.0),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextFormField(
-                      controller: _endDateController,
-                      decoration: const InputDecoration(
-                        labelText: 'End Date',
-                        border: OutlineInputBorder(),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter an end date';
-                        }
-                        return null;
-                      },
-                      readOnly: true,
-                      onTap: () => _selectEndDate(context),
-                    ),
-                  ),
-                  const SizedBox(width: 10.0),
-                  Expanded(
-                    child: TextFormField(
-                      controller: _endTimeController,
-                      decoration: const InputDecoration(
-                        labelText: 'End Time',
-                        border: OutlineInputBorder(),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter an end time';
-                        }
-                        return null;
-                      },
-                      readOnly: true,
-                      onTap: () => _selectEndTime(context),
-                    ),
-                  ),
-                ],
+              TextFormField(
+                controller: _endDateTimeController,
+                readOnly: true,
+                decoration: const InputDecoration(
+                  labelText: 'End Date & Time',
+                  border: OutlineInputBorder(),
+                ),
+                onTap: () => _selectEndDateTime(context),
               ),
               const SizedBox(height: 10.0),
               TextFormField(
@@ -349,14 +287,8 @@ class _CreateEventViewState extends State<CreateEventView> {
                   labelText: 'Event Location',
                   border: OutlineInputBorder(),
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter event location';
-                  }
-                  return null;
-                },
                 onSaved: (value) {
-                  _eventLocation = value!;
+                  _eventLocation = value ?? '';
                 },
               ),
               const SizedBox(height: 10.0),
@@ -367,21 +299,15 @@ class _CreateEventViewState extends State<CreateEventView> {
                   border: OutlineInputBorder(),
                 ),
                 maxLines: 3,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter event description';
-                  }
-                  return null;
-                },
                 onSaved: (value) {
-                  _eventDescription = value!;
+                  _eventDescription = value ?? '';
                 },
               ),
               const SizedBox(height: 20.0),
               ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.pink[100]),
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.pink[200]),
                 onPressed: _saveEvent,
-                child: const Text('Create Event'),
+                child: const Text('Save Event'),
               ),
             ],
           ),
