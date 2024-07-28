@@ -32,8 +32,7 @@ class _NotificationTileState extends State<NotificationTile> {
   }
 
   void _clearNotification() async {
-    await widget.notification.clear()
-      .then((_) => setState(() {}));
+    await widget.notification.clear();
   }
 
   @override
@@ -70,6 +69,8 @@ class _NotificationTileState extends State<NotificationTile> {
           ),
           subtitle: widget.notification.message != null ? Text(
             widget.notification.message!,
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle( 
               color: Theme.of(context).colorScheme.onSecondaryContainer,
             ),
